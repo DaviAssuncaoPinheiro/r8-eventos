@@ -3,7 +3,7 @@ import * as React from 'react'
 import { AnimatePresence, motion, useScroll, useTransform, type HTMLMotionProps } from 'motion/react'
 import { Drawer } from 'vaul'
 import * as SwitchPrimitive from '@radix-ui/react-switch'
-import { ArrowLeft, Check, CloudOff, MessageCircle, Minus, PawPrint, Plus, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Check, CloudOff, MessageCircle, Minus, ImageOff, Plus, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { LogoMark } from '@/components/AppShell'
 import { useDemo } from '@/store'
@@ -482,7 +482,7 @@ export function SafeImg({ src, alt, className, style, draggable }: { src: string
   if (failed)
     return (
       <span role="img" aria-label={alt} className={cn('flex items-center justify-center bg-muted-2 text-ink-4', className)} style={style}>
-        <PawPrint className="size-6" strokeWidth={1.8} />
+        <ImageOff className="size-6" strokeWidth={1.8} />
       </span>
     )
   return <img src={src} alt={alt} className={className} style={style} draggable={draggable} onError={() => setFailed(true)} />
