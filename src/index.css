@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/manrope/wght.css';
+
+/*
+  R8 Eventos · design tokens
+  Painel claro com cartões brancos muito arredondados, navegação em pílulas,
+  preto como cor de ação e o laranja da marca R8 como destaque.
+*/
+
+@theme {
+  --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* superfícies */
+  --color-canvas: #e8e9ec;
+  --color-surface: #f4f5f7;
+  --color-card: #ffffff;
+  --color-muted: #eff0f3;
+  --color-muted-2: #e6e8ec;
+  --color-line: #e7e8ec;
+  --color-line-2: #d9dbe0;
+
+  /* texto */
+  --color-ink: #111214;
+  --color-ink-2: #4a4e57;
+  --color-ink-3: #8a8f99;
+  --color-ink-4: #b9bdc5;
+
+  /* ação */
+  --color-black: #111214;
+  --color-black-2: #1d1f23;
+  --color-brand: #ee6a1c;
+  --color-brand-2: #db5a0f;
+  --color-brand-soft: #ffeadc;
+  --color-brand-ink: #5c2400;
+
+  /* categorias e status */
+  --color-blue: #3d7afa;
+  --color-blue-soft: #e8efff;
+  --color-violet: #7b6cf0;
+  --color-violet-soft: #efedff;
+  --color-green: #2eb46c;
+  --color-green-soft: #e2f6ea;
+  --color-yellow: #f5cf45;
+  --color-yellow-soft: #fdf4d0;
+  --color-yellow-ink: #7a5a00;
+  --color-coral: #e5577e;
+  --color-coral-soft: #fde7ee;
+  --color-red: #e5484d;
+  --color-red-soft: #fde8e8;
+  --color-teal: #1fa7a0;
+  --color-teal-soft: #ddf4f2;
+
+  /* regiões do DF */
+  --color-z-plano: #7b6cf0;
+  --color-z-lagos: #3d7afa;
+  --color-z-guara: #1fa7a0;
+  --color-z-oeste: #2eb46c;
+  --color-z-sul: #f5b83d;
+  --color-z-norte: #e5577e;
+
+  /* tipos de serviço */
+  --color-s-montagem: #3d7afa;
+  --color-s-limpeza: #1fa7a0;
+  --color-s-retirada: #7b6cf0;
+  --color-s-manutencao: #f5b83d;
+
+  /* mapa */
+  --color-river: #c9d6e6;
+  --color-river-2: #b7c7dc;
+  --color-park: #e4f2e2;
+
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-3xl: 34px;
+
+  --shadow-card: 0 1px 2px rgba(17, 18, 20, 0.04), 0 6px 20px -12px rgba(17, 18, 20, 0.1);
+  --shadow-lift: 0 2px 4px rgba(17, 18, 20, 0.04), 0 14px 32px -14px rgba(17, 18, 20, 0.18);
+  --shadow-float: 0 24px 60px -18px rgba(17, 18, 20, 0.32), 0 4px 12px rgba(17, 18, 20, 0.08);
+  --shadow-pill: 0 1px 2px rgba(17, 18, 20, 0.06), 0 2px 8px -2px rgba(17, 18, 20, 0.08), inset 0 1px 0 #fff;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+  button {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .font-display,
+  .font-display-tight {
+    font-family: var(--font-sans);
+    letter-spacing: -0.025em;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  /* rótulo pequeno, sem caixa alta e sem mono */
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-ink-3);
+  }
+  /* hachura diagonal: dias sem atendimento, horários bloqueados */
+  .hatch {
+    background-color: var(--color-muted);
+    background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(17, 18, 20, 0.07) 6px 7px);
+  }
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .3 0 0 0 0 .3 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-2) transparent;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
