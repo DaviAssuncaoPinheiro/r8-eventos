@@ -761,7 +761,7 @@ function StockCard() {
         <div className="flex items-baseline justify-between gap-3">
           <div className="flex items-baseline gap-1.5">
             <span className="num text-[30px] leading-none font-bold tracking-[-0.03em] text-ink">{free}</span>
-            <span className="text-[13px] font-semibold text-ink-3">livres hoje</span>
+            <span className="text-[13px] font-semibold text-ink-3">na base hoje</span>
           </div>
           <span className="num text-[12.5px] font-semibold text-ink-3">de {p.stock}</span>
         </div>

@@ -6,7 +6,7 @@ import { Check, ChevronLeft, ChevronRight, CloudCheck, CloudOff } from 'lucide-r
 import { cn } from '@/lib/utils'
 import { type Job } from '@/data/mock'
 import { useDemo } from '@/store'
-import { notify, useCampo, type Draft } from './campoStore'
+import { checklistDone, itemsOk, notify, useCampo, type Draft } from './campoStore'
 import { contactFirst, firstStepLabel, minutesSince, rentalOf, useJob } from './data'
 import { commitJob } from './finalize'
 import { Btn, ConnectivityBanner, EASE_IOS, Pressable, Screen } from './kit'
@@ -62,6 +62,14 @@ export function useRecordFlow(job: Job, draft: Draft) {
 
   const finish = () => {
     if (saving) return
+    // relatório vazio não vai para o cliente: pede ao menos unidades (ou conferência) e checklist
+    const conf = job.type === 'Montagem' || job.type === 'Retirada'
+    const workDone = conf ? itemsOk(job, draft) > 0 : Object.values(draft.units).some(Boolean)
+    if (!workDone || checklistDone(job, draft) === 0) {
+      notify({ kind: 'app', title: 'Faltam registros', body: `Marque ${conf ? 'a conferência dos itens' : 'as unidades atendidas'} e o checklist antes de enviar o relatório.` })
+      setStep(0)
+      return
+    }
     setSaving(true)
     const rep = commitJob(job, draft)
     const first = contactFirst(rental)

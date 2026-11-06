@@ -181,7 +181,7 @@ export function ProductCards({ splits, group, onPick }: { splits: ProductSplit[]
               </div>
               <div className="mt-1 rounded-[18px] bg-surface p-3.5">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[12.5px] font-semibold text-ink-3">Livres agora</span>
+                  <span className="text-[12.5px] font-semibold text-ink-3">Livres para novas reservas</span>
                   <span className="text-[12.5px] font-semibold text-ink-3">
                     Estoque <span className="num text-ink">{p.stock.toLocaleString('pt-BR')}</span>
                   </span>

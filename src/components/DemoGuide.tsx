@@ -26,6 +26,8 @@ export function DemoGuide() {
     try { localStorage.setItem('r8-guide-closed', '1') } catch {}
   }
   if (typeof window !== 'undefined' && window.innerWidth < 1280) return null
+  // na tela de registro a barra de ações fica no rodapé: o roteiro sai da frente
+  if (/\/campo\/servico\/[^/]+\/registro/.test(loc.pathname)) return null
 
   const step = STEPS[Math.max(0, current)]
   const idx = Math.max(0, current)
