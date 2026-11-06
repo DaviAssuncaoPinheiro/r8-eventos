@@ -1,75 +1,40 @@
-# Vet Domicílio · Design system v2
+# R8 Eventos · Design system
 
-Protótipo clicável (100% mock) de SaaS para veterinários que atendem em domicílio em Manaus. O cliente reprovou a v1 por "cara de IA". A v2 é engenharia reversa de 4 referências do Dribbble, em `/root/.claude/uploads/47345af6-79db-5cfe-8de2-3891a4e567e6/`: `31f35101-image.jpg`, `73303b79-image.jpg`, `8b0cff8e-image.jpg` e `339cb1b3-image.jpg`. **Abra e estude essas imagens antes de codar.**
+Protótipo clicável (100% dados fictícios) do sistema de operação da R8 Eventos, que aluga banheiros químicos, trailers, alambrados, fechamentos, tendas e balcões em Brasília. O protótipo cobre a parte que o Conta Azul não cobre: agenda das equipes, registro de limpeza pelo celular, relatório para o cliente, estoque por data e QR na porta de cada unidade.
 
-## O que copiar de cada referência
-1. **Dashboard de RH, "Planned Absences"** (31f35101): é a linguagem principal do desktop.
-   - Fundo cinza claro (`bg-canvas` fora e `bg-surface` nos painéis). Painéis grandes com raio de 26–28px que agrupam cartões brancos de raio 16–20px.
-   - Navegação em pílulas com ícone e label; a ativa é branca e elevada (`shadow-pill`).
-   - Pilha de avatares com "+N", botões redondos brancos e o padrão "↗ Ver tudo" (`ViewAll`).
-   - Calendário em grade com dias de folga hachurados (`.hatch`), dia de hoje em pílula azul sólida, linha vertical tracejada azul marcando agora, e eventos como barras coloridas com um mini selo branco interno ("• Aprovado").
-   - Cartão amarelo de destaque com pílulas internas (horário, data). Cards de pessoa centralizados com avatar, nome, cargo e uma pílula cinza de progresso ("5/10 tarefas").
-   - Cartão de assistente com a esfera brilhante (`.orb`), saudação centralizada, chips de ação e campo de mensagem.
-2. **logip** (73303b79):
-   - Muito respiro, divisórias de 1px e ícones dentro de círculos cinza (`IconCircle`).
-   - Métricas em linha separadas por divisor vertical, com variação pequena colorida ao lado ("▲ +12%").
-   - Gráfico de linha com duas séries suaves, tooltip preto e linha guia pontilhada.
-   - Lista de tarefas com ícone circular, status com ponto colorido e duração.
-   - Coluna direita com cartão de perfil em fundo cinza, botões redondos de ação e feed de atividade com balão de mensagem azul-claro e anexo.
-3. **Apps de finanças** (8b0cff8e), para o celular:
-   - Cabeçalho escuro (preto com leve gradiente) com o número grande; o conteúdo vem numa folha branca que sobe com cantos arredondados.
-   - Abas em pílula, cartão "Insight" com fundo azul-claro, linhas de lista com valor e chevron, cartão de alerta com fundo vermelho-claro.
-   - Barra de alocação segmentada (`SegmentBar`).
-   - **Dock flutuante preta** com o item ativo em pílula com label.
-4. **App de condomínio** (339cb1b3), para o celular:
-   - Preto com **verde-limão** (`bg-lime`) nos cartões de ação e nas pílulas ativas pretas.
-   - Botões redondos grandes (voltar, chat, sino) e cartões de raio 28px.
-   - Cartões de imagem com rótulo translúcido por cima, e chips de "ação rápida" com ícone em círculo.
+A base visual veio do protótipo Vet Domicílio v2 (painel claro, cartões brancos arredondados, navegação em pílulas). O que mudou foi a marca: o destaque verde-limão virou o **laranja da R8**, e o preto continua como cor de ação.
+
+## Telas
+- **Painel** (`/`): indicadores do dia, mapa do DF com os serviços de cada equipe, carga do caminhão, próximos serviços, estoque e "Precisa de atenção" (avisos do QR, atrasos, falta de estoque, avisos sem resposta).
+- **Agenda** (`/agenda`): semana por equipe, cartões por tipo de serviço, novo serviço.
+- **Locações** (`/locacoes`, `/locacoes/:id`): contratos de obra e evento, itens, unidades, plano de limpeza, histórico e relatório do cliente.
+- **Equipamentos** (`/equipamentos`): estoque por produto, disponibilidade por data, patrimônio com QR.
+- **Regiões** (`/regioes`): demanda por região do DF e escala das equipes.
+- **Avisos** (`/avisos`): mensagens de WhatsApp ao cliente e regras automáticas.
+- **App da equipe** (`/campo/servico/:id`): chegada, registro em 5 etapas (unidades, checklist, fotos, ocorrências, assinatura) e conclusão.
+- **Páginas públicas**: relatório do cliente (`/relatorio/:locacao`) e QR na porta (`/u/:unidade`).
 
 ## Tokens (src/index.css)
 - **Superfícies:** `canvas`, `surface`, `card` (branco), `muted`, `muted-2`, `line`, `line-2`.
 - **Texto:** `ink`, `ink-2`, `ink-3`, `ink-4`.
-- **Ação:** `black` (botão principal, pílula ativa, dock), `lime` (destaque e CTA especial, com texto `ink`), `lime-soft`.
-- **Categorias e status**, sempre o sólido para barras e pontos e o `-soft` para fundos:
-  - `blue` / `blue-soft`
-  - `violet` / `violet-soft`
-  - `green` / `green-soft`
-  - `yellow` / `yellow-soft` / `yellow-ink`
-  - `coral` / `coral-soft`
-  - `red` / `red-soft`
-  - `teal` / `teal-soft`
-- **Zonas:** `z-oeste` (verde), `z-centrooeste` (teal), `z-sul` (amarelo), `z-centrosul` (violeta), `z-norte` (azul), `z-leste` (coral). Os hex estão em `geo.ts`.
-- **Aliases legados:** `paper`, `sage-*`, `terra-*`, `ok`, `warn`, `late`, `info` existem só para não quebrar código antigo. **Migre todo uso para os tokens novos** nos seus arquivos.
-- **Raios:** cartões `rounded-[20px]` a `rounded-[24px]`, painéis `rounded-[28px]`, controles `rounded-full`. Nada de cantos de 6–8px em superfícies.
-- **Sombras:** `shadow-card` (muito sutil), `shadow-pill` (pílulas e botões brancos), `shadow-float` (popovers, dock). Nada de bordas escuras: separe por cor de fundo ou por `line`.
+- **Ação:** `black` (botão principal, pílula ativa, dock) e `brand` (laranja R8 `#ee6a1c`, destaque e "agora"). Sobre `bg-brand` o texto é branco. `brand-soft` com `brand-ink` para fundos claros.
+- **Tipos de serviço** (`--color-s-*`, ver `JOB_TYPE` em `src/lib/status.ts`): Montagem azul, Limpeza teal, Retirada violeta, Manutenção amarelo.
+- **Regiões do DF** (`--color-z-*`): Plano, Lagos, Guará, Oeste, Sul, Norte. Os hex estão em `src/data/geo.ts`.
+- **Status:** `green` (concluído), `brand` (em andamento), `blue` (a caminho), `red` (atraso, falta), `yellow` (atenção).
+- **Raios:** cartões 20 a 24px, painéis 28px, controles `rounded-full`.
+- **Sombras:** `shadow-card`, `shadow-pill`, `shadow-float`. Nada de bordas escuras.
 
 ## Tipografia
-- Uma família só: **Manrope** (`font-sans`). Use pesos 500, 600, 700 e 800.
-- Títulos de página: 28–32px, peso 700, tracking −0.03em. Títulos de cartão: 16–18px, peso 700. Texto: 13–14px, peso 500. Secundário: `text-ink-3`.
-- Números grandes: 28–40px, peso 700, com `num` (tabular).
-- **Proibido:** serifas, mono, caixa alta com tracking (eyebrow em CAPS), labels técnicos estilo terminal.
+- Uma família: **Manrope**, pesos 500 a 800.
+- Títulos de página 28 a 32px peso 700; cartões 16 a 18px peso 700; texto 13 a 14px peso 500. Números com `num`.
+- **Proibido:** serifas, mono, caixa alta com tracking, labels de terminal.
 
 ## Copy, para não ter cara de IA
-- Português do Brasil simples, como nos apps reais: "Visitas de hoje", "Próximas vacinas", "Ver tudo", "Nova visita".
-- **Proibido:**
-  - travessão (— e –);
-  - frases de efeito ou títulos poéticos ("Quem vai a cada zona, e quando", "O sistema sugere, o veterinário confirma");
-  - explicações longas na interface;
-  - emoji decorativo, fora das mensagens de WhatsApp.
-- Títulos de seção são substantivos curtos, como nas referências: "Planned Absences", "Future Events", "Onboarding", "Current Tasks".
+- Português simples, como app de operação: "Serviços de hoje", "Carga do caminhão", "Ver tudo", "Novo serviço".
+- **Proibido:** travessão (— e –), frases de efeito, explicações longas, emoji fora de mensagens de WhatsApp, assistente com esfera ou qualquer elemento que pareça chatbot.
 
-## Componentes (src/components/ui/index.tsx)
-- `Button` (pílulas `primary`, que é preto, e `lime` | `outline` | `ghost` | `subtle` | `danger`), `IconButton` (redondo; tones `card` | `muted` | `black` | `lime` | `ghost`).
-- `Badge` (tones `neutral` | `ok` | `warn` | `late` | `info` | `dark` | `violet` | `lime` | `white`), `Chip` (filtro em pílula; o ativo é preto).
-- `Card` (branco, raio 24px), `Panel` (cinza, que agrupa cartões), `CardHeader`, `ViewAll`.
-- `PetAvatar`, `VetAvatar`, `AvatarStack`, `IconCircle`.
-- `Segmented` (abas em pílula; `tone="dark"` para fundo preto), `Tip`, `NumberTicker`, `CountUp`, `Ring`, `SegmentBar`, `Kbd`, `Divider`, `PageHeader`, `Empty`.
-- **Utilitários CSS:** `.hatch` (hachura), `.orb` (esfera do assistente), `.num`, `.no-scrollbar`, `.scroll-thin`.
-- **Ícones:** `lucide-react`, `strokeWidth` de 1.9 a 2, tamanho 16–19px, quase sempre dentro de um círculo.
-- **Movimento:** `motion/react`, 150–400ms, ease-out. Anime só transform e opacity, com stagger leve. Hover em tudo que é clicável e `active:scale-[.97]` em botões.
-
-## Layout
-- O shell (`AppShell.tsx`) já existe: trilho de ícones à esquerda, pílulas no topo e, no celular, dock preta flutuante. O conteúdo da página fica em `bg-surface` e usa `px-4 md:px-6 pb-6`.
-- Monte a página como no dashboard de RH: grids de cartões brancos (`Card`), às vezes dentro de `Panel`, com gap de 12–16px.
-- Celular a partir de 390px sem scroll horizontal. Deixe espaço no rodapé para a dock (`pb-28`).
-- **Dados e estado:** `src/data/*`, `src/store.ts` e `src/lib/*` (não altere a lógica). Uma ação numa tela reflete nas outras pelo store.
+## Dados e estado
+- `src/data/mock.ts`: empresa, equipes, produtos, clientes, locações, unidades com patrimônio, serviços, ocorrências, avisos, estoque por dia.
+- `src/store.ts`: estado da demonstração (status dos serviços, relatórios salvos pelo app, fotos, ocorrências, avisos). Persistido no navegador; "Reiniciar demonstração" no ícone de engrenagem.
+- `src/lib/history.ts`: checklists por tipo e registro dos serviços já concluídos, usado pela ficha, relatório e QR.
+- Fotos dos produtos em `public/produtos/` (recortes das fotos da própria R8).
