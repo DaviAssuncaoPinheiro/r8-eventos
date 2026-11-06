@@ -72,15 +72,6 @@ export default function Locacoes() {
         <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.03em] text-ink md:text-[32px]">Locações</h1>
         <span className="num inline-flex h-8 items-center rounded-full bg-card px-3 text-[13px] font-bold text-ink-2 shadow-pill">{rows.length}</span>
         <div className="ml-auto flex items-center gap-2">
-          <span className="hidden text-[13px] font-medium text-ink-3 md:inline">
-            <span className="num font-bold text-ink">{brl(monthly)}</span> por mês em obras · <span className="num font-bold text-ink">{events}</span> eventos na semana
-            {attention > 0 && (
-              <>
-                {' '}
-                · <span className="num font-bold text-red">{attention}</span> pedem atenção
-              </>
-            )}
-          </span>
           <Button variant="primary" onClick={() => nav('/agenda?novo=1')}>
             <Plus className="size-4" strokeWidth={2.2} /> Novo serviço
           </Button>
@@ -114,7 +105,7 @@ export default function Locacoes() {
             ]}
           />
           <div className="no-scrollbar -mx-4 flex min-w-0 items-center gap-1.5 overflow-x-auto px-4 md:mx-0 md:px-0">
-            {SITS.map((k) => (
+            {SITS.filter((k) => k === 'todas' || count(k) > 0 || sit === k).map((k) => (
               <Chip key={k} active={sit === k} onClick={() => setSit(k)} className="shrink-0">
                 {k === 'todas' ? 'Todas as situações' : RENTAL_STATUS[k].label}
                 {k !== 'todas' && <span className="num ml-1.5 opacity-70">{count(k)}</span>}
@@ -135,9 +126,7 @@ export default function Locacoes() {
       </div>
 
       <div className="mb-2 flex items-center justify-between px-1 text-[12.5px] font-medium text-ink-3">
-        <span className="num">
-          {filtered.length} de {rows.length} locações
-        </span>
+        <span className="num">{filtering ? `${filtered.length} de ${rows.length}` : ''}</span>
         {filtering && (
           <button onClick={clear} className="font-semibold text-ink-2 underline-offset-2 hover:underline">
             Limpar filtros

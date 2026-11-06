@@ -76,7 +76,6 @@ const toneCls: Record<Tone, string> = {
 export function Badge({ tone = 'neutral', dot, className, children }: { tone?: Tone; dot?: boolean; className?: string; children: React.ReactNode }) {
   return (
     <span className={cn('inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[11.5px] font-semibold leading-none whitespace-nowrap', toneCls[tone], className)}>
-      {dot && <span className="size-1.5 rounded-full bg-current" />}
       {children}
     </span>
   )
@@ -93,7 +92,7 @@ export function Chip({ active, onClick, children, className, color }: { active?:
         className,
       )}
     >
-      {color && <span className="size-2 rounded-full" style={{ background: color }} />}
+      
       {children}
     </button>
   )
@@ -123,7 +122,6 @@ export function CardHeader({ title, eyebrow, action, className }: { title: React
     <div className={cn('flex items-center justify-between gap-3 px-5 pt-5 pb-3', className)}>
       <div className="min-w-0">
         <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">{title}</h3>
-        {eyebrow && <div className="mt-0.5 text-[12.5px] font-medium text-ink-3">{eyebrow}</div>}
       </div>
       {action}
     </div>
@@ -350,7 +348,6 @@ export function PageHeader({ eyebrow, title, description, actions }: { eyebrow?:
     <div className="flex flex-col gap-4 pb-5 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
         <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.03em] text-ink md:text-[32px]">{title}</h1>
-        {(description || eyebrow) && <p className="mt-1.5 max-w-2xl text-[14px] font-medium text-ink-3">{description ?? eyebrow}</p>}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </div>

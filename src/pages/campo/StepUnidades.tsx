@@ -85,7 +85,6 @@ function Unidades({ job, rental, draft, patch, layout, eyebrow }: StepProps) {
                 </span>
                 <span className="min-w-0">
                   <span className="num block text-[15px] font-bold">{u.id}</span>
-                  <span className={cn('block truncate text-[12px] font-medium', on ? 'text-white/55' : 'text-ink-3')}>{u.productId === 'bq' ? 'Standard' : PRODUCT[u.productId].short.replace('Banheiro ', '')}</span>
                 </span>
                 {occ && <span className="absolute top-2 right-2 size-2.5 rounded-full bg-red ring-2 ring-card" title={OCC_KIND[occ.kind].label} />}
               </Pressable>

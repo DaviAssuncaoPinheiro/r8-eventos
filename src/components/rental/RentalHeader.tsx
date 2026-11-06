@@ -39,7 +39,7 @@ export function RentalHeader({ rental, model }: { rental: Rental; model: RentalM
     })
   }
 
-  const chips = [rental.kind === 'obra' ? 'Obra' : 'Evento', itemsLabel(rental.items, 4), period(rental), valueLabel(rental)]
+  const chips = [period(rental), valueLabel(rental)]
 
   const actions = (
     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
@@ -85,34 +85,17 @@ export function RentalHeader({ rental, model }: { rental: Rental; model: RentalM
 
       <div className="mt-4 flex flex-col gap-5 lg:mt-2">
         <div className="flex min-w-0 items-center gap-4 md:gap-5">
-          <motion.div initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} className="relative shrink-0">
-            <RentalAvatar rental={rental} size={112} className="max-md:size-[84px]!" />
-            {live?.status === 'em-andamento' && (
-              <span className="absolute right-1 bottom-1.5 flex size-5 items-center justify-center rounded-full bg-brand ring-[3px] ring-card md:right-2 md:bottom-2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-brand opacity-60" />
-              </span>
-            )}
+          <motion.div initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} className="relative shrink-0 max-md:hidden">
+            <RentalAvatar rental={rental} size={96} />
           </motion.div>
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
               <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.03em] text-ink md:text-[32px]">{rental.title}</h1>
-              {live?.status === 'em-andamento' ? (
-                <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-brand pr-3 pl-1 text-[12px] font-semibold text-white">
-                  <TeamAvatar teamId={live.teamId} size={20} />
-                  {live.type} em andamento
-                </span>
-              ) : live?.status === 'a-caminho' ? (
-                <Badge tone="info" dot>
-                  {TEAM[live.teamId].short} a caminho
-                </Badge>
-              ) : (
-                <Badge tone={st.tone} dot>
-                  {st.label}
-                </Badge>
-              )}
             </div>
-            <div className="mt-1 text-[14px] font-semibold text-ink-2">{client.name}</div>
+            <div className="mt-1 text-[14px] font-semibold text-ink-2">
+              {client.name} · {rental.kind === 'obra' ? 'Obra' : 'Evento'}
+            </div>
             <div className="mt-2.5 flex flex-wrap gap-1.5">
               {chips.map((c) => (
                 <span key={c} className="num inline-flex h-7 items-center rounded-full bg-muted px-3 text-[12.5px] font-semibold text-ink-2">
@@ -122,8 +105,8 @@ export function RentalHeader({ rental, model }: { rental: Rental; model: RentalM
             </div>
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px] font-medium text-ink-3">
               {live ? (
-                <span>
-                  {TEAM[live.teamId].name} · {live.note}
+                <span className="font-semibold text-ink-2">
+                  {live.type} {live.status === 'em-andamento' ? 'agora' : 'a caminho'} com a {TEAM[live.teamId].name}
                 </span>
               ) : model.next ? (
                 <span>
@@ -131,11 +114,6 @@ export function RentalHeader({ rental, model }: { rental: Rental; model: RentalM
                 </span>
               ) : (
                 <span>Nada agendado</span>
-              )}
-              {rental.eventDays && (
-                <span>
-                  {fmt.short(rental.eventDays[0]) === fmt.short(rental.eventDays[1]) ? `Evento em ${fmt.short(rental.eventDays[0])}` : `Evento de ${fmt.short(rental.eventDays[0])} a ${fmt.short(rental.eventDays[1])}`}
-                </span>
               )}
             </div>
           </div>

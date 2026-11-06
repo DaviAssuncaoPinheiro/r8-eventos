@@ -41,7 +41,7 @@ export function DayTimeline({ off, teams, all, freshId }: { off: number; teams: 
                   {zones.length ? (
                     zones.map((z) => (
                       <span key={z} className="inline-flex h-5 items-center gap-1 rounded-full px-2 text-[10.5px] font-bold text-ink" style={{ background: zoneTint(z, 22) }}>
-                        <span className="size-1.5 rounded-full" style={{ background: ZONE[z].hex }} />
+                        
                         {ZONE[z].short}
                       </span>
                     ))

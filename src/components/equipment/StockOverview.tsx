@@ -7,7 +7,7 @@ import { Badge, Card, IconCircle, ProductThumb, SegmentBar } from '@/components/
 import { PRODUCT, qtyLabel, type ProductGroup } from '@/data/mock'
 import { daysFromToday } from '@/data/time'
 import { cn } from '@/lib/utils'
-import { dayLabel, rangeLabel, type ProductSplit, type ShortageGroup } from './model'
+import { dayLabel, dayNum, rangeLabel, type ProductSplit, type ShortageGroup } from './model'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -55,10 +55,6 @@ export function ShortageAlert({ groups, onShowDay }: { groups: ShortageGroup[]; 
                   <h2 className="mt-0.5 text-[19px] leading-snug font-bold tracking-[-0.02em] text-ink">
                     Faltam <span className="num">{g.deficit}</span> {unitName} {rangeLabel(g.days)}
                   </h2>
-                  <p className="mt-1 text-[13px] leading-snug font-medium text-ink-2">
-                    Estoque de <span className="num">{p.stock}</span>. No pico, {dayLabel(g.peakOffset).toLowerCase()}, as reservas somam{' '}
-                    <span className="num">{p.stock + g.deficit}</span> com as obras em andamento e a manutenção.
-                  </p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 lg:justify-end">
@@ -152,7 +148,6 @@ export function ProductCards({ splits, group, onPick }: { splits: ProductSplit[]
     <div>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1">
         <Legend />
-        <span className="text-[12.5px] font-medium text-ink-3">Reservado: o que já tem data marcada nos próximos 14 dias</span>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {list.map((s, i) => {
@@ -171,7 +166,6 @@ export function ProductCards({ splits, group, onPick }: { splits: ProductSplit[]
                 <ProductThumb productId={p.id} size={56} rounded="xl" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[15px] font-bold text-ink">{p.short}</div>
-                  <div className="truncate text-[12.5px] font-medium text-ink-3">{p.note}</div>
                 </div>
                 {s.falta > 0 ? (
                   <Badge tone="late">Faltam {s.falta}</Badge>

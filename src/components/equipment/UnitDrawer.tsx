@@ -129,7 +129,7 @@ function Body({ unitId, onClose }: { unitId: string; onClose: () => void }) {
           <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[13px] font-medium text-ink-3">
             {p.name}
             <span className="inline-flex items-center gap-1.5 font-semibold text-ink-2">
-              <span className="size-2 rounded-full" style={{ background: st.dot }} />
+              
               {st.label}
             </span>
           </div>

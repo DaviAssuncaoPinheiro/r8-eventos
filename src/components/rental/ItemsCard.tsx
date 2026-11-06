@@ -51,9 +51,6 @@ export function ItemsCard({ rental, occurrences }: { rental: Rental; occurrences
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div className="min-w-0">
           <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Itens da locação</h3>
-          <div className="mt-0.5 text-[12.5px] font-medium text-ink-3">
-            {onSite ? 'No local, com patrimônio e QR na porta' : rental.status === 'montagem' ? 'Patrimônio definido na montagem' : 'Já recolhidos'}
-          </div>
         </div>
       </div>
       <ul className="px-5 pt-2 pb-4">
@@ -73,13 +70,9 @@ export function ItemsCard({ rental, occurrences }: { rental: Rental; occurrences
                 <ProductThumb productId={it.productId} size={48} rounded="xl" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-bold text-ink">{p.name}</div>
-                  <div className="truncate text-[12.5px] font-medium text-ink-3">{p.note}</div>
                 </div>
                 <div className="shrink-0 text-right">
                   <div className="num text-[15px] font-bold text-ink">{qtyLabel(it.productId, it.qty)}</div>
-                  <div className="num text-[11.5px] font-medium text-ink-3">
-                    {brl(price)} {daily ? 'por dia' : 'por mês'}
-                  </div>
                 </div>
               </div>
               {ids.length > 0 && <UnitChips ids={ids} openUnits={openUnits} />}

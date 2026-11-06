@@ -12,7 +12,7 @@ export function ZoneChip({ id, size = 'sm', className }: { id: ZoneId; size?: 'x
       className={cn('inline-flex items-center gap-1.5 rounded-full font-semibold whitespace-nowrap text-ink', size === 'xs' ? 'h-5 px-2 text-[10.5px]' : 'h-6 px-2.5 text-[11.5px]', className)}
       style={{ background: zoneTint(id, 20) }}
     >
-      <span className="size-1.5 rounded-full" style={{ background: z.hex }} />
+      
       {z.short}
     </span>
   )
@@ -58,5 +58,5 @@ export function CapacityBar({ ratio, className }: { ratio: number; className?: s
 
 /** Selo branco dentro da barra, igual ao "• Aprovado" da referência */
 export function InnerBadge({ children }: { children: React.ReactNode }) {
-  return <span className="inline-flex h-[18px] shrink-0 items-center rounded-full bg-white px-2 text-[10px] leading-none font-bold whitespace-nowrap text-ink shadow-[0_1px_2px_rgba(17,18,20,.12)]">• {children}</span>
+  return <span className="inline-flex h-[18px] shrink-0 items-center rounded-full bg-white px-2 text-[10px] leading-none font-bold whitespace-nowrap text-ink shadow-[0_1px_2px_rgba(17,18,20,.12)]">{children}</span>
 }

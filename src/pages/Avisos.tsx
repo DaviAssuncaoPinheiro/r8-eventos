@@ -98,68 +98,6 @@ export default function Avisos() {
         }
       />
 
-      {/* indicadores */}
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)]">
-        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE }} className="flex flex-col rounded-[28px] bg-black p-5 text-white sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="text-[13.5px] font-medium text-white/60">Relatórios abertos pelos clientes</div>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="num text-[52px] leading-none font-bold tracking-[-0.04em]">{Math.round(KPIS.reportsOpened * 100)}</span>
-                <span className="text-[22px] font-bold text-white/70">%</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-[13px] font-medium text-white/60">Resposta ao QR</div>
-              <div className="num mt-2 text-[26px] leading-none font-bold tracking-[-0.02em]">{KPIS.avgResponseH.toLocaleString('pt-BR')} h</div>
-              <div className="num mt-1 text-[12px] font-medium text-white/45">antes {KPIS.avgResponseHPrev.toLocaleString('pt-BR')} h</div>
-            </div>
-          </div>
-          <div className="mt-auto pt-5">
-            <div className="h-2 overflow-hidden rounded-full bg-white/12">
-              <motion.div className="h-full rounded-full bg-brand" initial={{ width: 0 }} animate={{ width: `${KPIS.reportsOpened * 100}%` }} transition={{ duration: 1, ease: EASE }} />
-            </div>
-            <div className="mt-2.5 flex justify-between text-[12.5px] font-medium text-white/55">
-              <span>Links de limpeza enviados no mês</span>
-              <span className="num">{KPIS.cleaningsMonth} enviados</span>
-            </div>
-          </div>
-        </motion.section>
-
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: EASE, delay: 0.05 }}
-          onClick={() => setKind(kind === 'montagem' ? 'todos' : 'montagem')}
-          className={cn('flex flex-col rounded-[28px] bg-card p-5 text-left shadow-card transition-shadow hover:shadow-lift sm:p-6', kind === 'montagem' && 'ring-2 ring-black')}
-        >
-          <IconCircle tone="blue" size={40}>
-            <Truck size={18} strokeWidth={1.9} />
-          </IconCircle>
-          <div className="mt-auto pt-6 text-[13.5px] font-medium text-ink-3">Montagens confirmadas</div>
-          <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="num text-[34px] leading-none font-bold tracking-[-0.03em] text-ink">{montOk}</span>
-            <span className="num text-[16px] font-semibold text-ink-3">de {montagens.length}</span>
-          </div>
-          <div className="mt-2 text-[12.5px] font-medium text-ink-3">Hoje e amanhã, com horário e acesso combinados</div>
-        </motion.button>
-
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: EASE, delay: 0.1 }}
-          onClick={() => setKind(kind === 'retirada' ? 'todos' : 'retirada')}
-          className={cn('flex flex-col rounded-[28px] bg-card p-5 text-left shadow-card transition-shadow hover:shadow-lift sm:p-6', kind === 'retirada' && 'ring-2 ring-black')}
-        >
-          <IconCircle tone={pendentes.length ? 'red' : 'green'} size={40}>
-            <ArrowUpFromLine size={18} strokeWidth={1.9} />
-          </IconCircle>
-          <div className="mt-auto pt-6 text-[13.5px] font-medium text-ink-3">Retiradas e renovações sem resposta</div>
-          <div className="num mt-1 text-[34px] leading-none font-bold tracking-[-0.03em] text-ink">{pendentes.length}</div>
-          <div className="mt-2 text-[12.5px] font-medium text-ink-3">{pendentes.length ? 'Vale uma ligação antes de mandar o caminhão' : 'Tudo respondido'}</div>
-        </motion.button>
-      </div>
-
       {/* filtros */}
       <div className="mt-5 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">

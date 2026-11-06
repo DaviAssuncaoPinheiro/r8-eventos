@@ -74,9 +74,6 @@ export function PhotosCard({ photos }: { photos: PhotoItem[] }) {
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div>
           <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Fotos</h3>
-          <div className="mt-0.5 text-[12.5px] font-medium text-ink-3">
-            {photos.length} {photos.length === 1 ? 'foto tirada' : 'fotos tiradas'} pela equipe{fresh ? ` · ${fresh} hoje` : ''}
-          </div>
         </div>
       </div>
       {photos.length === 0 ? (

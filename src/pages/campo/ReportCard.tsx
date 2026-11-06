@@ -46,42 +46,10 @@ export function ReportCard({ job, rep, className, delay = 0.75 }: { job: Job; re
       <div className="flex items-center justify-between px-3 pt-3 pb-3">
         <div>
           <h3 className="text-[17px] font-bold tracking-[-0.02em]">Relatório do cliente</h3>
-          <div className="text-[13px] font-medium text-white/55">Link para {first} acompanhar</div>
         </div>
         <span className="inline-flex h-7 items-center rounded-full bg-brand px-2.5 text-[12px] font-bold text-white">Pronto</span>
       </div>
 
-      {/* prévia em miniatura */}
-      <Pressable scale={0.985} onClick={() => nav(href)} aria-label="Abrir relatório" className="block w-full rounded-[22px] bg-surface p-3 text-left text-ink">
-        <div className="flex items-center gap-2">
-          <LogoMark size={22} />
-          <span className="text-[12px] font-bold">{COMPANY.name}</span>
-          <span className="ml-auto text-[11px] font-semibold text-ink-3">{dateShort(rep.finishedAt)}</span>
-        </div>
-        <div className="mt-3 flex items-center gap-3 rounded-[16px] bg-card p-2.5 shadow-card">
-          <RentalAvatar rental={r} size={42} />
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[14px] font-bold">{r.title}</div>
-            <div className="line-clamp-2 text-[11.5px] leading-snug font-medium text-ink-3">{rep.summary}</div>
-          </div>
-        </div>
-        <div className="mt-2 grid grid-cols-2 gap-1.5">
-          {rows.map((x) => (
-            <span key={x.text} className="flex h-8 min-w-0 items-center gap-1.5 rounded-full bg-card px-2.5 text-[11.5px] font-semibold text-ink-2 shadow-card">
-              <x.icon className="size-3.5 shrink-0 text-ink" strokeWidth={2} />
-              <span className="truncate">{x.text}</span>
-            </span>
-          ))}
-        </div>
-        {photos.length > 0 && (
-          <div className="mt-2 flex gap-1.5">
-            {photos.slice(0, 4).map((p) => (
-              <SafeImg key={p.id} src={p.src} alt={p.label} className="size-11 rounded-[12px] object-cover" />
-            ))}
-            {photos.length > 4 && <span className="flex size-11 items-center justify-center rounded-[12px] bg-card text-[12px] font-bold">+{photos.length - 4}</span>}
-          </div>
-        )}
-      </Pressable>
 
       <div className="mt-2 flex flex-col gap-2 min-[440px]:grid min-[440px]:grid-cols-2">
         <Pressable onClick={() => nav(href)} className="inline-flex h-12 items-center justify-center gap-1.5 rounded-full bg-white/10 px-3 text-[14px] font-semibold text-white hover:bg-white/15">

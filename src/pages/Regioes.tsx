@@ -116,7 +116,6 @@ export default function Regioes() {
       <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.03em] text-ink md:text-[32px]">Regiões</h1>
-          <p className="mt-1.5 text-[14px] font-medium text-ink-3">Escala das equipes por região do DF e dia da semana</p>
         </div>
         <Button variant="outline" onClick={() => nav('/agenda')} className="self-start sm:self-auto">
           <CalendarDays className="size-4" strokeWidth={2} /> Agenda das equipes
@@ -129,7 +128,6 @@ export default function Regioes() {
           <div className="flex flex-col gap-3 px-2 pt-2 pb-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Mapa de calor</h2>
-              <p className="mt-0.5 text-[12.5px] font-medium text-ink-3">Serviços por região às {dayInfo.plural}, últimas 8 semanas</p>
             </div>
             <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
               <Segmented value={String(day)} onChange={(v) => setDay(Number(v))} options={DAYS.map((x) => ({ value: String(x.d), label: x.short }))} />
@@ -154,17 +152,6 @@ export default function Regioes() {
               <span className="num text-[12px] font-semibold text-ink-3">0</span>
               <span className="h-2 w-32 rounded-full" style={{ background: `linear-gradient(90deg, ${[0, 0.25, 0.5, 0.75, 1].map((t) => heatColor(t)).join(',')})` }} />
               <span className="num text-[12px] font-semibold text-ink-3">{HEAT_MAX} serviços</span>
-            </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {TEAMS.map((v) => {
-                const zs = plan[v.id][day] ?? []
-                return (
-                  <span key={v.id} className="inline-flex h-8 items-center gap-1.5 rounded-full bg-muted pr-3 pl-1 text-[12px] font-semibold text-ink-2">
-                    <TeamAvatar teamId={v.id} size={24} />
-                    <span className={cn(!zs.length && 'text-ink-4')}>{zs.length ? zs.map((z) => ZONE[z].short).join(' e ') : 'Folga'}</span>
-                  </span>
-                )
-              })}
             </div>
           </div>
         </Card>
@@ -234,13 +221,6 @@ function Insight({ applied, onApply, onUndo, onShow }: { applied: boolean; onApp
           <h2 className="mt-3.5 text-[19px] leading-snug font-bold tracking-[-0.02em] text-ink">
             {zoneName} sem equipe às {plurals}
           </h2>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed font-medium text-brand-ink">
-            A {team.name} já atende o Plano Piloto nesses dias. Dá para incluir os Lagos pela Ponte JK na mesma saída.
-          </p>
-          <div className="mt-4">
-            <div className="mb-2 text-[12.5px] font-bold text-brand-ink">{zoneName} na semana</div>
-            <WeekDots covered={SUGGEST.covered} added={SUGGEST.days} />
-          </div>
           <div className="mt-4 flex gap-2">
             <Button variant="primary" onClick={onApply} className="flex-1">
               Aplicar à escala <ArrowRight className="size-4" />
@@ -264,10 +244,6 @@ function Insight({ applied, onApply, onUndo, onShow }: { applied: boolean; onApp
           <p className="mt-3 text-[13.5px] leading-relaxed font-medium text-white/65">
             A {team.name} cobre Plano Piloto e Lagos às {plurals}.
           </p>
-          <div className="mt-4">
-            <div className="mb-2 text-[12.5px] font-bold text-white/60">{zoneName} na semana</div>
-            <WeekDots covered={[...SUGGEST.covered, ...SUGGEST.days]} added={SUGGEST.days} dark />
-          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -281,7 +257,6 @@ function ZonePanel({ zone, onZone, plan, day }: { zone: ZoneId | null; onZone: (
     <Panel className="bg-muted">
       <div className="px-3 pt-3 pb-3">
         <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Regiões</h2>
-        <p className="mt-0.5 text-[12.5px] font-medium text-ink-3">Serviços por dia da semana e tempo de caminhão a partir da base</p>
       </div>
       <ul className="grid grid-cols-1 items-start gap-2 md:grid-cols-2 lg:grid-cols-1">
         {ZONES.map((z) => {
@@ -302,18 +277,10 @@ function ZonePanel({ zone, onZone, plan, day }: { zone: ZoneId | null; onZone: (
                 </span>
                 <SegmentBar className="mt-3" parts={DAYS.map(({ d }) => ({ value: HEATMAP[z.id][d - 1], color: coverage(plan, z.id, d).length ? z.hex : 'var(--color-coral-soft)' }))} />
                 <span className="mt-2.5 flex items-center gap-2 text-[12px] font-medium text-ink-3">
-                  <span className="truncate">{days.length ? days.map((x) => x.short).join(', ') : 'Sem dia fixo'}</span>
-                  <span className="text-ink-4">·</span>
-                  <span className="num shrink-0">
-                    {rentals.length} {rentals.length === 1 ? 'locação' : 'locações'}
-                  </span>
-                  {off > 0 && <span className="num ml-auto shrink-0 font-semibold text-coral">{off} fora da escala</span>}
-                </span>
-                <span className="mt-1.5 flex items-center gap-2 text-[12px] font-medium text-ink-3">
                   <Clock className="size-3.5 shrink-0" strokeWidth={2} />
                   <span className="num">{travelMinutesFromBase(z.id)} min da base</span>
                   <span className="text-ink-4">·</span>
-                  <span className="num">{toilets} banheiros no local hoje</span>
+                  <span className="num">{toilets} banheiros hoje</span>
                 </span>
               </button>
               <AnimatePresence initial={false}>
@@ -428,9 +395,6 @@ function CoverageTable({
         <div className="flex items-center justify-between gap-3 px-2 pt-2 pb-3">
           <div className="min-w-0">
             <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Escala da semana</h2>
-            <p className="mt-0.5 text-[12.5px] font-medium text-ink-3">
-              <span className="num font-semibold text-coral">{totalOff}</span> serviços fora da escala em 8 semanas
-            </p>
           </div>
           <ViewAll onClick={() => nav('/agenda')}>Agenda</ViewAll>
         </div>

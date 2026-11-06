@@ -68,7 +68,7 @@ export function StepFotos({ job, rental, layout, eyebrow }: StepProps) {
           {moments.map((m) => (
             <Chip key={m.id} size="sm" on={moment === m.id} onClick={() => setMoment(m.id)}>
               {m.label}
-              {current.some((p) => p.moment === m.id) && <span className={cn('size-1.5 rounded-full', moment === m.id ? 'bg-brand' : 'bg-green')} />}
+              
             </Chip>
           ))}
         </div>

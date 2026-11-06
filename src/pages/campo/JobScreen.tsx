@@ -169,7 +169,7 @@ function JobDetail({ job }: { job: Job }) {
       <div className="relative mx-4 h-[248px] overflow-hidden rounded-[32px]">
         <JobHero job={job} />
         <span className="absolute top-3 left-3 inline-flex h-8 items-center gap-1.5 rounded-full bg-white/80 px-3 text-[12.5px] font-bold text-ink backdrop-blur-md">
-          <span className={cn('size-2 rounded-full', status === 'em-andamento' ? 'bg-brand' : status === 'concluido' ? 'bg-green' : status === 'a-caminho' ? 'bg-blue' : 'bg-ink-4')} />
+          
           {st.label}
         </span>
         <div className="absolute inset-x-3 bottom-3 flex items-center gap-3 rounded-[22px] bg-white/78 px-3 py-2.5 backdrop-blur-xl">
@@ -196,22 +196,6 @@ function JobDetail({ job }: { job: Job }) {
       <div className="px-5 pt-5">
         <h1 className="text-[30px] leading-[1.05] font-bold tracking-[-0.035em] text-ink">{rental.title}</h1>
         <div className="mt-1.5 text-[14.5px] font-medium text-ink-3">{client.name}</div>
-        <div className="no-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5">
-          <span className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-card pr-4 pl-1.5 text-[14px] font-semibold text-ink shadow-pill">
-            <span className="flex size-8 items-center justify-center rounded-full bg-muted">
-              <ClipboardList className="size-4" strokeWidth={2} />
-            </span>
-            {scopeLabel(job)}
-          </span>
-          <span className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-card pr-4 pl-1.5 text-[14px] font-semibold text-ink shadow-pill">
-            <TeamAvatar teamId={team.id} size={32} />
-            {team.name}
-          </span>
-          <span className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-card pr-4 pl-3.5 text-[14px] font-semibold text-ink shadow-pill">
-            <span className="size-2.5 rounded-full" style={{ background: zone.hex }} />
-            {b.name}
-          </span>
-        </div>
       </div>
 
       {canArrival && (
@@ -219,7 +203,6 @@ function JobDetail({ job }: { job: Job }) {
           <RentalAvatar rental={rental} size={48} className="ring-2 ring-brand" />
           <span className="min-w-0 flex-1">
             <span className="block text-[15.5px] font-bold">Ver cartão de chegada</span>
-            <span className="block truncate text-[12.5px] font-medium text-white/55">Acesso, contato e o que fazer</span>
           </span>
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white">
             <ArrowUpRight className="size-[18px]" strokeWidth={2.2} />
@@ -304,9 +287,8 @@ export function LastCard({ flow, className }: { flow: Flow; className?: string }
         Última limpeza
       </div>
       <div className="mt-2.5 text-[16px] font-bold text-ink">{stamp(last.report.finishedAt)}</div>
-      <div className="mt-0.5 line-clamp-2 text-[13.5px] leading-snug font-medium text-ink-2">{last.report.summary}</div>
       <div className="mt-3 text-[13px] font-bold text-blue">
-        {relDays(last.report.finishedAt)} · {TEAM[last.job.teamId].name} · {n} {n === 1 ? 'unidade' : 'unidades'}
+        {relDays(last.report.finishedAt)} · {TEAM[last.job.teamId].name}
       </div>
     </div>
   )
@@ -322,7 +304,6 @@ export function ItemsCard({ job, className }: { job: Job; className?: string }) 
     <div className={cn('rounded-[28px] bg-card p-2 shadow-card', className)}>
       <div className="flex items-baseline justify-between px-3 pt-3 pb-1">
         <h3 className="text-[16px] font-bold tracking-[-0.02em] text-ink">{job.type === 'Montagem' ? 'Vai para o local' : job.type === 'Retirada' ? 'Volta para a base' : 'No local'}</h3>
-        <span className="text-[12.5px] font-semibold text-ink-3">{rental.code}</span>
       </div>
       <ul>
         {items.map((it, i) => (
@@ -335,7 +316,6 @@ export function ItemsCard({ job, className }: { job: Job; className?: string }) 
       </ul>
       {units.length > 0 && (
         <div className="mx-1 mt-1 mb-1 rounded-[20px] bg-surface p-3">
-          <div className="text-[12.5px] font-semibold text-ink-3">Patrimônio com QR na porta</div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {shown.map((u) => (
               <span key={u.id} className="num inline-flex h-7 items-center rounded-full bg-card px-2.5 text-[12px] font-bold text-ink shadow-pill">
@@ -379,7 +359,7 @@ export function ContactCard({ flow, className, desk }: { flow: Flow; className?:
           <div className="min-w-0 text-[14.5px] leading-snug">
             <div className="font-bold text-ink">{rental.address}</div>
             <div className="mt-1 flex items-center gap-1.5 text-[13px] font-medium text-ink-3">
-              <span className="size-1.5 rounded-full" style={{ background: zone.hex }} />
+              
               {b.name}, Brasília
             </div>
           </div>

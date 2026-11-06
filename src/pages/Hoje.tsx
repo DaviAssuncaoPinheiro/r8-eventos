@@ -134,9 +134,6 @@ export default function Hoje() {
           <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.03em] text-ink md:text-[32px]">
             {greeting()}, {firstName(CURRENT_USER.name)}
           </h1>
-          <p className="mt-1.5 text-[14px] font-medium text-ink-3">
-            {all.length} serviços hoje com {TEAMS.length} caminhões
-          </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="hidden text-[14px] font-semibold text-ink-2 sm:inline">{dateTxt}</span>
@@ -149,10 +146,9 @@ export default function Hoje() {
         </div>
       </div>
 
-      <Metrics stops={all} />
 
       {/* mapa + serviços de hoje */}
-      <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:h-[680px] lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:h-[680px] lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_420px]">
         <MapCard stops={byTeam[teamId]} byTeam={byTeam} teamId={teamId} onTeam={(id) => pickTeam(id)} sel={sel} onSel={setSel} />
         <JobsPanel stops={byTeam[teamId]} teamId={teamId} selected={sel} onHover={setSel} onAll={() => nav('/agenda')} />
       </div>
@@ -315,17 +311,7 @@ function MapCard({ stops, byTeam, teamId, onTeam, sel, onSel }: { stops: Stop[];
           ariaLabel={`Serviços de hoje da ${team.name}`}
         />
 
-        <div className="pointer-events-none absolute top-3 left-3 hidden max-w-[calc(100%-120px)] items-center gap-2 rounded-full bg-card/95 py-1.5 pr-3.5 pl-1.5 shadow-pill backdrop-blur-sm sm:flex">
-          <TeamAvatar teamId={teamId} size={26} />
-          <span className="truncate text-[12.5px] font-semibold text-ink">{team.truck}</span>
-          <span className="num shrink-0 text-[12px] font-semibold text-ink-3">{team.plate}</span>
-        </div>
-
         <span className="pointer-events-none absolute right-3 bottom-3 inline-flex h-8 items-center gap-2 rounded-full bg-black pr-3.5 pl-3 text-[12.5px] font-semibold text-white shadow-pill sm:top-3 sm:bottom-auto">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-brand" />
-          </span>
           Agora <span className="num">{hhmm(NOW_MIN)}</span>
         </span>
 
@@ -368,9 +354,6 @@ function JobsPanel({ stops, teamId, selected, onHover, onAll }: { stops: Stop[];
       <div className="flex items-center justify-between gap-3 px-3 pt-3 pb-3">
         <div className="min-w-0">
           <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Serviços de hoje</h2>
-          <p className="mt-0.5 truncate text-[12.5px] font-medium text-ink-3">
-            {team.name}, {joinE(team.members.map(firstName))}
-          </p>
         </div>
         <ViewAll onClick={onAll} />
       </div>
@@ -383,7 +366,6 @@ function JobsPanel({ stops, teamId, selected, onHover, onAll }: { stops: Stop[];
                 <div className="flex items-center gap-2 px-2 pb-2">
                   <span className="size-2.5 shrink-0 rounded-full" style={{ background: ZONE[z].hex }} />
                   <span className="shrink-0 text-[13.5px] font-bold whitespace-nowrap text-ink">{ZONE[z].name}</span>
-                  <span className="min-w-0 truncate text-[12.5px] font-medium text-ink-3">{joinE([...new Set(ss.map((s) => bairroOf(s.job).name))])}</span>
                 </div>
                 <ol className="flex flex-col gap-2">
                   {ss.map((s, i) => (
@@ -456,13 +438,7 @@ function JobCard({ s, i, selected, onHover, onOpen }: { s: Stop; i: number; sele
       <button onClick={onOpen} className="grid w-full grid-cols-[44px_40px_minmax(0,1fr)_auto] items-center gap-x-3 text-left" aria-label={`Abrir ${j.type.toLowerCase()} em ${r.title}`}>
         <div className="leading-tight">
           <div className={cn('num text-[14px] font-bold', done ? 'text-ink-3' : live ? 'text-white' : 'text-ink')}>{hhmm(s.startMin)}</div>
-          {j.fixedTime ? (
-            <span className={cn('mt-0.5 inline-flex items-center gap-0.5 text-[11px] font-semibold', live ? 'text-white/50' : 'text-ink-3')}>
-              <Lock className="size-2.5" strokeWidth={2.4} /> fixo
-            </span>
-          ) : (
-            <div className={cn('num mt-0.5 text-[11px] font-semibold', live ? 'text-white/50' : 'text-ink-4')}>{durFmt(j.durationMin)}</div>
-          )}
+          {j.fixedTime && <Lock className={cn('mt-1 size-3', live ? 'text-white/50' : 'text-ink-4')} strokeWidth={2.4} aria-label="Horário combinado" />}
         </div>
         <TypeIcon job={j} live={live} done={done} />
         <div className={cn('min-w-0', done && 'opacity-70')}>
@@ -554,9 +530,6 @@ function TruckLoad({ teamId, stops }: { teamId: string; stops: Stop[] }) {
       <div className="flex items-center justify-between gap-3 px-3 pt-3 pb-3">
         <div className="min-w-0">
           <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Carga do caminhão</h2>
-          <p className="mt-0.5 truncate text-[12.5px] font-medium text-ink-3">
-            {team.truck}, serviços que faltam hoje
-          </p>
         </div>
         <Button variant="outline" size="sm" onClick={copy} disabled={!items.length}>
           <Copy className="size-3.5" strokeWidth={2} /> Copiar lista
@@ -586,7 +559,7 @@ function TruckLoad({ teamId, stops }: { teamId: string; stops: Stop[] }) {
                     <Check className="-mx-0.5 size-3" strokeWidth={3} /> Carga pronta
                   </Badge>
                 ) : (
-                  <span className="text-[12.5px] font-medium text-ink-3">Toque para marcar</span>
+                  null
                 )}
               </div>
             </div>
@@ -631,7 +604,6 @@ function TruckLoad({ teamId, stops }: { teamId: string; stops: Stop[] }) {
                             </span>
                             <span className="min-w-0 flex-1">
                               <span className={cn('block truncate text-[13.5px] font-semibold transition-colors', on ? 'text-ink-3 line-through decoration-ink-4' : 'text-ink')}>{it.label}</span>
-                              <span className="mt-0.5 block truncate text-[12px] font-medium text-ink-3">{joinE(it.forSites.map((t) => shortTitle({ title: t } as Rental)))}</span>
                             </span>
                             <span className={cn('num inline-flex h-7 shrink-0 items-center rounded-full px-2.5 text-[12px] font-semibold', on ? 'bg-muted text-ink-3' : 'bg-muted text-ink')}>{loadQtyLabel(it)}</span>
                           </button>
@@ -662,7 +634,6 @@ function SectionHead({ title, sub, action }: { title: string; sub?: React.ReactN
     <div className="flex items-center justify-between gap-3 px-3 pt-3 pb-3">
       <div className="min-w-0">
         <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">{title}</h2>
-        {sub && <p className="mt-0.5 truncate text-[12.5px] font-medium text-ink-3">{sub}</p>}
       </div>
       {action}
     </div>
@@ -704,11 +675,10 @@ function NextJobs({ byTeam, onPick, onAll }: { byTeam: Record<string, Stop[]>; o
                   <div className="truncate text-[15px] font-bold text-ink">
                     {shortTitle(r)}, {j.type.toLowerCase()}
                   </div>
-                  <div className={cn('mt-0.5 line-clamp-1 text-[13px] font-medium', hot ? 'text-yellow-ink' : 'text-ink-3')}>{j.note}</div>
                 </div>
                 {hot && (
                   <span className="inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full bg-card px-2.5 text-[11.5px] font-semibold text-ink">
-                    <span className="size-1.5 rounded-full bg-ink" />
+                    
                     em {durFmt(s.startMin - NOW_MIN)}
                   </span>
                 )}
@@ -723,7 +693,6 @@ function NextJobs({ byTeam, onPick, onAll }: { byTeam: Record<string, Stop[]>; o
                   </InfoPill>
                 </div>
                 <AvatarStack size={32}>
-                  <RentalAvatar rental={r} size={32} />
                   <TeamAvatar teamId={j.teamId} size={32} />
                 </AvatarStack>
               </div>
@@ -796,9 +765,8 @@ function StockCard() {
           </IconCircle>
           <span className="min-w-0 flex-1">
             <span className="block text-[14px] leading-snug font-bold text-ink">
-              Faltam <span className="num">{worst}</span> banheiros {first.offset === last.offset ? onWeekday(dayDate(first.offset)) : `de ${fmt.weekdayShort(dayDate(first.offset))} a ${fmt.weekdayShort(dayDate(last.offset))}`}
+              Faltam <span className="num">{worst}</span> banheiros {first.offset === last.offset ? `em ${ddmm(first.offset)}` : `de ${ddmm(first.offset)} a ${ddmm(last.offset)}`}
             </span>
-            <span className="mt-0.5 block text-[12.5px] leading-snug font-medium text-ink-2">Festival, corrida e congresso nos mesmos dias. Sublocar ou remanejar.</span>
           </span>
           <ArrowRight className="mt-1 size-4 shrink-0 text-red" strokeWidth={2.2} />
         </button>
@@ -806,6 +774,8 @@ function StockCard() {
     </Panel>
   )
 }
+
+const ddmm = (offset: number) => fmt.date(dayDate(offset)).slice(0, 5)
 
 const dayDate = (offset: number) => {
   const d = new Date(TODAY)
@@ -868,9 +838,6 @@ function Teams({ byTeam, activeTeam, onPick }: { byTeam: Record<string, Stop[]>;
                 <span className={cn('absolute right-0 bottom-0 size-3.5 rounded-full ring-[3px] ring-card', state.dot)} />
               </span>
               <span className="mt-3 w-full truncate text-[13.5px] font-bold text-ink">{t.name}</span>
-              <span className="w-full truncate text-[12px] font-medium text-ink-3">
-                {t.truck.replace(/ · .*$/, '')}, {zonesTxt(zonesOf(stops))}
-              </span>
               <span className="mt-3 inline-flex h-7 max-w-full items-center gap-1.5 rounded-full bg-muted px-2.5 text-[11.5px] font-semibold text-ink-2">
                 <ClipboardCheck className="size-3.5 shrink-0 text-ink-3" strokeWidth={2} />
                 <span className="num">
@@ -1049,7 +1016,7 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
         icon: Boxes,
         title: (
           <>
-            Faltam {worst} {worst === 1 ? p.unit[0] : p.unit[1]} entre {fmt.weekdayShort(dayDate(list[0].offset))} e {fmt.weekdayShort(dayDate(list[list.length - 1].offset))}
+            Faltam {worst} {worst === 1 ? p.unit[0] : p.unit[1]} de {ddmm(list[0].offset)} a {ddmm(list[list.length - 1].offset)}
           </>
         ),
         sub: 'Reservas confirmadas passam do estoque. Veja quem disputa as unidades.',

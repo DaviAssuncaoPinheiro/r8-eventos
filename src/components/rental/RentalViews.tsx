@@ -41,7 +41,7 @@ export const valueLabel = (r: RentalRow['rental']) => (r.kind === 'obra' ? `${br
 function Status({ r }: { r: RentalRow }) {
   return (
     <span className="inline-flex items-center gap-2 text-[13px] font-semibold whitespace-nowrap text-ink">
-      <span className="size-2 rounded-full" style={{ background: DOT[r.rental.status] }} />
+      
       {RENTAL_STATUS[r.rental.status].label}
     </span>
   )
@@ -69,7 +69,7 @@ function NextJob({ job }: { job?: Job }) {
   const live = job.status === 'em-andamento'
   return (
     <span className="inline-flex min-w-0 items-center gap-2 text-[13px] whitespace-nowrap">
-      <span className="size-2 shrink-0 rounded-full" style={{ background: live ? 'var(--color-brand)' : t.color }} />
+      
       <span className="font-semibold text-ink">{job.type}</span>
       <span className={cn('num font-medium', live ? 'text-brand' : 'text-ink-3')}>{live ? 'agora' : `${relDays(job.start)}, ${fmt.time(job.start)}`}</span>
     </span>
@@ -126,7 +126,7 @@ export function RentalTable({ rows, sort, onSort }: { rows: RentalRow[]; sort: S
               <td className="px-3 leading-tight">
                 <div className="max-w-[190px] truncate text-[13px] font-medium text-ink">{r.client.name}</div>
                 <span className="mt-1 inline-flex items-center gap-1.5 text-[12px] font-medium whitespace-nowrap text-ink-3">
-                  <span className="size-1.5 rounded-full" style={{ background: ZONE[r.zone].hex }} />
+                  
                   {r.bairroName}
                 </span>
               </td>

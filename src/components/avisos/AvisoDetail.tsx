@@ -10,7 +10,6 @@ import { AVISO_KIND, AVISO_STATUS, JOB_TYPE } from '@/lib/status'
 import { cn, lowerFirst } from '@/lib/utils'
 import { useDemo } from '@/store'
 import { baseTemplate, buildMessage, dm, placeOf, VARIABLES, varsOf, zoneName, type Item } from './data'
-import { WhatsAppPhone } from './WhatsAppPhone'
 
 /** Editor de mensagem: variáveis {assim} destacadas sobre o texto */
 function Highlighted({ text }: { text: string }) {
@@ -164,17 +163,6 @@ export function AvisoDetail({ item, custom, onCustom, onClose }: { item: Item; c
           {a.status === 'programado' && <Row label="Envio">{a.kind === 'limpeza' ? 'Quando a equipe finalizar' : <span className="num">{dm(a.sendDate)} às {fmt.time(a.sendDate)}</span>}</Row>}
         </Card>
 
-        <div className="mt-3 rounded-[24px] bg-muted px-3 py-6">
-          <WhatsAppPhone
-            item={item}
-            message={buildMessage(item, occurrences, tpl)}
-            onQuick={(b) => {
-              if (b === 'Ver relatório') nav(`/relatorio/${rental.id}`)
-              else toast(`Resposta rápida: "${b}"`, { description: 'O cliente responde com um toque.' })
-            }}
-          />
-        </div>
-
         <div className="mt-3 flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => nav(`/locacoes/${rental.id}`)}>
             <ArrowUpRight size={14} strokeWidth={2} /> Abrir locação
@@ -192,13 +180,10 @@ export function AvisoDetail({ item, custom, onCustom, onClose }: { item: Item; c
           )}
         </div>
 
-        <AnimatePresence initial={false}>{editing && <MessageEditor vars={vars} value={tpl} onChange={(v) => onCustom(a.id, v)} onReset={() => onCustom(a.id, undefined)} />}</AnimatePresence>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 bg-card px-5 py-3.5">
-        <Button variant={editing ? 'brand' : 'subtle'} size="md" onClick={() => setEditing((v) => !v)} className="mr-auto">
-          <Pencil size={15} strokeWidth={1.9} /> {editing ? 'Concluir' : 'Editar'}
-        </Button>
+        <span className="mr-auto" />
         {!confirmed && (
           <Button variant="outline" size="md" onClick={confirm}>
             <CheckCheck size={15} strokeWidth={1.9} /> Confirmado

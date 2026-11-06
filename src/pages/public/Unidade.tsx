@@ -40,7 +40,7 @@ function Header() {
       <LogoMark size={40} />
       <div className="min-w-0 leading-tight">
         <div className="text-[15px] font-bold tracking-[-0.01em] text-ink">{COMPANY.name}</div>
-        <div className="text-[12.5px] font-medium text-ink-3">Banheiros e estruturas · {COMPANY.city}</div>
+        <div className="text-[12.5px] font-medium text-ink-3">{COMPANY.city}</div>
       </div>
     </motion.header>
   )
@@ -186,7 +186,6 @@ function UnitView({ unitId }: { unitId: string }) {
                 <div className="mt-3 flex items-center gap-2.5 rounded-[16px] bg-surface px-3 py-2.5">
                   <TeamAvatar teamId={last.job.teamId} size={28} />
                   <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink-2">{TEAM[last.job.teamId].name}</span>
-                  <span className="text-[12px] font-medium text-ink-3">Sucção, lavagem e reposição</span>
                 </div>
               )}
               <div className="mt-3 flex items-center gap-3 border-t border-line pt-3">
@@ -239,7 +238,6 @@ function UnitView({ unitId }: { unitId: string }) {
               </button>
               <div className="min-w-0">
                 <h2 className="text-[20px] leading-tight font-bold tracking-[-0.02em] text-ink">Qual é o problema?</h2>
-                <p className="text-[13px] font-medium text-ink-3">Unidade {unitId}</p>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de problema">
@@ -316,9 +314,6 @@ function UnitView({ unitId }: { unitId: string }) {
         )}
       </AnimatePresence>
 
-      <motion.footer {...rise(5)} className="mt-8 text-center text-[12.5px] font-medium text-ink-4">
-        {COMPANY.name} · {COMPANY.site} · WhatsApp {COMPANY.whatsapp}
-      </motion.footer>
     </Shell>
   )
 }

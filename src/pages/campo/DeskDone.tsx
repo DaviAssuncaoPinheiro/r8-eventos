@@ -8,7 +8,7 @@ import { contactFirst, doneTitle } from './data'
 import { EASE_OUT } from './kit'
 import { useGo } from './nav'
 import { ReportCard } from './ReportCard'
-import { AnimatedCheck, durationOf, NextJobCard, SendStatus, SignOffCard, StatCards, useDoneReport, WhatsAppPreview } from './DoneScreen'
+import { AnimatedCheck, durationOf, NextJobCard, SendStatus, SignOffCard, StatCards, useDoneReport } from './DoneScreen'
 import { DeskTitleRow } from './DeskJob'
 
 export function DeskDone() {
@@ -49,10 +49,7 @@ export function DeskDone() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4, ease: EASE_OUT }} className="mt-4 grid items-start gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <div className="flex min-w-0 flex-col gap-4">
           <StatCards job={job} rep={rep} className="gap-3 xl:grid-cols-4" delay={0.3} />
-          <div className="grid gap-4 xl:grid-cols-2">
-            <WhatsAppPreview job={job} rep={rep} />
-            <SignOffCard rep={rep} />
-          </div>
+          <SignOffCard rep={rep} />
           <NextJobCard job={job} onOpen={(nid) => go(`/servico/${nid}`, { dir: 1 })} />
         </div>
         <div className="flex min-w-0 flex-col gap-4">

@@ -14,7 +14,7 @@ function StateDot({ state }: { state: UnitState }) {
   const s = STATE_LABEL[state]
   return (
     <span className="inline-flex items-center gap-2 text-[13px] font-semibold whitespace-nowrap text-ink">
-      <span className="size-2 rounded-full" style={{ background: s.dot }} />
+      
       {s.label}
     </span>
   )
@@ -53,7 +53,6 @@ export function UnitTable({ rows, onOpen }: { rows: UnitRow[]; onOpen: (id: stri
       <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 pb-3">
         <div className="min-w-0">
           <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Patrimônio</h2>
-          <p className="mt-0.5 text-[12.5px] font-medium text-ink-3">Cada banheiro tem número e QR na porta</p>
         </div>
         <span className="num inline-flex h-8 items-center rounded-full bg-muted px-3 text-[12.5px] font-bold text-ink-2">{rows.length} unidades</span>
       </div>
@@ -166,7 +165,7 @@ export function UnitTable({ rows, onOpen }: { rows: UnitRow[]; onOpen: (id: stri
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2">
                       <span className="num text-[14.5px] font-bold text-ink">{r.unit.id}</span>
-                      {r.openOcc > 0 && <span className="size-2 rounded-full bg-red" />}
+                      
                     </span>
                     <span className="block truncate text-[12.5px] font-medium text-ink-3">{r.place}</span>
                   </span>

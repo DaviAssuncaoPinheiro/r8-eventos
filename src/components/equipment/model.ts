@@ -115,9 +115,8 @@ export const dayLabel = (offset: number) => (offset === 0 ? 'Hoje' : offset === 
 export function rangeLabel(days: number[]) {
   const a = Math.min(...days)
   const b = Math.max(...days)
-  const name = (d: number) => (d === 0 ? 'hoje' : d === 1 ? 'amanhã' : fmt.weekdayShort(day(d)))
-  if (a === b) return a <= 1 ? name(a) : onWeekday(day(a))
-  return `de ${name(a)} a ${name(b)}`
+  if (a === b) return `em ${dayNum(a)}`
+  return `de ${dayNum(a)} a ${dayNum(b)}`
 }
 
 /* ───────────── limpezas por locação ───────────── */

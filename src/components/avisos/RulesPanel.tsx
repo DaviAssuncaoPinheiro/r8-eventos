@@ -83,9 +83,6 @@ export function RulesPanel({
       <div className="flex items-center gap-3 px-5 pt-5 pb-3">
         <div className="min-w-0 flex-1">
           <h2 className="text-[22px] leading-tight font-bold tracking-[-0.02em] text-ink">Regras</h2>
-          <p className="mt-0.5 text-[12.5px] text-ink-3">
-            {active} de {rules.length} ativas
-          </p>
         </div>
         <IconButton tone="card" size={40} onClick={onClose} aria-label="Fechar">
           <X size={18} strokeWidth={1.9} />

@@ -12,7 +12,7 @@ const spring = { type: 'spring' as const, bounce: 0.1, duration: 0.5 }
 function Zone({ it }: { it: Item }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[12px] text-ink-3">
-      <span className="size-1.5 rounded-full" style={{ background: zoneHex(it.zone) }} />
+      
       {zoneName(it.zone)}
     </span>
   )
@@ -62,7 +62,6 @@ export function BoardCard({ it, selected, flash, onOpen }: { it: Item; selected:
             <span className="truncate text-[15px] leading-tight font-bold text-ink">{it.rental.title}</span>
             {it.isNew && <Badge tone="brand" className="h-[18px] px-1.5 text-[10.5px]">Novo</Badge>}
           </div>
-          <div className="truncate text-[12px] text-ink-3">{it.client.name}</div>
         </div>
       </div>
       <div className="mt-3 text-[13.5px] leading-snug font-semibold text-ink">{it.a.title}</div>
@@ -78,9 +77,6 @@ export function BoardCard({ it, selected, flash, onOpen }: { it: Item; selected:
       </div>
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-line pt-2.5">
         <TeamOf it={it} size={22} />
-        <Badge tone={st.tone} dot>
-          {st.label}
-        </Badge>
       </div>
       {flash && (
         <span className="absolute top-2.5 right-2.5 flex size-5 items-center justify-center rounded-full bg-green text-white">
@@ -114,7 +110,6 @@ export function ListRow({ it, selected, flash, onOpen }: { it: Item; selected: b
             <span className="truncate text-[15px] leading-tight font-bold text-ink">{it.rental.title}</span>
             {it.isNew && <Badge tone="brand" className="h-[18px] px-1.5 text-[10.5px]">Novo</Badge>}
           </div>
-          <div className="truncate text-[12px] text-ink-3">{it.client.name}</div>
         </div>
       </div>
       <div className="order-last col-span-3 min-w-0 lg:order-none lg:col-span-1">
@@ -135,9 +130,6 @@ export function ListRow({ it, selected, flash, onOpen }: { it: Item; selected: b
         <span className="lg:hidden">
           <TeamOf it={it} size={22} />
         </span>
-        <Badge tone={st.tone} dot>
-          {st.label}
-        </Badge>
       </div>
       <ChevronRight size={16} strokeWidth={1.9} className="hidden text-ink-4 transition-transform group-hover:translate-x-0.5 lg:block" />
     </motion.button>

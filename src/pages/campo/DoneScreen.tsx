@@ -46,7 +46,7 @@ export function SendStatus({ pending, first, className }: { pending: boolean; fi
       </span>
       <div className="min-w-0 flex-1">
         <div className={cn('text-[15px] font-bold', pending ? 'text-white' : 'text-ink')}>{pending ? 'Relatório na fila' : `Relatório enviado para ${first}`}</div>
-        <div className={cn('text-[13px] font-medium', pending ? 'text-white/55' : 'text-ink-2')}>{pending ? 'Sai quando o sinal voltar' : 'Fotos, checklist e assinatura'}</div>
+        {pending && <div className="text-[13px] font-medium text-white/55">Sai quando o sinal voltar</div>}
       </div>
       {!pending && <Check className="size-5 text-green" strokeWidth={2.6} />}
     </div>
@@ -155,7 +155,7 @@ export function NextJobCard({ job, className, onOpen }: { job: Job; className?: 
           Próximo serviço · <span className="num">{fmt.time(next.start)}</span>
         </span>
         <span className="block truncate text-[15px] font-bold text-ink">{r.title}</span>
-        <span className="block truncate text-[12.5px] font-medium text-ink-3">{next.type}, {lowerFirst(next.note)}</span>
+        <span className="block truncate text-[12.5px] font-medium text-ink-3">{next.type}</span>
       </span>
       <TeamAvatar teamId={next.teamId} size={30} />
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-white">
@@ -211,7 +211,6 @@ export default function DoneScreen() {
         <NextJobCard job={job} className="mx-4 mt-2.5" onOpen={(nid) => go(`/servico/${nid}`, { dir: 1 })} />
         <ReportCard job={job} rep={rep} className="mx-4 mt-2.5" />
         <StatCards job={job} rep={rep} className="mx-4 mt-2.5" />
-        <WhatsAppPreview job={job} rep={rep} className="mx-4 mt-2.5" />
         <SignOffCard rep={rep} className="mx-4 mt-2.5" />
       </motion.div>
     </Screen>

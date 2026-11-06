@@ -35,7 +35,6 @@ export function AvailabilityGrid({ sel, onSel }: { sel: CellSel; onSel: (s: Cell
       <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 pb-3">
         <div className="min-w-0">
           <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Disponibilidade</h2>
-          <p className="mt-0.5 text-[12.5px] font-medium text-ink-3">Quanto sobra livre em cada dia, já descontando obras, eventos e manutenção</p>
         </div>
         <Segmented<ProductGroup | 'todos'>
           value={group}
@@ -76,7 +75,6 @@ export function AvailabilityGrid({ sel, onSel }: { sel: CellSel; onSel: (s: Cell
                     <ProductThumb productId={p.id} size={30} />
                     <span className="min-w-0">
                       <span className="block truncate text-[13px] font-bold text-ink">{p.short}</span>
-                      <span className="num block text-[11.5px] font-medium text-ink-3">de {p.stock.toLocaleString('pt-BR')}</span>
                     </span>
                   </span>
                 </th>
@@ -134,7 +132,7 @@ function DayDetail({ sel }: { sel: CellSel }) {
               <ProductThumb productId={p.id} size={40} />
               <div className="min-w-0">
                 <div className="truncate text-[15px] font-bold text-ink">
-                  {p.short}, {dayLabel(sel.offset).toLowerCase()}
+                  {p.short} em {dayNum(sel.offset)}
                 </div>
                 <div className="text-[12.5px] font-medium text-ink-3">
                   <span className="num">{need.toLocaleString('pt-BR')}</span> comprometidos de <span className="num">{p.stock.toLocaleString('pt-BR')}</span>

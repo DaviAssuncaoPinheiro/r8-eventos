@@ -10,11 +10,9 @@ import { NOW_MIN, cap, hhmm, hm, jobsOf, loadOf, siteName, typeInk, zonesOfDay, 
 import { CapacityBar, InnerBadge, zoneTint } from './shared'
 
 export function jobBadge(v: AJob) {
-  if (v.status === 'concluido') return 'Concluído'
   if (v.status === 'em-andamento') return 'Agora'
   if (v.status === 'a-caminho') return 'A caminho'
   if (v.origin === 'novo') return 'Novo'
-  if (v.fixed) return 'Fixo'
   return null
 }
 
@@ -94,11 +92,6 @@ export function WeekGrid({ days, teams, all, freshId, onOpenDay }: { days: numbe
                 <span className="text-[12.5px] font-semibold">
                   {cap(fmt.weekdayShort(d))} <span className="num font-bold">{d.getDate()}</span>
                 </span>
-                {dayJobs.length > 0 && (
-                  <span className={cn('num text-[10.5px] font-semibold', today ? 'text-white/75' : 'text-ink-3')}>
-                    {dayJobs.length} {dayJobs.length === 1 ? 'serviço' : 'serviços'} · {hm(dayJobs.reduce((a, j) => a + j.dur, 0))}
-                  </span>
-                )}
               </button>
             )
           })}
@@ -128,8 +121,6 @@ function Row({ team, days, all, freshId, onOpenDay }: { team: Team; days: number
         <TeamAvatar teamId={team.id} size={36} />
         <div className="leading-tight">
           <div className="text-[13.5px] font-bold text-ink">{team.name}</div>
-          <div className="mt-0.5 text-[11.5px] text-ink-3">{team.truck.split(' · ')[1] ?? team.truck}</div>
-          <div className="mt-0.5 text-[11px] font-semibold text-ink-4 num">{team.plate}</div>
         </div>
       </div>
       {days.map((off) => {
@@ -147,31 +138,12 @@ function Row({ team, days, all, freshId, onOpenDay }: { team: Team; days: number
         }
         return (
           <div key={off} className="flex min-h-[132px] flex-col rounded-[18px] bg-card p-1.5 shadow-card">
-            <div className="flex flex-wrap gap-1 px-0.5 pb-1.5">
-              {zones.map((z) => (
-                <span key={z} className="inline-flex h-5 items-center gap-1 rounded-full px-2 text-[10.5px] font-bold text-ink" style={{ background: zoneTint(z, 22) }}>
-                  <span className="size-1.5 rounded-full" style={{ background: ZONE[z].hex }} />
-                  {ZONE[z].short}
-                </span>
-              ))}
-            </div>
             <div className="flex flex-1 flex-col gap-1">
               {list.length === 0 && <div className="m-auto py-3 text-center text-[11.5px] font-medium text-ink-4">Livre</div>}
               {list.map((v) => (
                 <JobBlock key={v.id} v={v} fresh={v.id === freshId} past={past || (today && v.startMin + v.dur < NOW_MIN)} onOpen={() => onOpenDay(off)} />
               ))}
             </div>
-            {list.length > 0 && (
-              <div className="px-1 pt-2 pb-0.5">
-                <div className="mb-1.5 flex items-baseline justify-between gap-1 text-[10.5px] font-medium text-ink-3 num">
-                  <span className="font-bold text-ink-2">
-                    {load.count} {load.count === 1 ? 'serviço' : 'serviços'}
-                  </span>
-                  <span>{hm(load.service)}</span>
-                </div>
-                <CapacityBar ratio={load.ratio} />
-              </div>
-            )}
           </div>
         )
       })}

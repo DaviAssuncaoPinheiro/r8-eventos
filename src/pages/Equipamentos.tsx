@@ -79,7 +79,6 @@ export default function Equipamentos() {
       <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-[28px] leading-[1.1] font-bold tracking-[-0.03em] text-ink md:text-[32px]">Equipamentos</h1>
-          <p className="mt-1.5 text-[14px] font-medium text-ink-3">Estoque, reservas e patrimônio com QR</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={() => nav(`/u/${DEMO_UNIT}`)}>
@@ -89,14 +88,6 @@ export default function Equipamentos() {
             <Boxes className="size-4" strokeWidth={2} /> Patrimônio
           </Button>
         </div>
-      </div>
-
-      {/* números dos banheiros */}
-      <div className="mb-4 grid grid-cols-1 divide-y divide-line rounded-[24px] bg-card shadow-card sm:grid-cols-2 sm:divide-y-0 xl:grid-cols-4 xl:divide-x">
-        <Metric icon={Toilet} label="Banheiros em campo" value={sum('campo')} sub={`de ${stock}`} subTone="muted" />
-        <Metric icon={Warehouse} label="Livres para reserva" value={sum('livre')} sub={sum('livre') < 10 ? 'estoque apertado' : undefined} subTone="red" />
-        <Metric icon={Wrench} label="Em manutenção" value={sum('manutencao')} sub="na oficina" subTone="muted" />
-        <Metric icon={Boxes} label="Pico do banheiro químico" value={`${occupancy}%`} sub={occupancy > 100 ? 'acima do estoque' : undefined} subTone="red" />
       </div>
 
       <ShortageAlert

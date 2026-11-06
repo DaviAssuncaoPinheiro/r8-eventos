@@ -155,7 +155,6 @@ export default function Agenda() {
 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <TypeFilter value={types} onToggle={toggleType} counts={weekCounts} />
-        <span className="text-[12px] font-medium text-ink-3">Fixo: horário combinado com o cliente</span>
       </div>
 
       {view === 'semana' ? (

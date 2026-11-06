@@ -74,10 +74,7 @@ export default function Relatorio() {
         <footer className="mt-10 flex flex-col items-center gap-2 text-center">
           <LogoMark size={28} />
           <div className="text-[12.5px] font-medium text-ink-3">
-            {COMPANY.name} · Locação de banheiros e estruturas · {COMPANY.city}
-          </div>
-          <div className="num text-[12px] font-medium text-ink-4">
-            WhatsApp {COMPANY.whatsapp} · {COMPANY.site}
+            {COMPANY.name} · {COMPANY.city}
           </div>
         </footer>
       </div>
@@ -210,7 +207,7 @@ function ReportBody({ rental }: { rental: Rental }) {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_90%_0%,rgba(238,106,28,.22),transparent_60%)]" />
           <div className="relative">
             <div className="text-[14px] font-medium text-white/60">
-              {isEvent ? 'Relatório do evento' : 'Relatório de limpezas'} · {rental.code}
+              {isEvent ? 'Relatório do evento' : 'Relatório de limpezas'}
             </div>
             <h1 className="mt-1 text-[34px] leading-[1.05] font-bold tracking-[-0.04em] sm:text-[42px]">{rental.title}</h1>
             <div className="mt-2 text-[14px] font-medium text-white/60">{client.name}</div>
@@ -229,30 +226,15 @@ function ReportBody({ rental }: { rental: Rental }) {
             <TeamAvatar teamId={team.id} size={44} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[15px] font-bold">{team.name}</div>
-              <div className="truncate text-[12.5px] font-medium text-white/55">
-                {team.truck} · placa {team.plate}
-              </div>
             </div>
             {live ? (
               <span className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-brand px-3 text-[12.5px] font-bold text-white">
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-70" />
-                  <span className="relative inline-flex size-2 rounded-full bg-white" />
-                </span>
                 No local agora
               </span>
             ) : (
               <span className="hidden h-8 shrink-0 items-center rounded-full bg-white/10 px-3 text-[12.5px] font-semibold text-white/80 min-[420px]:inline-flex">Responsável</span>
             )}
           </div>
-        </section>
-      </Reveal>
-
-      {/* resumo */}
-      <Reveal i={1}>
-        <section className="rounded-[26px] bg-brand-soft p-5 sm:p-6">
-          <div className="text-[13.5px] font-semibold text-brand-ink">Olá, {contactFirst(rental.contact.name)}</div>
-          <p className="mt-1.5 text-[18px] leading-[1.5] font-semibold tracking-[-0.01em] text-ink sm:text-[19px]">{summary}</p>
         </section>
       </Reveal>
 
@@ -271,13 +253,12 @@ function ReportBody({ rental }: { rental: Rental }) {
         <Reveal i={3}>
           <section className="flex items-center gap-3.5 rounded-[26px] bg-card p-4 shadow-card sm:p-5 print:hidden">
             <span className="relative flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-white">
-              <span className="absolute inset-0 animate-ping rounded-full bg-brand opacity-25" />
               {React.createElement(JOB_TYPE[live.type].icon, { className: 'relative size-[18px]', strokeWidth: 2 })}
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-[15px] font-bold text-ink">{live.type} em andamento</div>
               <div className="text-[13px] font-medium text-ink-3">
-                Começou às <span className="num">{fmt.time(live.start)}</span>. O registro aparece aqui quando a equipe finalizar.
+                Desde <span className="num">{fmt.time(live.start)}</span>
               </div>
             </div>
           </section>
@@ -286,7 +267,7 @@ function ReportBody({ rental }: { rental: Rental }) {
 
       {/* serviços */}
       <Reveal i={4}>
-        <Section title={isEvent ? 'Serviços no evento' : 'Limpezas e serviços'} aside={<span className="num text-[13px] font-semibold text-ink-3">{entries.length} no período</span>}>
+        <Section title={isEvent ? 'Serviços no evento' : 'Limpezas e serviços'}>
           {entries.length ? (
             <ol className="flex flex-col gap-2">
               {shown.map((e, i) => (

@@ -21,7 +21,7 @@ export function ZoneChip({ bairroId, className }: { bairroId: string; className?
   const z = ZONE[b.zone]
   return (
     <span className={cn('inline-flex h-6 items-center gap-1.5 rounded-full bg-card px-2.5 text-[11.5px] font-semibold whitespace-nowrap text-ink-2 shadow-pill', className)}>
-      <span className="size-1.5 rounded-full" style={{ background: z.hex }} />
+      
       {z.name}
     </span>
   )
@@ -93,9 +93,6 @@ export function ContactCard({ rental }: { rental: Rental }) {
           </div>
         </div>
       </div>
-      <div className="mt-3 text-left text-[12.5px] font-medium text-ink-3">
-        Cliente: <span className="text-ink-2">{client.name}</span> · <span className="num">{client.cnpj}</span>
-      </div>
     </div>
   )
 }
@@ -128,7 +125,6 @@ export function ReportCard({ rental, model, className }: { rental: Rental; model
           </span>
           <div className="min-w-0">
             <h3 className="text-[17px] leading-tight font-bold tracking-[-0.02em]">Relatório do cliente</h3>
-            <p className="mt-0.5 text-[12.5px] font-medium text-white/60">Limpezas, horários, fotos e assinaturas</p>
           </div>
         </div>
         <Link
@@ -146,11 +142,7 @@ export function ReportCard({ rental, model, className }: { rental: Rental; model
           <QRCodeSVG value={url} size={96} level="M" fgColor="#111214" bgColor="#ffffff" />
         </div>
         <div className="min-w-0">
-          <div className="text-[19px] leading-tight font-bold tracking-[-0.02em]">{rental.title}</div>
-          <div className="mt-0.5 truncate text-[12.5px] font-medium text-white/60">
-            {COMPANY.name} · {rental.code}
-          </div>
-          <span className="num mt-2.5 inline-flex h-7 items-center gap-1.5 rounded-full bg-white/10 px-3 text-[12px] font-semibold">
+          <span className="num inline-flex h-7 items-center gap-1.5 rounded-full bg-white/10 px-3 text-[12px] font-semibold">
             <Check className="size-3.5 text-brand" strokeWidth={2.6} />
             {cleanings} {cleanings === 1 ? 'limpeza registrada' : 'limpezas registradas'}
           </span>
@@ -197,7 +189,7 @@ export function OccurrencesPanel({ rental, occurrences }: { rental: Rental; occu
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-[13.5px] leading-snug font-bold text-ink">{OCC_KIND[o.kind].label}</span>
                     <span className={cn('inline-flex shrink-0 items-center gap-1.5 pt-0.5 text-[12px] font-semibold', open ? 'text-red' : 'text-ink-2')}>
-                      <span className={cn('size-1.5 rounded-full', open ? 'bg-red' : 'bg-green')} />
+                      
                       {open ? 'Aberta' : 'Resolvida'}
                     </span>
                   </div>
@@ -264,7 +256,7 @@ export function AvisosPanel({ avisos }: { avisos: Aviso[] }) {
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-[13.5px] leading-snug font-bold text-ink">{a.title}</span>
                   <span className="inline-flex shrink-0 items-center gap-1.5 pt-0.5 text-[12px] font-semibold text-ink-2">
-                    <span className={cn('size-1.5 rounded-full', DOT[st.tone] ?? 'bg-ink-4')} />
+                    
                     {st.label}
                   </span>
                 </div>

@@ -57,7 +57,7 @@ export function Block({ title, hint, children, className, bodyClassName, action 
         <div className="flex items-start justify-between gap-3 px-5 pt-5">
           <div className="min-w-0">
             {title && <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">{title}</h3>}
-            {hint && <div className="mt-0.5 text-[13px] font-medium text-ink-3">{hint}</div>}
+            {hint && /\d/.test(String(hint)) && <div className="mt-0.5 text-[13px] font-medium text-ink-3">{hint}</div>}
           </div>
           {action}
         </div>
@@ -67,22 +67,9 @@ export function Block({ title, hint, children, className, bodyClassName, action 
   )
 }
 
-export function StepIntro({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
-  const desk = useIsDesk()
-  if (desk)
-    return (
-      <div className="flex items-baseline gap-3 px-1 pb-4">
-        <h2 className="text-[24px] leading-tight font-bold tracking-[-0.03em] text-ink">{title}</h2>
-        {children && <p className="truncate text-[14px] font-medium text-ink-3">{children}</p>}
-      </div>
-    )
-  return (
-    <div className="px-5 pt-3 pb-1">
-      <div className="text-[13px] font-semibold text-ink-3">{eyebrow}</div>
-      <h2 className="mt-0.5 text-[28px] leading-tight font-bold tracking-[-0.03em] text-ink">{title}</h2>
-      {children && <p className="mt-1 text-[14px] leading-snug font-medium text-ink-3">{children}</p>}
-    </div>
-  )
+/** O nome da etapa já aparece no indicador de etapas: não repete aqui */
+export function StepIntro(_props: { eyebrow: string; title: string; children?: React.ReactNode }) {
+  return null
 }
 
 /** Campo de texto grande em fundo cinza */

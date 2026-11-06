@@ -63,7 +63,6 @@ function DayStrip({ jobs }: { jobs: Job[] }) {
               )}
               {live ? (
                 <span className="relative flex size-6 items-center justify-center rounded-full bg-brand text-white">
-                  <span className="absolute inset-0 animate-ping rounded-full bg-brand opacity-50" />
                   {Icon && <Icon className="relative size-3" strokeWidth={2.4} />}
                 </span>
               ) : j && done ? (
@@ -100,7 +99,6 @@ function Tile({ icon, tone, title, value, sub, action }: { icon: React.ReactNode
         </div>
         {action}
       </div>
-      <div className="mt-3 text-[12.5px] leading-snug font-medium text-ink-3">{sub}</div>
     </div>
   )
 }
@@ -120,9 +118,6 @@ export function CleaningPlan({ rental, model }: { rental: Rental; model: RentalM
       <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 pb-3">
         <div className="min-w-0">
           <h2 className="text-[17px] font-bold tracking-[-0.02em] text-ink">{rental.kind === 'evento' ? 'Agenda do evento' : 'Plano de limpeza'}</h2>
-          <p className="mt-0.5 truncate text-[12.5px] font-medium text-ink-3">
-            {freqLabel(rental)} · {units} {units === 1 ? 'unidade' : 'unidades'} · {TEAM[rental.teamId].name}
-          </p>
         </div>
         <Segmented
           value={view}
@@ -192,7 +187,6 @@ export function CleaningPlan({ rental, model }: { rental: Rental; model: RentalM
               <span className="inline-flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-brand" /> Agora
               </span>
-              <span className="ml-auto">Toque no dia para abrir o serviço</span>
             </div>
           </>
         ) : model.upcoming.length ? (
@@ -236,8 +230,8 @@ export function ComplianceIndex({ model, className }: { model: RentalModel; clas
   const s = empty ? { tone: 'neutral' as const, label: 'Sem histórico', color: 'var(--color-ink-4)' } : scoreTone(c.score)
   const rows = [
     { id: 'feitas', label: 'Feitas', detail: c.due ? `${c.done} de ${c.due} previstas` : 'Nada previsto no período', ok: c.done >= c.due },
-    { id: 'horario', label: 'No horário', detail: `${c.onTimePct}% até 15 min do horário`, ok: c.onTimePct >= 85 },
-    { id: 'tempo', label: 'Tempo médio', detail: c.avgMin ? `${c.avgMin} min por limpeza` : 'Sem registros', ok: true },
+    { id: 'horario', label: 'No horário', detail: `${c.onTimePct}%`, ok: c.onTimePct >= 85 },
+    { id: 'tempo', label: 'Tempo médio', detail: c.avgMin ? `${c.avgMin} min` : 'Sem registros', ok: true },
     { id: 'ocorr', label: 'Ocorrências', detail: c.occTotal ? `${c.occResolved} de ${c.occTotal} resolvidas` : 'Nenhuma no período', ok: c.occResolved >= c.occTotal },
   ]
   const okCount = rows.filter((r) => r.ok).length
@@ -260,16 +254,13 @@ export function ComplianceIndex({ model, className }: { model: RentalModel; clas
           <Badge tone={s.tone} dot>
             {s.label}
           </Badge>
-          <div className="mt-2 text-[12.5px] font-medium text-ink-3">
-            {empty ? 'A conta começa na primeira limpeza' : `${okCount} de ${rows.length} itens em dia`}
-          </div>
         </div>
       </div>
 
       <ul className="mt-3 px-5 pb-4">
         {rows.map((r, i) => (
           <li key={r.id} className={cn('flex items-center gap-3 py-2.5', i > 0 && 'border-t border-line')}>
-            <span className={cn('size-2 shrink-0 rounded-full', r.ok ? 'bg-green' : 'bg-yellow')} />
+            
             <span className="w-[92px] shrink-0 text-[13px] font-semibold text-ink">{r.label}</span>
             <span className={cn('min-w-0 flex-1 truncate text-right text-[12.5px] font-medium', r.ok ? 'text-ink-3' : 'text-yellow-ink')}>{r.detail}</span>
           </li>

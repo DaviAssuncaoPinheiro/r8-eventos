@@ -59,7 +59,7 @@ function DeskJobDetail({ job }: { job: Job }) {
         sub={
           <>
             {!isToday(job.start) && <>{dateShort(job.start)} · </>}
-            <span className="num">{fmt.time(job.start)}</span> · {job.durationMin} min · {b.name} · {team.name}
+            <span className="num">{fmt.time(job.start)}</span>
           </>
         }
         right={
@@ -90,23 +90,7 @@ function DeskJobDetail({ job }: { job: Job }) {
             <div className="px-4 pt-4 pb-3">
               <h2 className="text-[30px] leading-[1.05] font-bold tracking-[-0.035em] text-ink">{rental.title}</h2>
               <div className="mt-1.5 text-[14px] font-medium text-ink-3">
-                {client.name} · {rental.code}
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="inline-flex h-10 items-center gap-2 rounded-full bg-surface pr-4 pl-1.5 text-[13.5px] font-semibold text-ink">
-                  <span className="flex size-7 items-center justify-center rounded-full bg-card shadow-pill">
-                    <ClipboardList className="size-3.5" strokeWidth={2} />
-                  </span>
-                  {scopeLabel(job)}
-                </span>
-                <span className="inline-flex h-10 items-center gap-2 rounded-full bg-surface pr-4 pl-1.5 text-[13.5px] font-semibold text-ink">
-                  <TeamAvatar teamId={team.id} size={28} />
-                  {team.name} · {team.truck}
-                </span>
-                <span className="inline-flex h-10 items-center gap-2 rounded-full bg-surface pr-4 pl-3.5 text-[13.5px] font-semibold text-ink">
-                  <span className="size-2 rounded-full" style={{ background: zone.hex }} />
-                  {zone.name}
-                </span>
+                {client.name}
               </div>
             </div>
           </Card>
@@ -137,7 +121,6 @@ function DeskJobDetail({ job }: { job: Job }) {
                 <RentalAvatar rental={rental} size={40} className="ring-2 ring-brand" />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[14.5px] font-bold">Ver cartão de chegada</span>
-                  <span className="block truncate text-[12.5px] font-medium text-white/55">Acesso, contato e o que fazer</span>
                 </span>
                 <span className="flex size-9 items-center justify-center rounded-full bg-brand text-white transition-transform group-hover:translate-x-0.5">
                   <ArrowUpRight className="size-4" strokeWidth={2.2} />
@@ -182,7 +165,6 @@ function DeskJobDetail({ job }: { job: Job }) {
                           </span>
                           <span className="shrink-0 text-[12.5px] font-medium text-ink-3">{relDays(report.finishedAt)}</span>
                         </div>
-                        <div className="mt-0.5 line-clamp-2 text-[13px] leading-snug font-medium text-ink-3">{report.summary}</div>
                       </div>
                     </button>
                   </div>

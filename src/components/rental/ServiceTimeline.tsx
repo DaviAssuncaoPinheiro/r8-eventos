@@ -117,7 +117,7 @@ function Entry({ item, index }: { item: HistoryItem; index: number }) {
           </div>
         </div>
 
-        <div className="mt-2.5 max-w-[620px] rounded-[16px] rounded-tl-[6px] bg-blue-soft px-3.5 py-2.5 text-[13px] leading-relaxed font-medium text-ink-2">{report.summary}</div>
+        {job.type === 'Manutenção' && <div className="mt-2.5 max-w-[620px] rounded-[16px] rounded-tl-[6px] bg-blue-soft px-3.5 py-2.5 text-[13px] leading-relaxed font-medium text-ink-2">{report.summary}</div>}
 
         <button onClick={() => setOpen((v) => !v)} aria-expanded={open} className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-semibold text-ink-2 hover:text-ink">
           {open ? 'Esconder detalhes' : 'Ver checklist e assinatura'}
@@ -229,13 +229,7 @@ export function ServiceTimeline({ items, live, title }: { items: HistoryItem[]; 
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <div>
           <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Histórico de serviços</h3>
-          <div className="mt-0.5 text-[12.5px] font-medium text-ink-3">
-            {items.length} {items.length === 1 ? 'registro' : 'registros'}{fresh ? ` · ${fresh} novo${fresh > 1 ? 's' : ''} hoje` : ''}
-          </div>
         </div>
-        <span className="hidden items-center gap-1.5 text-[12px] font-semibold text-ink-3 sm:inline-flex">
-          <Clock className="size-3.5" strokeWidth={2} /> Horário real registrado no app
-        </span>
       </div>
 
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-5 pt-4 pb-1">
