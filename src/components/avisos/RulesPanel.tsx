@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { KPIS } from '@/data/mock'
 import * as Switch from '@radix-ui/react-switch'
 import { motion } from 'motion/react'
 import { ArrowUpFromLine, Clock3, FileText, Lock, Mail, QrCode, RefreshCw, Truck, X, type LucideIcon } from 'lucide-react'
@@ -24,7 +25,7 @@ export interface Rule {
 }
 
 export const INITIAL_RULES: Rule[] = [
-  { id: 'limpeza', title: 'Relatório da limpeza', desc: 'Sai quando a equipe finaliza a limpeza no app, com o link do relatório e as fotos.', icon: FileText, tone: 'teal', on: true, before: 'Ao concluir', repeat: 0, stat: '186 enviados no mês' },
+  { id: 'limpeza', title: 'Relatório da limpeza', desc: 'Sai quando a equipe finaliza a limpeza no app, com o link do relatório e as fotos.', icon: FileText, tone: 'teal', on: true, before: 'Ao concluir', repeat: 0, stat: `${KPIS.cleaningsMonth} enviados no mês` },
   { id: 'montagem', title: 'Confirmação de montagem', desc: 'Data, horário, equipe e placa do caminhão.', icon: Truck, tone: 'blue', on: true, before: 1, repeat: 0, options: [1, 2, 3], stat: '23 enviados no mês' },
   { id: 'retirada', title: 'Aviso de retirada', desc: 'Pergunta se pode retirar ou se o cliente quer renovar.', icon: ArrowUpFromLine, tone: 'violet', on: true, before: 2, repeat: 1, options: [1, 2, 5], stat: '14 enviados no mês' },
   { id: 'renovacao', title: 'Renovação de contrato', desc: 'Para obras com contrato mensal.', icon: RefreshCw, tone: 'yellow', on: true, before: 5, repeat: 3, options: [3, 5, 10], stat: '9 enviados no mês' },
@@ -93,16 +94,6 @@ export function RulesPanel({
 
       <div className="scroll-thin min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-4">
         <Card className="divide-y divide-line">
-          <div className="flex flex-wrap items-center gap-3 px-4 py-3.5">
-            <IconCircle tone="muted" size={40}>
-              <Clock3 size={18} strokeWidth={1.9} />
-            </IconCircle>
-            <div className="min-w-0 flex-1 basis-32">
-              <div className="text-[14px] font-bold text-ink">Horário dos avisos programados</div>
-              <div className="text-[12.5px] text-ink-3">Relatórios e QR saem na hora</div>
-            </div>
-            <Chips value={hour} onChange={setHour} options={['07:00', '09:00', '12:00', '17:00'].map((h) => ({ v: h, label: h }))} />
-          </div>
           <div className="flex items-center gap-3 px-4 py-3.5">
             <IconCircle tone="muted" size={40}>
               <Mail size={18} strokeWidth={1.9} />
@@ -170,7 +161,7 @@ export function RulesPanel({
         <Button
           variant="primary"
           onClick={() => {
-            toast.success('Regras salvas', { description: `${active} regras ativas, avisos programados às ${hour}.` })
+            toast.success('Regras salvas', { description: `${active} ${active === 1 ? 'regra ativa' : 'regras ativas'}.` })
             onClose()
           }}
         >

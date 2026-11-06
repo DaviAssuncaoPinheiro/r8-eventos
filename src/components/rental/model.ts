@@ -70,9 +70,11 @@ export interface RentalRow {
 export function useRentalRows(): RentalRow[] {
   const jobs = useJobs()
   const occurrences = useDemo((s) => s.occurrences)
+  const over = useDemo((s) => s.rentalStatus)
   return React.useMemo(
     () =>
-      RENTALS.map((r) => {
+      RENTALS.map((base) => {
+        const r = over[base.id] ? { ...base, status: over[base.id] } : base
         const js = jobs.filter((j) => j.rentalId === r.id)
         return {
           rental: r,
@@ -85,7 +87,7 @@ export function useRentalRows(): RentalRow[] {
           alert: endAlert(r),
         }
       }),
-    [jobs, occurrences],
+    [jobs, occurrences, over],
   )
 }
 
@@ -189,7 +191,7 @@ export function useRentalModel(rental: Rental | undefined): RentalModel | null {
       const pr = PRODUCT[it.productId]
       if (seen.has(pr.photo) || rental.status === 'montagem') continue
       seen.add(pr.photo)
-      demo.push({ id: `demo-inst-${it.productId}`, src: pr.photo, label: `${pr.short} instalado`, date: mount?.start ?? rental.start, jobId: mount?.id ?? '', isNew: false })
+      demo.push({ id: `demo-inst-${it.productId}`, src: pr.photo, label: `Instalação: ${pr.short}`, date: mount?.start ?? rental.start, jobId: mount?.id ?? '', isNew: false })
     }
     const photos: PhotoItem[] = [
       ...storePhotos

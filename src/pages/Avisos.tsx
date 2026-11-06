@@ -70,7 +70,7 @@ export default function Avisos() {
         )
         if (n === ids.length - 1) {
           setSending(false)
-          toast.success(`${ids.length} mensagens enviadas`, { description: 'Entregues pelo WhatsApp Business.' })
+          toast.success(`${ids.length} ${ids.length === 1 ? 'mensagem enviada' : 'mensagens enviadas'}`, { description: 'Entregues pelo WhatsApp Business.' })
         }
       }, 260 * n)
     })

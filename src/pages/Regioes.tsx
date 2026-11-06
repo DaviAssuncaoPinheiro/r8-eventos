@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDemo } from '@/store'
 import { Link, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
@@ -7,7 +8,7 @@ import { Button, Card, IconCircle, Panel, RentalAvatar, Segmented, SegmentBar, T
 import { CityMap, heatColor, heatIsDark, type MapCtx } from '@/components/map/CityMap'
 import { travelMinutesFromBase } from '@/components/map/geometry'
 import { BAIRROS, ZONE, ZONES, type ZoneId } from '@/data/geo'
-import { CLIENT, HEATMAP, RENTALS, TEAM, TEAMS, WEEK_PLAN, cleanableQty, onSite, zoneOfRental } from '@/data/mock'
+import { CLIENT, HEATMAP, RENTALS, TEAM, TEAMS, WEEK_PLAN, cleanableQty, onSite, weekPlan, zoneOfRental } from '@/data/mock'
 import { TODAY } from '@/data/time'
 import { RENTAL_STATUS } from '@/lib/status'
 import { cn } from '@/lib/utils'
@@ -52,17 +53,15 @@ export default function Regioes() {
   const dow = TODAY.getDay()
   const [day, setDay] = React.useState<number>(dow === 0 ? 1 : dow)
   const [zone, setZone] = React.useState<ZoneId | null>('lagos')
-  const [plan, setPlan] = React.useState<Plan>(() => clonePlan(WEEK_PLAN))
-  const [applied, setApplied] = React.useState(false)
+  const applied = useDemo((s) => s.scaleApplied)
+  const setApplied = useDemo((s) => s.setScaleApplied)
+  const plan = React.useMemo<Plan>(() => weekPlan(applied), [applied])
   const tableRef = React.useRef<HTMLDivElement>(null)
 
   const heat = Object.fromEntries(ZONES.map((z) => [z.id, HEATMAP[z.id][day - 1]])) as Record<ZoneId, number>
   const dayInfo = DAYS[day - 1]
 
   const apply = () => {
-    const next = clonePlan(plan)
-    for (const d of SUGGEST.days) next[SUGGEST.team][d] = [...(next[SUGGEST.team][d] ?? []), SUGGEST.target]
-    setPlan(next)
     setApplied(true)
     setZone(SUGGEST.target)
     toast.success('Escala atualizada', {
@@ -70,7 +69,6 @@ export default function Regioes() {
     })
   }
   const undo = () => {
-    setPlan(clonePlan(WEEK_PLAN))
     setApplied(false)
     toast('Escala restaurada')
   }

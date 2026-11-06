@@ -6,7 +6,7 @@ import { CHECKLISTS } from '@/lib/history'
 import { jobItems } from '@/lib/fieldkit'
 import { useDemo } from '@/store'
 import { checklistDone, itemsOk } from './campoStore'
-import { cleanUnits } from './data'
+import { jobUnits } from './data'
 import { useIsDesk } from './stepKit'
 import { Block, StepFrame, StepIntro, TextInput, type StepProps } from './stepKit'
 
@@ -114,7 +114,7 @@ export function SignaturePad({ value, onChange, height = 200 }: { value?: string
 export function StepAssinatura({ job, rental, draft, patch, layout, eyebrow }: StepProps) {
   const desk = useIsDesk() || layout === 'desktop'
   const photos = useDemo((s) => s.photos).filter((p) => p.jobId === job.id)
-  const units = cleanUnits(rental)
+  const units = jobUnits(job, rental)
   const conf = job.type === 'Montagem' || job.type === 'Retirada'
   const unitsDone = units.filter((u) => draft.units[u.id]).length
   const items = jobItems(job)

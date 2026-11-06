@@ -134,7 +134,7 @@ export function RentalHeader({ rental, model }: { rental: Rental; model: RentalM
               )}
               {rental.eventDays && (
                 <span>
-                  Evento de {fmt.short(rental.eventDays[0])} a {fmt.short(rental.eventDays[1])}
+                  {fmt.short(rental.eventDays[0]) === fmt.short(rental.eventDays[1]) ? `Evento em ${fmt.short(rental.eventDays[0])}` : `Evento de ${fmt.short(rental.eventDays[0])} a ${fmt.short(rental.eventDays[1])}`}
                 </span>
               )}
             </div>

@@ -9,7 +9,7 @@ import { relDays } from '@/data/time'
 import type { OccKind } from '@/data/mock'
 import { useDemo } from '@/store'
 import { notify } from './campoStore'
-import { cleanUnits } from './data'
+import { cleanUnits, simNow } from './data'
 import { Chip, EASE_OUT, Pressable, SafeImg } from './kit'
 import { Block, CheckRow, StepFrame, StepIntro, TextArea, type StepProps } from './stepKit'
 
@@ -34,7 +34,7 @@ export function StepOcorrencias({ job, rental, draft, patch, layout, eyebrow }: 
     try {
       const src = await compressImage(file)
       const id = newId('ph')
-      addPhoto({ id, jobId: job.id, rentalId: rental.id, unitId, date: new Date().toISOString(), src, label: `Ocorrência${unitId ? ` · ${unitId}` : ''}`, moment: 'avaria' })
+      addPhoto({ id, jobId: job.id, rentalId: rental.id, unitId, date: simNow().toISOString(), src, label: `Ocorrência${unitId ? ` · ${unitId}` : ''}`, moment: 'avaria' })
       setPhotoId(id)
     } catch {
       notify({ kind: 'app', title: 'Não deu para ler a foto', body: 'Tente outra imagem.' })

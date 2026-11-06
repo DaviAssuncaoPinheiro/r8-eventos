@@ -69,7 +69,7 @@ export function StepChecklist({ job, draft, patch, layout, eyebrow }: StepProps)
       layout={layout}
       intro={
         <StepIntro eyebrow={eyebrow} title="Checklist">
-          {job.type === 'Limpeza' ? 'O padrão R8 em cada unidade' : 'Confira antes de sair do local'}
+          {job.type === 'Limpeza' ? 'Marque o que foi feito em todas as unidades' : 'Confira antes de sair do local'}
         </StepIntro>
       }
       left={left}

@@ -82,7 +82,7 @@ export function ScheduleDialog({
   const confirm = () => {
     if (!rental || !chosen) return
     const units = type === 'Limpeza' ? cleanableQty(rental) : type === 'Manutenção' ? 1 : rental.items.reduce((a, i) => a + i.qty, 0)
-    onConfirm({ rentalId: rental.id, type, note: note.trim() || `${type}, agendado pela agenda`, dur, units }, chosen)
+    onConfirm({ rentalId: rental.id, type, note: note.trim() || `${type} agendada pelo escritório`, dur, units }, chosen)
   }
 
   const input = 'h-11 w-full rounded-full bg-muted pr-4 pl-11 text-[14px] font-medium text-ink outline-none placeholder:text-ink-3 focus:bg-card focus:ring-2 focus:ring-black'

@@ -75,7 +75,7 @@ export function PhotosCard({ photos }: { photos: PhotoItem[] }) {
         <div>
           <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Fotos</h3>
           <div className="mt-0.5 text-[12.5px] font-medium text-ink-3">
-            {photos.length} {photos.length === 1 ? 'foto' : 'fotos'} tiradas pela equipe{fresh ? ` · ${fresh} hoje` : ''}
+            {photos.length} {photos.length === 1 ? 'foto tirada' : 'fotos tiradas'} pela equipe{fresh ? ` · ${fresh} hoje` : ''}
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDemo } from '@/store'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
@@ -24,7 +25,8 @@ const CELL: Record<'falta' | 'baixo' | 'ok', string> = {
 
 export function AvailabilityGrid({ sel, onSel }: { sel: CellSel; onSel: (s: CellSel) => void }) {
   const [group, setGroup] = React.useState<ProductGroup | 'todos'>('todos')
-  const grid = React.useMemo(() => availability(), [])
+  const overrides = useDemo((s) => s.unitState)
+  const grid = React.useMemo(() => availability(overrides), [overrides])
   const products = PRODUCTS.filter((p) => group === 'todos' || p.group === group)
   const days = Array.from({ length: HORIZON }, (_, d) => d)
 
@@ -118,7 +120,8 @@ function DayDetail({ sel }: { sel: CellSel }) {
   const nav = useNavigate()
   const p = PRODUCT[sel.productId]
   const rentals = rentalsUsing(sel.productId, sel.offset)
-  const maint = UNITS.filter((u) => u.productId === sel.productId && u.state === 'manutencao').length
+  const overrides = useDemo((s) => s.unitState)
+  const maint = UNITS.filter((u) => u.productId === sel.productId && (overrides[u.id] ?? u.state) === 'manutencao').length
   const need = rentals.reduce((a, r) => a + r.items.filter((i) => i.productId === sel.productId).reduce((x, i) => x + i.qty, 0), 0) + maint
   const free = p.stock - need
 
@@ -138,7 +141,7 @@ function DayDetail({ sel }: { sel: CellSel }) {
                 </div>
               </div>
             </div>
-            {free < 0 ? <Badge tone="late">Faltam {-free}</Badge> : <Badge tone={free < p.stock * 0.1 ? 'warn' : 'ok'}>{qtyLabel(p.id, free)} livres</Badge>}
+            {free < 0 ? <Badge tone="late">Faltam {-free}</Badge> : <Badge tone={free < p.stock * 0.1 ? 'warn' : 'ok'}>{qtyLabel(p.id, free)} {free === 1 ? 'livre' : 'livres'}</Badge>}
           </div>
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {rentals.map((r) => {

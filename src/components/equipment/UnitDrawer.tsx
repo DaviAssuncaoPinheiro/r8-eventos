@@ -252,7 +252,7 @@ function Body({ unitId, onClose }: { unitId: string; onClose: () => void }) {
         )}
 
         {/* ocorrências */}
-        <Section title="Avisos e ocorrências" aside={occ.some((o) => o.status === 'aberta') ? <Badge tone="late">{occ.filter((o) => o.status === 'aberta').length} aberto</Badge> : undefined}>
+        <Section title="Avisos e ocorrências" aside={occ.some((o) => o.status === 'aberta') ? <Badge tone="late">{(() => { const n = occ.filter((o) => o.status === 'aberta').length; return `${n} ${n === 1 ? 'aberto' : 'abertos'}` })()}</Badge> : undefined}>
           {occ.length ? (
             <ul className="flex flex-col gap-2">
               {occ.map((o) => (

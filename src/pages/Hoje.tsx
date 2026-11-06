@@ -42,17 +42,20 @@ import {
   TEAMS,
   UNITS,
   demandOn,
+  rentedOn,
   shortages,
   type Job,
   type JobStatus,
   type Rental,
 } from '@/data/mock'
-import { daysFromToday, fmt, TODAY } from '@/data/time'
+import { daysFromToday, fmt, onWeekday, TODAY } from '@/data/time'
 import { buildLoad, equipmentMoves, loadQtyLabel, navLinks, type LoadItem } from '@/lib/fieldkit'
 import { newId } from '@/lib/photos'
-import { cn, firstName } from '@/lib/utils'
+import { cn, firstName, lowerFirst } from '@/lib/utils'
 import { JOB_STATUS, JOB_TYPE, OCC_KIND } from '@/lib/status'
 import { useDemo, useJobs } from '@/store'
+import { productSplits } from '@/components/equipment/model'
+import { SPLIT_COLORS } from '@/components/equipment/StockOverview'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -214,7 +217,7 @@ function Metrics({ stops }: { stops: Stop[] }) {
   const unitState = useDemo((s) => s.unitState)
   const done = stops.filter((s) => s.status === 'concluido').length
   const inField = UNITS.filter((u) => (unitState[u.id] ?? u.state) === 'campo').length
-  const tomorrow = demandOn(1)
+  const tomorrow = rentedOn(1)
   const toiletsTomorrow = tomorrow.bq + tomorrow['bq-pne'] + tomorrow['bq-luxo']
   const open = occurrences.filter((o) => o.status === 'aberta')
   const qr = open.filter((o) => o.source === 'qr').length
@@ -743,13 +746,10 @@ function StockCard() {
   const nav = useNavigate()
   const unitState = useDemo((s) => s.unitState)
   const p = PRODUCT.bq
-  const units = UNITS.filter((u) => u.productId === 'bq')
-  const state = (id: string, s: string) => unitState[id] ?? s
-  const field = units.filter((u) => state(u.id, u.state) === 'campo').length
-  const maint = units.filter((u) => state(u.id, u.state) === 'manutencao').length
-  const reserved = Math.max(0, demandOn(0).bq - field - maint)
-  const free = Math.max(0, p.stock - field - maint - reserved)
-  const short = React.useMemo(() => shortages(14).filter((s) => s.productId === 'bq'), [])
+  // mesma conta da tela Equipamentos: reservado olha o pico dos próximos 14 dias
+  const split = React.useMemo(() => productSplits(unitState).find((x) => x.product.id === 'bq')!, [unitState])
+  const { campo: field, reservado: reserved, manutencao: maint, livre: free } = split
+  const short = React.useMemo(() => shortages(14, unitState).filter((s) => s.productId === 'bq'), [unitState])
   const worst = short.reduce((a, s) => Math.max(a, s.need - s.stock), 0)
   const first = short[0]
   const last = short[short.length - 1]
@@ -761,25 +761,25 @@ function StockCard() {
         <div className="flex items-baseline justify-between gap-3">
           <div className="flex items-baseline gap-1.5">
             <span className="num text-[30px] leading-none font-bold tracking-[-0.03em] text-ink">{free}</span>
-            <span className="text-[13px] font-semibold text-ink-3">na base hoje</span>
+            <span className="text-[13px] font-semibold text-ink-3">livres para novas reservas</span>
           </div>
           <span className="num text-[12.5px] font-semibold text-ink-3">de {p.stock}</span>
         </div>
         <SegmentBar
           className="mt-3"
           parts={[
-            { value: field, color: 'var(--color-black)' },
-            { value: reserved, color: 'var(--color-blue)' },
-            { value: maint, color: 'var(--color-yellow)' },
-            { value: free, color: 'var(--color-muted-2)' },
+            { value: field, color: SPLIT_COLORS.campo },
+            { value: reserved, color: SPLIT_COLORS.reservado },
+            { value: free, color: SPLIT_COLORS.livre },
+            { value: maint, color: SPLIT_COLORS.manutencao },
           ]}
         />
         <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[12.5px] font-semibold text-ink-2">
           {[
             ['bg-black', 'Em campo', field],
-            ['bg-blue', 'Reservado', reserved],
+            ['bg-brand', 'Reservado', reserved],
             ['bg-yellow', 'Manutenção', maint],
-            ['bg-muted-2', 'Na base', free],
+            ['bg-green', 'Livre', free],
           ].map(([c, l, n]) => (
             <span key={l as string} className="flex items-center gap-1.5">
               <span className={cn('size-2 rounded-full', c as string)} />
@@ -796,9 +796,9 @@ function StockCard() {
           </IconCircle>
           <span className="min-w-0 flex-1">
             <span className="block text-[14px] leading-snug font-bold text-ink">
-              Faltam <span className="num">{worst}</span> banheiros {first.offset === last.offset ? `na ${fmt.weekday(dayDate(first.offset))}` : `de ${fmt.weekdayShort(dayDate(first.offset))} a ${fmt.weekdayShort(dayDate(last.offset))}`}
+              Faltam <span className="num">{worst}</span> banheiros {first.offset === last.offset ? onWeekday(dayDate(first.offset)) : `de ${fmt.weekdayShort(dayDate(first.offset))} a ${fmt.weekdayShort(dayDate(last.offset))}`}
             </span>
-            <span className="mt-0.5 block text-[12.5px] leading-snug font-medium text-ink-2">Festival, corrida e congresso no mesmo fim de semana. Sublocar ou remanejar.</span>
+            <span className="mt-0.5 block text-[12.5px] leading-snug font-medium text-ink-2">Festival, corrida e congresso nos mesmos dias. Sublocar ou remanejar.</span>
           </span>
           <ArrowRight className="mt-1 size-4 shrink-0 text-red" strokeWidth={2.2} />
         </button>
@@ -815,9 +815,27 @@ const dayDate = (offset: number) => {
 
 /* ───────────────────────── equipes em campo (ref. Onboarding) ───────────────────────── */
 
+/** Serviço que o botão "App da equipe" abre: o atual da equipe escolhida, o próximo ou o último */
+function appJob(byTeam: Record<string, Stop[]>, teamId: string) {
+  const stops = byTeam[teamId]
+  const pick = stops.find((s) => s.status === 'em-andamento') ?? stops.find((s) => s.status === 'a-caminho') ?? stops.find((s) => s.status === 'agendado') ?? stops[stops.length - 1]
+  return pick?.job
+}
+
+/** Primeiro horário livre da equipe depois de agora (fora do almoço e sem encostar em outro serviço) */
+function freeSlot(stops: Stop[], dur: number) {
+  const busy = stops.map((s) => [s.startMin - 10, s.startMin + s.job.durationMin + 10] as const)
+  for (let t = Math.ceil((NOW_MIN + 30) / 10) * 10; t < 18 * 60; t += 10) {
+    if (t < 13 * 60 + 30 && t + dur > 12 * 60) continue
+    if (busy.some(([a, b]) => t < b && t + dur > a)) continue
+    return t
+  }
+  return 17 * 60
+}
+
 function teamState(stops: Stop[]) {
   const cur = stops.find((s) => s.status === 'em-andamento')
-  if (cur) return { dot: 'bg-brand', txt: `No ${shortTitle(rentalOf(cur.job))}` }
+  if (cur) return { dot: 'bg-brand', txt: `Em ${shortTitle(rentalOf(cur.job))}` }
   const way = stops.find((s) => s.status === 'a-caminho')
   if (way) return { dot: 'bg-blue', txt: `Indo para ${shortTitle(rentalOf(way.job))}` }
   const next = stops.find((s) => s.status === 'agendado')
@@ -827,10 +845,9 @@ function teamState(stops: Stop[]) {
 
 function Teams({ byTeam, activeTeam, onPick }: { byTeam: Record<string, Stop[]>; activeTeam: string; onPick: (teamId: string) => void }) {
   const nav = useNavigate()
-  const live = TEAMS.flatMap((t) => byTeam[t.id]).find((s) => s.status === 'em-andamento')
   return (
     <Panel className="flex flex-col bg-muted">
-      <SectionHead title="Equipes em campo" action={<ViewAll onClick={() => live && openJob(nav, live.job)}>App da equipe</ViewAll>} />
+      <SectionHead title="Equipes em campo" action={<ViewAll onClick={() => { const j = appJob(byTeam, activeTeam); if (j) openJob(nav, j) }}>App da equipe</ViewAll>} />
       <div className="grid grid-cols-3 gap-2">
         {TEAMS.map((t) => {
           const stops = byTeam[t.id]
@@ -897,8 +914,9 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
   const avisos = useDemo((s) => s.avisos)
   const setAvisoStatus = useDemo((s) => s.setAvisoStatus)
   const addJob = useDemo((s) => s.addJob)
-  const [resolved, setResolved] = React.useState<Record<string, boolean>>({})
-  const resolve = (id: string) => setResolved((r) => ({ ...r, [id]: true }))
+  const resolved = useDemo((s) => s.resolved)
+  const resolve = useDemo((s) => s.resolve)
+  const addAvisos = useDemo((s) => s.addAvisos)
 
   const stops = TEAMS.flatMap((t) => byTeam[t.id])
   const items: AttnItem[] = []
@@ -906,7 +924,10 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
   // avisos do QR e da equipe
   for (const o of occurrences.filter((x) => x.status === 'aberta')) {
     const r = RENTAL[o.rentalId]
-    const scheduled = stops.find((s) => s.job.rentalId === o.rentalId && s.job.type === 'Manutenção' && s.status !== 'concluido')
+    const cleaning = o.kind === 'sem-papel' || o.kind === 'sujo' || o.kind === 'cheio'
+    const scheduled = stops.find(
+      (s) => s.job.rentalId === o.rentalId && s.status !== 'concluido' && (s.job.note.includes(o.unitId) || s.job.type === 'Manutenção' || (cleaning && s.job.type === 'Limpeza')),
+    )
     const team = TEAM[r.teamId]
     const id = `occ-${o.id}`
     const when = daysFromToday(o.at) === 0 ? `hoje às ${fmt.time(o.at)}` : `${daysFromToday(o.at) === -1 ? 'ontem' : fmt.short(o.at)} às ${fmt.time(o.at)}`
@@ -924,7 +945,11 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
       sub: (
         <>
           {shortTitle(r)}, {when}.{' '}
-          {scheduled ? `Na rota da ${TEAM[scheduled.job.teamId].name} às ${hhmm(scheduled.startMin)}.` : 'Ainda sem equipe.'}
+          {scheduled
+            ? scheduled.status === 'em-andamento'
+              ? `A ${TEAM[scheduled.job.teamId].name} está no local agora.`
+              : `Na rota da ${TEAM[scheduled.job.teamId].name} às ${hhmm(scheduled.startMin)}.`
+            : 'Ainda sem equipe.'}
         </>
       ),
       action: scheduled
@@ -933,16 +958,16 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
             done: 'Cliente avisado',
             run: () => {
               resolve(id)
-              toast.success(`${r.contact.name} foi avisado pelo WhatsApp`, { description: `A ${TEAM[scheduled.job.teamId].name} passa às ${hhmm(scheduled.startMin)}.` })
+              toast.success(`${r.contact.name} foi avisado pelo WhatsApp`, {
+                description: scheduled.status === 'em-andamento' ? `A ${TEAM[scheduled.job.teamId].name} já está no local.` : `A ${TEAM[scheduled.job.teamId].name} passa às ${hhmm(scheduled.startMin)}.`,
+              })
             },
           }
         : {
             label: 'Encaixar na rota',
             done: 'Na rota',
             run: () => {
-              const teamStops = byTeam[team.id]
-              const after = teamStops.filter((s) => s.startMin > NOW_MIN)
-              const slot = Math.max(NOW_MIN + 30, ...after.filter((s) => s.startMin < 12 * 60 + 30).map((s) => s.startMin + s.job.durationMin + 10))
+              const slot = freeSlot(byTeam[team.id], 20)
               const d = new Date(TODAY)
               d.setHours(Math.floor(slot / 60), slot % 60, 0, 0)
               addJob({
@@ -951,14 +976,25 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
                 teamId: team.id,
                 start: d.toISOString(),
                 durationMin: 20,
-                type: o.kind === 'sem-papel' || o.kind === 'sujo' || o.kind === 'cheio' ? 'Limpeza' : 'Manutenção',
+                type: cleaning ? 'Limpeza' : 'Manutenção',
                 note: `${OCC_KIND[o.kind].label} na ${o.unitId}`,
                 status: 'agendado',
                 fixedTime: false,
                 units: 1,
               })
-              resolve(id)
-              toast.success(`Encaixado na rota da ${team.name} às ${hhmm(slot)}`, { description: `${r.contact.name} recebe o aviso pelo WhatsApp.` })
+              addAvisos([
+                {
+                  id: newId('av'),
+                  rentalId: r.id,
+                  kind: 'ocorrencia',
+                  title: `${OCC_KIND[o.kind].short} na ${o.unitId}`,
+                  dueDate: d.toISOString(),
+                  sendDate: NOW.toISOString(),
+                  status: 'enviado',
+                  origin: 'Aviso pelo QR da unidade',
+                },
+              ])
+              toast.success(`Encaixado na rota da ${team.name} às ${hhmm(slot)}`, { description: `${r.contact.name} recebeu o aviso pelo WhatsApp.` })
             },
           },
     })
@@ -979,7 +1015,7 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
       rental: r,
       title: (
         <>
-          {TEAM[s.job.teamId].name} chega {late + 10} min depois no {shortTitle(r)}
+          {TEAM[s.job.teamId].name} chega {late + 10} min depois em {shortTitle(r)}
         </>
       ),
       sub: (
@@ -1034,12 +1070,12 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
       rental: r,
       title: (
         <>
-          {shortTitle(r)}: {a.title.toLowerCase()}
+          {shortTitle(r)}: {lowerFirst(a.title)}
         </>
       ),
       sub: (
         <>
-          Enviado para {r.contact.name}, {daysFromToday(a.sendDate) >= 0 ? 'hoje' : `há ${-daysFromToday(a.sendDate)} dias`}
+          Enviado para {r.contact.name}, {daysFromToday(a.sendDate) >= 0 ? `hoje às ${fmt.time(a.sendDate)}` : daysFromToday(a.sendDate) === -1 ? 'ontem' : `há ${-daysFromToday(a.sendDate)} dias`}
         </>
       ),
       action: {
@@ -1063,7 +1099,7 @@ function Attention({ byTeam }: { byTeam: Record<string, Stop[]> }) {
       <SectionHead
         title="Precisa de atenção"
         sub={open ? 'Resolva antes dos próximos serviços' : 'Tudo resolvido por hoje'}
-        action={open ? <Badge tone="dark">{open} abertos</Badge> : <Badge tone="ok">Em dia</Badge>}
+        action={open ? <Badge tone="dark">{open} {open === 1 ? 'aberto' : 'abertos'}</Badge> : <Badge tone="ok">Em dia</Badge>}
       />
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {shown.map((it, i) => {

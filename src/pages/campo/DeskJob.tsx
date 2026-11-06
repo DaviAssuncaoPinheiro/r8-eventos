@@ -8,7 +8,7 @@ import { Badge, Card, IconCircle, RentalAvatar, TeamAvatar } from '@/components/
 import { TEAM, type Job } from '@/data/mock'
 import { fmt, relDays } from '@/data/time'
 import { JOB_TYPE } from '@/lib/status'
-import { useJob, useRentalHistory } from './data'
+import { dateShort, isToday, useJob, useRentalHistory } from './data'
 import { Btn, EASE_OUT } from './kit'
 import { ContactCard, ItemsCard, JobHero, LastCard, OccAlert, scopeLabel, TodoCard, Tracker, useJobFlow } from './JobScreen'
 import { ArrivalCard } from './ArrivalCard'
@@ -58,6 +58,7 @@ function DeskJobDetail({ job }: { job: Job }) {
         title={`${job.type} · ${rental.title}`}
         sub={
           <>
+            {!isToday(job.start) && <>{dateShort(job.start)} · </>}
             <span className="num">{fmt.time(job.start)}</span> · {job.durationMin} min · {b.name} · {team.name}
           </>
         }

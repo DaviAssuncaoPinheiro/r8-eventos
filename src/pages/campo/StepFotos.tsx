@@ -7,7 +7,7 @@ import { compressImage, newId } from '@/lib/photos'
 import { PRODUCT, type Job } from '@/data/mock'
 import { useDemo, type JobPhoto } from '@/store'
 import { notify, queueIfOffline } from './campoStore'
-import { cleanUnits, coverPhoto } from './data'
+import { cleanUnits, coverPhoto, simNow } from './data'
 import { Chip, EASE_OUT, Pressable, SafeImg, usePhone } from './kit'
 import { Block, StepFrame, StepIntro, type StepProps } from './stepKit'
 
@@ -37,7 +37,7 @@ export function StepFotos({ job, rental, layout, eyebrow }: StepProps) {
   const momentLabel = (m: Moment) => moments.find((x) => x.id === m)?.label ?? m
 
   const save = (src: string) => {
-    addPhoto({ id: newId('ph'), jobId: job.id, rentalId: rental.id, unitId, date: new Date().toISOString(), src, label: `${momentLabel(moment)}${unitId ? ` · ${unitId}` : ''}`, moment })
+    addPhoto({ id: newId('ph'), jobId: job.id, rentalId: rental.id, unitId, date: simNow().toISOString(), src, label: `${momentLabel(moment)}${unitId ? ` · ${unitId}` : ''}`, moment })
     queueIfOffline()
     // depois de "Antes", sugere "Depois"
     const idx = moments.findIndex((m) => m.id === moment)

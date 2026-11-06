@@ -145,7 +145,7 @@ export function UnitTable({ rows, onOpen }: { rows: UnitRow[]; onOpen: (id: stri
                   </td>
                   <td className="max-w-[260px] px-3">
                     <div className="truncate text-[13.5px] font-semibold text-ink">{r.place}</div>
-                    {(r.region || r.unit.note) && <div className="truncate text-[12px] font-medium text-ink-3">{r.region ?? r.unit.note}</div>}
+                    {(r.region || (r.state === 'manutencao' && r.unit.note)) && <div className="truncate text-[12px] font-medium text-ink-3">{r.region ?? r.unit.note}</div>}
                   </td>
                   <td className="px-3 text-[13px] font-medium whitespace-nowrap text-ink-2">{lastLabel(r) ?? <span className="text-ink-4">Sem registro</span>}</td>
                   <td className="px-3">{r.openOcc > 0 ? <Badge tone="late" dot>{r.openOcc} {r.openOcc === 1 ? 'aberto' : 'abertos'}</Badge> : <span className="text-[13px] text-ink-4">Nenhum</span>}</td>

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { motion } from 'motion/react'
-import { ArrowLeft, BadgeCheck, Check, CheckCheck, Clock, Mic, MoreVertical, Phone, Plus, Reply, Smile, Video } from 'lucide-react'
+import { ArrowLeft, BadgeCheck, Check, CheckCheck, Clock, Lock, Mic, MoreVertical, Phone, Plus, Reply, Smile, Video } from 'lucide-react'
 import { LogoMark } from '@/components/AppShell'
-import { COMPANY } from '@/data/mock'
+import { COMPANY, simNow } from '@/data/mock'
 import { daysFromToday, fmt } from '@/data/time'
 import { cn } from '@/lib/utils'
 import { QUICK, contactFirst, dm, type Item } from './data'
@@ -77,13 +77,16 @@ export function WhatsAppPhone({ item, message, onQuick, className }: { item: Ite
   const { a, rental } = item
   const programmed = a.status === 'programado'
   const send = new Date(a.sendDate)
-  const now = new Date()
+  const now = simNow()
   const sentAt = send > now ? now : send
   const sentToday = daysFromToday(sentAt) === 0
   const read = a.status === 'lido' || a.status === 'confirmado'
   const replyAt = new Date(sentAt.getTime() + (12 + (parseInt(a.id.replace(/\D/g, '') || '3', 10) * 17) % 70) * 60000)
   const followUp = a.status === 'sem-resposta'
-  const followAt = new Date(sentAt.getTime() + 86400000)
+  // lembrete automático: no dia seguinte, ou 2 h depois se foi enviado hoje (só se já passou)
+  const followAt = new Date(sentAt.getTime() + (sentToday ? 2 * 3600000 : 86400000))
+  const showFollow = followUp && followAt <= now
+  const silentDays = Math.max(0, -daysFromToday(sentAt))
   const autoOnFinish = programmed && a.kind === 'limpeza'
 
   return (
@@ -91,7 +94,7 @@ export function WhatsAppPhone({ item, message, onQuick, className }: { item: Ite
       <div className="relative overflow-hidden rounded-[32px] bg-[#efeae2]">
         {/* barra de status */}
         <div className="flex h-6 items-center justify-between bg-[#008069] px-5 pt-1 text-[10px] font-medium text-white/90">
-          <span>9:41</span>
+          <span>{clock(now)}</span>
           <span className="absolute top-1.5 left-1/2 h-[14px] w-[72px] -translate-x-1/2 rounded-full bg-black" />
           <span className="tracking-tight">5G ▮▮▮</span>
         </div>
@@ -114,20 +117,24 @@ export function WhatsAppPhone({ item, message, onQuick, className }: { item: Ite
         {/* conversa */}
         <div className="scroll-thin flex h-[392px] flex-col gap-1.5 overflow-y-auto px-2.5 py-2.5" style={{ backgroundImage: CHAT_BG, backgroundColor: '#efeae2' }}>
           <Chip>{programmed ? 'Mensagem programada' : sentToday ? 'Hoje' : `${dm(sentAt)}/${sentAt.getFullYear()}`}</Chip>
-          <Chip tone="sys">🔒 Conversa com conta comercial verificada.</Chip>
+          <Chip tone="sys">
+            <Lock size={10} strokeWidth={2.4} className="mr-1 inline -translate-y-px" />
+            Conversa com conta comercial verificada.
+          </Chip>
           <Bubble out time={clock(programmed ? send : sentAt)} ticks={read ? 'read' : 'sent'} pending={programmed} buttons={QUICK[a.kind]} onButton={onQuick}>
             {renderRich(message)}
           </Bubble>
-          {programmed && <Chip tone="sys">{autoOnFinish ? 'Sai sozinha quando a equipe finalizar a limpeza no app' : `Envio automático em ${dm(send)} às 09:00`}</Chip>}
-          {followUp && (
+          {programmed && <Chip tone="sys">{autoOnFinish ? 'Sai sozinha quando a equipe finalizar a limpeza no app' : `Envio automático em ${dm(send)} às ${clock(send)}`}</Chip>}
+          {followUp && !showFollow && <Chip tone="sys">Sem resposta desde as {clock(sentAt)}</Chip>}
+          {showFollow && (
             <>
-              <Chip>
-                {dm(followAt)}/{followAt.getFullYear()}
-              </Chip>
+              {daysFromToday(followAt) !== daysFromToday(sentAt) && (
+                <Chip>{daysFromToday(followAt) === 0 ? 'Hoje' : `${dm(followAt)}/${followAt.getFullYear()}`}</Chip>
+              )}
               <Bubble out time={clock(followAt)} ticks="sent">
                 {renderRich(`Oi, ${contactFirst(rental.contact.name)}! Conseguiu ver a mensagem sobre *${rental.title}*? Se preferir, me liga no ${COMPANY.whatsapp}.`)}
               </Bubble>
-              <Chip tone="sys">Sem resposta há {Math.max(1, -daysFromToday(followAt))} {Math.max(1, -daysFromToday(followAt)) === 1 ? 'dia' : 'dias'}</Chip>
+              <Chip tone="sys">{silentDays === 0 ? `Sem resposta desde as ${clock(sentAt)}` : `Sem resposta há ${silentDays} ${silentDays === 1 ? 'dia' : 'dias'}`}</Chip>
             </>
           )}
           {a.reply && <Bubble time={clock(replyAt)}>{a.reply}</Bubble>}

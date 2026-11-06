@@ -2,7 +2,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Camera, Check, CheckCheck, ClipboardCheck, Clock, CloudOff, House, MessageCircle, TriangleAlert, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, lowerFirst } from '@/lib/utils'
 import { TeamAvatar } from '@/components/ui'
 import { RENTAL, type Job } from '@/data/mock'
 import { fmt } from '@/data/time'
@@ -155,7 +155,7 @@ export function NextJobCard({ job, className, onOpen }: { job: Job; className?: 
           Próximo serviço · <span className="num">{fmt.time(next.start)}</span>
         </span>
         <span className="block truncate text-[15px] font-bold text-ink">{r.title}</span>
-        <span className="block truncate text-[12.5px] font-medium text-ink-3">{next.type}, {next.note.toLowerCase()}</span>
+        <span className="block truncate text-[12.5px] font-medium text-ink-3">{next.type}, {lowerFirst(next.note)}</span>
       </span>
       <TeamAvatar teamId={next.teamId} size={30} />
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black text-white">

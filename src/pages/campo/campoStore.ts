@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import { PRODUCT, RENTAL, type Job, type OccKind } from '@/data/mock'
 import { CHECKLISTS } from '@/lib/history'
 import { jobItems } from '@/lib/fieldkit'
-import { useDemo } from '@/store'
+import { onDemoReset, useDemo } from '@/store'
 import { cleanUnits, plainName } from './data'
 
 export interface DraftOcc {
@@ -137,3 +137,6 @@ export function queueIfOffline() {
   }
   return false
 }
+
+// "Reiniciar demonstração" também limpa o que está só no app da equipe
+onDemoReset(() => useCampo.setState({ drafts: {}, arrived: {}, startedAt: {}, notices: [], pending: 0, syncing: false }))

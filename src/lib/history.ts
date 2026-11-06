@@ -1,7 +1,8 @@
 // Checklists por tipo de serviço e histórico de serviços concluídos.
 // Serviços concluídos antes da demonstração ganham um registro sintético e estável,
 // para a ficha da locação, o relatório do cliente e a página do QR mostrarem os mesmos dados.
-import { PRODUCT, RENTAL, TEAM, unitsOf, type Job, type JobType, type OccKind } from '@/data/mock'
+import { PRODUCT, RENTAL, TEAM, qtyLabel, unitsOf, type Job, type JobType, type OccKind } from '@/data/mock'
+import { lowerFirst, plural } from './utils'
 import { fmt } from '@/data/time'
 import type { ServiceReport } from '@/store'
 import { jobItems } from './fieldkit'
@@ -18,7 +19,7 @@ export function suppliesFor(units: number) {
   return [
     { label: 'Papel higiênico', qty: `${units * 2} rolos` },
     { label: 'Produto químico', qty: `${Math.ceil(units * 0.5)} litros` },
-    { label: 'Desinfetante', qty: `${Math.max(1, Math.round(units / 6))} galão${Math.round(units / 6) > 1 ? 'ões' : ''}` },
+    { label: 'Desinfetante', qty: plural(Math.max(1, Math.round(units / 6)), 'galão', 'galões') },
   ]
 }
 
@@ -58,7 +59,7 @@ export function demoPhotosFor(job: Job): { src: string; label: string }[] {
     const p = PRODUCT[it.productId]
     if (seen.has(p.photo)) continue
     seen.add(p.photo)
-    out.push({ src: p.photo, label: job.type === 'Montagem' ? `${p.short} instalado` : `${p.short} recolhido` })
+    out.push({ src: p.photo, label: `${job.type === 'Montagem' ? 'Instalação' : 'Retirada'}: ${p.short}` })
   }
   return out.slice(0, 3)
 }
@@ -80,12 +81,12 @@ export function syntheticReport(job: Job): ServiceReport {
   const n = job.type === 'Limpeza' ? units.length || job.units : job.units
   const summary =
     job.type === 'Limpeza'
-      ? `${n} ${n === 1 ? 'unidade higienizada' : 'unidades higienizadas'} e abastecidas pela ${team.name}.${occ.length ? ' 1 ocorrência registrada.' : ''}`
+      ? `${n} ${n === 1 ? 'unidade higienizada e abastecida' : 'unidades higienizadas e abastecidas'} pela ${team.name}.${occ.length ? ' 1 ocorrência registrada.' : ''}`
       : job.type === 'Montagem'
-        ? `Montagem concluída: ${items?.map((i) => `${i.done} ${i.label.toLowerCase()}`).join(', ')}.`
+        ? `Montagem concluída: ${jobItems(job).map((i) => qtyLabel(i.productId, i.qty)).join(', ')}.`
         : job.type === 'Retirada'
-          ? `Retirada concluída: ${items?.map((i) => `${i.done} ${i.label.toLowerCase()}`).join(', ')}.`
-          : `Manutenção feita: ${job.note.toLowerCase()}.`
+          ? `Retirada concluída: ${jobItems(job).map((i) => qtyLabel(i.productId, i.qty)).join(', ')}.`
+          : `Manutenção feita: ${lowerFirst(job.note)}.`
   return {
     jobId: job.id,
     rentalId: r.id,

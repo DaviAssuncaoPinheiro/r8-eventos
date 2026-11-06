@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { AVISOS, JOBS, OCCURRENCES, type Aviso, type AvisoStatus, type Job, type JobStatus, type JobType, type Occurrence, type OccKind, type OccStatus, type UnitState } from './data/mock'
+import { AVISOS, JOBS, OCCURRENCES, RENTAL, type Aviso, type AvisoStatus, type Job, type JobStatus, type JobType, type Occurrence, type OccKind, type OccStatus, type Rental, type RentalStatus, type UnitState } from './data/mock'
+import { TODAY } from './data/time'
 
 /** Foto tirada pela equipe no app (antes, depois, instalação, avaria) */
 export interface JobPhoto {
@@ -54,6 +55,12 @@ interface DemoState {
   reports: Record<string, ServiceReport>
   /** carga do caminhão marcada: "teamId:itemId" */
   loadChecked: Record<string, boolean>
+  /** situação da locação alterada por serviços concluídos na demonstração */
+  rentalStatus: Record<string, RentalStatus>
+  /** cartões de "Precisa de atenção" já resolvidos */
+  resolved: Record<string, boolean>
+  /** sugestão de escala da tela Regiões aplicada */
+  scaleApplied: boolean
   setJobStatus: (id: string, s: JobStatus) => void
   addJob: (j: Job) => void
   setAvisoStatus: (id: string, s: AvisoStatus) => void
@@ -67,6 +74,9 @@ interface DemoState {
   removePhoto: (id: string) => void
   saveReport: (r: ServiceReport) => void
   toggleLoad: (key: string) => void
+  setRentalStatus: (id: string, s: RentalStatus) => void
+  resolve: (id: string) => void
+  setScaleApplied: (v: boolean) => void
   reset: () => void
 }
 
@@ -81,6 +91,9 @@ const initial = () => ({
   photos: [] as JobPhoto[],
   reports: {} as Record<string, ServiceReport>,
   loadChecked: {} as Record<string, boolean>,
+  rentalStatus: {} as Record<string, RentalStatus>,
+  resolved: {} as Record<string, boolean>,
+  scaleApplied: false,
 })
 
 export const useDemo = create<DemoState>()(
@@ -100,11 +113,32 @@ export const useDemo = create<DemoState>()(
       removePhoto: (id) => set((st) => ({ photos: st.photos.filter((x) => x.id !== id) })),
       saveReport: (r) => set((st) => ({ reports: { ...st.reports, [r.jobId]: r } })),
       toggleLoad: (key) => set((st) => ({ loadChecked: { ...st.loadChecked, [key]: !st.loadChecked[key] } })),
-      reset: () => set(initial()),
+      setRentalStatus: (id, s) => set((st) => ({ rentalStatus: { ...st.rentalStatus, [id]: s } })),
+      resolve: (id) => set((st) => ({ resolved: { ...st.resolved, [id]: true } })),
+      setScaleApplied: (v) => set({ scaleApplied: v }),
+      reset: () => {
+        set(initial())
+        for (const fn of resetListeners) fn()
+      },
     }),
-    { name: 'r8-eventos-demo-v1' },
+    // a demonstração recomeça a cada dia: as datas dos dados são relativas a hoje
+    { name: `r8-eventos-demo-${TODAY.getFullYear()}-${TODAY.getMonth() + 1}-${TODAY.getDate()}` },
   ),
 )
+
+/** Outros estados (ex.: app da equipe) que também devem voltar ao início no "Reiniciar demonstração" */
+const resetListeners = new Set<() => void>()
+export const onDemoReset = (fn: () => void) => {
+  resetListeners.add(fn)
+  return () => resetListeners.delete(fn)
+}
+
+/** Locação com a situação atual (montagem concluída vira "No local", retirada concluída vira "Encerrada") */
+export function useRentalStatus() {
+  const over = useDemo((s) => s.rentalStatus)
+  return (r: Rental): RentalStatus => over[r.id] ?? r.status
+}
+export const rentalStatusNow = (id: string): RentalStatus => useDemo.getState().rentalStatus[id] ?? RENTAL[id].status
 
 /** Todos os serviços (base + criados na demonstração) com o status atual */
 export function useJobs(): Job[] {

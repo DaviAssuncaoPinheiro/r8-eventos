@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { AppShell } from './components/AppShell'
 import { TooltipProvider } from './components/ui'
@@ -18,7 +18,7 @@ const Unidade = lazy(() => import('./pages/public/Unidade'))
 export default function App() {
   return (
     <TooltipProvider>
-      <HashRouter>
+      <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Suspense fallback={<div className="h-dvh bg-surface" />}>
           <Routes>
             <Route path="/campo/*" element={<Campo />} />
@@ -33,6 +33,7 @@ export default function App() {
               <Route path="equipamentos" element={<Equipamentos />} />
               <Route path="avisos" element={<Avisos />} />
             </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </HashRouter>

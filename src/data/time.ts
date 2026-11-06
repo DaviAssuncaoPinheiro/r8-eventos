@@ -58,3 +58,9 @@ export function ageLabel(birth: Date | string) {
   const m = months % 12
   return m ? `${y} a ${m} m` : `${y} ${y === 1 ? 'ano' : 'anos'}`
 }
+
+/** "na segunda-feira", "no sábado" */
+export function onWeekday(d: Date | string) {
+  const w = fmt.weekday(d)
+  return `${/^(sábado|domingo)/.test(w) ? 'no' : 'na'} ${w}`
+}

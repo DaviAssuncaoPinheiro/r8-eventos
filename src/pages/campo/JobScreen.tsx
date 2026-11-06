@@ -6,13 +6,13 @@ import { ArrowUpRight, Check, ChevronRight, ClipboardList, Clock, FileText, KeyR
 import { cn } from '@/lib/utils'
 import { ProductThumb, RentalAvatar, TeamAvatar } from '@/components/ui'
 import { CLIENT, PRODUCT, TEAM, type Job } from '@/data/mock'
-import { fmt, relDays } from '@/data/time'
+import { daysFromToday, fmt, relDays } from '@/data/time'
 import { JOB_STATUS, JOB_TYPE, OCC_KIND } from '@/lib/status'
 import { jobItems, navLinks } from '@/lib/fieldkit'
 import { jobReport, stamp } from '@/lib/history'
 import { useDemo } from '@/store'
 import { notify, queueIfOffline, useCampo } from './campoStore'
-import { bairroOf, cleanUnits, contactFirst, coverPhoto, rentalOf, simNow, useJob, useLastCleaning, zoneOf } from './data'
+import { bairroOf, cleanUnits, contactFirst, coverPhoto, dateShort, isToday, rentalOf, simNow, useJob, useLastCleaning, zoneOf } from './data'
 import { Btn, ConnectivityBanner, EASE_OUT, Pressable, RoundBtn, SafeImg, Screen } from './kit'
 import { useGo } from './nav'
 import { ArrivalCard } from './ArrivalCard'
@@ -84,7 +84,13 @@ export function useJobFlow(job: Job) {
   const canArrival = status === 'em-andamento' || (status === 'a-caminho' && arrived)
   const arrivalStart = status === 'em-andamento' ? 'Continuar registro' : 'Começar registro'
 
+  const future = daysFromToday(job.start) > 0
+  const past = daysFromToday(job.start) < 0
   const onPrimary = () => {
+    if ((future || past) && status === 'agendado') {
+      notify({ kind: 'app', title: future ? `Serviço de ${dateShort(job.start)}` : 'Serviço de outro dia', body: future ? 'O registro abre no dia do serviço.' : 'Esse serviço ficou para trás. Reagende pela agenda.' })
+      return
+    }
     if (status === 'agendado' || status === 'cancelado') {
       setJobStatus(job.id, 'a-caminho')
       const offline = queueIfOffline()
@@ -105,7 +111,11 @@ export function useJobFlow(job: Job) {
 
   const stage = status === 'concluido' ? 3 : status === 'em-andamento' ? 2 : status === 'a-caminho' ? (arrived ? 1 : 0) : -1
   const primaryLabel =
-    status === 'agendado' || status === 'cancelado'
+    (future || past) && status === 'agendado'
+      ? future
+        ? `Agendado para ${dateShort(job.start)}`
+        : 'Serviço não feito'
+      : status === 'agendado' || status === 'cancelado'
       ? 'Estou a caminho'
       : status === 'a-caminho'
         ? arrived
@@ -170,6 +180,7 @@ function JobDetail({ job }: { job: Job }) {
             <div className="text-[15px] font-bold text-ink">{job.type}</div>
             <div className="mt-0.5 flex items-center gap-1.5 text-[12.5px] font-semibold text-ink-2">
               <Clock className="size-3.5" strokeWidth={2.2} />
+              {!isToday(job.start) && <>{dateShort(job.start)} · </>}
               <span className="num">{fmt.time(job.start)}</span> · {job.durationMin} min
             </div>
           </div>

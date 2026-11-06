@@ -59,7 +59,7 @@ export interface CityMapProps {
   /** 'optimized' = linha preta contínua; 'naive' = coral tracejada (como foi marcada) */
   routeVariant?: 'optimized' | 'naive'
   showRoute?: boolean
-  /** troque para redesenhar a rota do zero (ex.: ao trocar de veterinário) */
+  /** troque para redesenhar a rota do zero (ex.: ao trocar de equipe) */
   routeKey?: string
   selectedVisitId?: string | null
   onSelectVisit?: (id: string | null) => void
@@ -71,7 +71,7 @@ export interface CityMapProps {
   heat?: Partial<Record<ZoneId, number>>
   heatMax?: number
   heatUnit?: string
-  /** 'visits' enquadra as paradas (zoom); 'city' mostra Manaus inteira */
+  /** 'visits' enquadra as paradas (zoom); 'city' mostra o DF inteiro */
   focus?: 'city' | 'visits'
   /** proporção largura/altura. Sem ela, o mapa preenche a altura do pai */
   aspect?: number

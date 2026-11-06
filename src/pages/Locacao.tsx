@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Building2, Search } from 'lucide-react'
 import { Button, Card, IconCircle, RentalAvatar } from '@/components/ui'
@@ -46,7 +47,8 @@ function NotFound({ id }: { id?: string }) {
 
 export default function Locacao() {
   const { id } = useParams()
-  const rental = id ? RENTAL[id] : undefined
+  const over = useDemo((s) => (id ? s.rentalStatus[id] : undefined))
+  const rental = React.useMemo(() => (id && RENTAL[id] ? (over ? { ...RENTAL[id], status: over } : RENTAL[id]) : undefined), [id, over])
   const model = useRentalModel(rental)
   const avisos = useDemo((s) => s.avisos)
 

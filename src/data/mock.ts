@@ -241,7 +241,7 @@ export const RENTALS: Rental[] = [
     address: 'Setor Central do Gama, praça do Cine Itapuã', bairro: 'gama', start: iso(-4), end: iso(0), eventDays: [iso(-3, '07:00'), iso(-1, '14:00')],
     items: [{ productId: 'bq', qty: 6 }, { productId: 'bq-pne', qty: 1 }, { productId: 'tenda-5', qty: 10 }], cleanPerWeek: 0,
     contact: { name: 'Sônia Ribeiro', role: 'Gerente de eventos', phone: '(61) 98190-3374' },
-    status: 'retirada', value: 7350, teamId: 'marcos',
+    status: 'encerrada', value: 7350, teamId: 'marcos',
   }),
   rental({
     id: 'padroeira', clientId: 'paroquia', title: 'Corrida da Padroeira 2026', kind: 'evento',
@@ -348,6 +348,13 @@ export interface Job {
   products?: ProductId[]
 }
 
+/** Dia da semana (1 = seg) → regiões de cada equipe. Base do "organizar por região". */
+export const WEEK_PLAN: Record<string, Record<number, ZoneId[]>> = {
+  fabio: { 1: ['norte', 'plano'], 2: ['plano', 'lagos'], 3: ['norte', 'lagos'], 4: ['plano'], 5: ['norte', 'plano', 'lagos'], 6: ['plano'] },
+  marcos: { 1: ['oeste', 'guara'], 2: ['oeste', 'sul'], 3: ['oeste', 'guara'], 4: ['sul', 'guara'], 5: ['oeste', 'guara', 'sul'], 6: ['oeste'] },
+  wesley: { 1: ['guara'], 2: ['plano', 'sul'], 3: ['oeste'], 4: ['lagos'], 5: ['plano', 'lagos', 'sul'], 6: ['plano', 'oeste'] },
+}
+
 let jSeq = 0
 function job(dayOffset: number, hhmm: string, teamId: string, rentalId: string, type: JobType, note: string, status: JobStatus, durationMin = 40, fixedTime = false, units?: number): Job {
   jSeq++
@@ -357,6 +364,10 @@ function job(dayOffset: number, hhmm: string, teamId: string, rentalId: string, 
 
 /** Hora "agora" simulada no protótipo: 10h40 de hoje */
 export const NOW = day(0, '10:40')
+
+/** Relógio simulado: começa às 10:40 de hoje e anda junto com o tempo real */
+const LOADED_AT = Date.now()
+export const simNow = () => new Date(+NOW + (Date.now() - LOADED_AT))
 
 const HAND_JOBS: Job[] = [
   // ── HOJE · Equipe Fábio · Norte, Plano e Lagos
@@ -388,7 +399,7 @@ const HAND_JOBS: Job[] = [
   job(3, '07:00', 'wesley', 'festival', 'Retirada', 'Tudo: banheiros, trailers e estruturas', 'agendado', 300, true, 362),
   job(3, '09:00', 'marcos', 'congresso', 'Limpeza', 'Plantão no evento', 'agendado', 90, true),
   job(3, '13:00', 'wesley', 'corrida', 'Retirada', 'Banheiros, grades e tendas', 'agendado', 180, false, 442),
-  job(3, '15:30', 'wesley', 'escola', 'Retirada', '3 banheiros', 'agendado', 40, false, 3),
+  job(3, '16:30', 'wesley', 'escola', 'Retirada', '3 banheiros', 'agendado', 40, false, 3),
   job(4, '08:00', 'wesley', 'congresso', 'Retirada', '20 banheiros, 2 PNE e 2 tendas', 'agendado', 150, false, 24),
 ]
 
@@ -453,7 +464,40 @@ const RECURRING: Job[] = (() => {
   return out
 })()
 
-export const JOBS: Job[] = [...HAND_JOBS, ...RECURRING].sort((a, b) => +new Date(a.start) - +new Date(b.start))
+/** Equipe de montagem nos dias sem montagem ou retirada: manutenção preventiva nas obras da região do dia */
+const WESLEY_NOTES = ['Vistoria das unidades e do fechamento', 'Troca de unidade com avaria', 'Reforço do fechamento metálico', 'Reposição de painéis do fechamento']
+const PREVENTIVE: Job[] = (() => {
+  const out: Job[] = []
+  const busy = new Set([...HAND_JOBS, ...RECURRING].filter((j) => j.teamId === 'wesley').map((j) => daysFromToday(j.start)))
+  for (let d = -21; d <= 13; d++) {
+    const date = day(d)
+    const dow = date.getDay()
+    if (dow === 0 || busy.has(d)) continue
+    const plan = WEEK_PLAN.wesley[dow] ?? []
+    const sites = RENTALS.filter((r) => r.kind === 'obra' && r.status === 'ativa' && onSite(r, d) && plan.includes(BAIRRO[r.bairro].zone))
+    if (!sites.length) continue
+    const h = Math.abs((d * 2654435761) | 0)
+    const n = Math.min(sites.length, 1 + (h % 2))
+    for (let i = 0; i < n; i++) {
+      const r = sites[(h + i * 3) % sites.length]
+      out.push({
+        id: `g-w-${d < 0 ? 'm' : 'p'}${Math.abs(d)}-${i}`,
+        rentalId: r.id,
+        teamId: 'wesley',
+        start: iso(d, i === 0 ? '08:00' : '13:30'),
+        durationMin: 60 + ((h >>> (i + 2)) % 3) * 30,
+        type: 'Manutenção',
+        note: WESLEY_NOTES[(h >>> 5) % WESLEY_NOTES.length],
+        status: d < 0 ? 'concluido' : 'agendado',
+        fixedTime: false,
+        units: 1,
+      })
+    }
+  }
+  return out
+})()
+
+export const JOBS: Job[] = [...HAND_JOBS, ...RECURRING, ...PREVENTIVE].sort((a, b) => +new Date(a.start) - +new Date(b.start))
 export const JOB = Object.fromEntries(JOBS.map((j) => [j.id, j])) as Record<string, Job>
 
 export const jobsOn = (offset: number) => JOBS.filter((j) => daysFromToday(j.start) === offset)
@@ -472,11 +516,23 @@ export const ROUTE_FABIO = {
   minOptimized: 151,
 }
 
-/** Dia da semana (1 = seg) → regiões de cada equipe. Base do "organizar por região". */
-export const WEEK_PLAN: Record<string, Record<number, ZoneId[]>> = {
-  fabio: { 1: ['norte', 'plano'], 2: ['plano', 'lagos'], 3: ['norte', 'lagos'], 4: ['plano'], 5: ['norte', 'plano', 'lagos'], 6: ['plano'] },
-  marcos: { 1: ['oeste', 'guara'], 2: ['oeste', 'sul'], 3: ['oeste', 'guara'], 4: ['sul', 'guara'], 5: ['oeste', 'guara', 'sul'], 6: ['oeste'] },
-  wesley: { 1: ['guara'], 2: ['plano', 'sul'], 3: ['oeste'], 4: ['lagos'], 5: ['plano', 'lagos', 'sul'], 6: ['plano', 'oeste'] },
+
+/** Sugestão da tela Regiões: Equipe Fábio inclui os Lagos nos dias em que já está no Plano e ninguém cobre os Lagos */
+export const scaleSuggestion = () => {
+  const team = 'fabio'
+  const target: ZoneId = 'lagos'
+  const days = [1, 2, 3, 4, 5, 6].filter((d) => !Object.values(WEEK_PLAN).some((p) => p[d]?.includes(target)) && WEEK_PLAN[team][d]?.includes('plano') && HEATMAP[target][d - 1] > 0)
+  return { team, target, days }
+}
+
+/** Escala da semana, com ou sem a sugestão aplicada */
+export function weekPlan(applied: boolean): Record<string, Record<number, ZoneId[]>> {
+  const out = Object.fromEntries(Object.entries(WEEK_PLAN).map(([t, p]) => [t, Object.fromEntries(Object.entries(p).map(([d, z]) => [d, [...z]]))])) as Record<string, Record<number, ZoneId[]>>
+  if (applied) {
+    const sg = scaleSuggestion()
+    for (const d of sg.days) out[sg.team][d] = [...(out[sg.team][d] ?? []), sg.target]
+  }
+  return out
 }
 
 /* ───────────────────────── Ocorrências (QR na porta e equipe) ───────────────────────── */
@@ -521,28 +577,32 @@ export interface Aviso {
 }
 
 let aSeq = 0
-function aviso(rentalId: string, kind: AvisoKind, title: string, dueOffset: number, status: AvisoStatus, origin: string, reply?: string, sendBefore = 2): Aviso {
+function aviso(rentalId: string, kind: AvisoKind, title: string, dueOffset: number, status: AvisoStatus, origin: string, reply?: string, sendBefore = 2, sendAt = '09:00'): Aviso {
   aSeq++
-  return { id: `a${aSeq}`, rentalId, kind, title, dueDate: iso(dueOffset), sendDate: iso(dueOffset - sendBefore, '09:00'), status, origin, reply }
+  return { id: `a${aSeq}`, rentalId, kind, title, dueDate: iso(dueOffset), sendDate: iso(dueOffset - sendBefore, sendAt), status, origin, reply }
 }
 
+/** Dia do mês de uma data relativa (para textos como "vence todo dia 12") */
+const dom = (offset: number) => day(offset).getDate()
+
 export const AVISOS: Aviso[] = [
-  aviso('escola', 'retirada', 'Retirada dos 3 banheiros', 3, 'sem-resposta', 'Fim do contrato', undefined, 3),
-  aviso('noroeste', 'renovacao', 'Renovação mensal', 6, 'lido', 'Contrato vence todo dia 12', undefined, 4),
-  aviso('br020', 'ocorrencia', 'Porta com trava solta', 0, 'enviado', 'Aviso pelo QR da unidade', undefined, 0),
+  aviso('escola', 'retirada', 'Retirada dos 3 banheiros', 3, 'sem-resposta', 'Fim do contrato', undefined, 3, '08:00'),
+  aviso('noroeste', 'renovacao', 'Renovação mensal', 6, 'lido', `Contrato vence todo dia ${dom(6)}`, undefined, 4),
+  aviso('br020', 'ocorrencia', 'Porta com trava solta', 0, 'enviado', 'Aviso pelo QR da unidade', undefined, 1, '17:30'),
   aviso('festival', 'montagem', 'Montagem dos banheiros', 1, 'confirmado', 'Ordem de serviço', 'Confirmado. Portão F liberado a partir das 6h.', 1),
   aviso('casamento', 'montagem', 'Montagem do trailer e tendas', 0, 'confirmado', 'Ordem de serviço', 'Perfeito, a casa estará aberta a partir das 14h.', 1),
   aviso('corrida', 'montagem', 'Montagem de banheiros e grades', 1, 'enviado', 'Ordem de serviço', undefined, 1),
   aviso('congresso', 'montagem', 'Montagem dos banheiros', 1, 'lido', 'Ordem de serviço', undefined, 1),
   aviso('feira-gama', 'retirada', 'Retirada após a feira', 0, 'confirmado', 'Fim do evento', 'Pode retirar cedo, o portão abre às 6h30.', 1),
-  aviso('jardins', 'limpeza', 'Relatório da limpeza de hoje', 0, 'programado', 'Enviado ao concluir cada limpeza', undefined, 0),
-  aviso('torre36', 'limpeza', 'Relatório da limpeza de hoje', 0, 'enviado', 'Enviado ao concluir cada limpeza', undefined, 0),
-  aviso('smart', 'limpeza', 'Relatório da limpeza de hoje', 0, 'lido', 'Enviado ao concluir cada limpeza', undefined, 0),
-  aviso('br020', 'limpeza', 'Relatório da limpeza de hoje', 0, 'enviado', 'Enviado ao concluir cada limpeza', undefined, 0),
-  aviso('santamaria', 'renovacao', 'Renovação do contrato', 12, 'programado', 'Contrato vence em 75 dias, renovação mensal', undefined, 5),
-  aviso('galpao', 'renovacao', 'Renovação mensal', 9, 'programado', 'Contrato vence todo dia 15', undefined, 5),
-  aviso('smart', 'ocorrencia', 'Vazamento na PNE', 0, 'confirmado', 'Registro da equipe', 'Ok, obrigado pelo aviso. Podem vir às 14h.', 0),
-  aviso('torre36', 'ocorrencia', 'Falta de papel', 0, 'sem-resposta', 'Aviso pelo QR da unidade', undefined, 0),
+  aviso('jardins', 'limpeza', 'Relatório da limpeza de hoje', 0, 'programado', 'Enviado ao concluir cada limpeza', undefined, 0, '10:55'),
+  aviso('br020', 'limpeza', 'Relatório da limpeza de hoje', 0, 'enviado', 'Enviado ao concluir cada limpeza', undefined, 0, '08:07'),
+  aviso('torre36', 'limpeza', 'Relatório da limpeza de hoje', 0, 'enviado', 'Enviado ao concluir cada limpeza', undefined, 0, '08:32'),
+  aviso('noroeste', 'limpeza', 'Relatório da limpeza de hoje', 0, 'lido', 'Enviado ao concluir cada limpeza', undefined, 0, '09:07'),
+  aviso('smart', 'limpeza', 'Relatório da limpeza de hoje', 0, 'lido', 'Enviado ao concluir cada limpeza', undefined, 0, '09:27'),
+  aviso('santamaria', 'renovacao', 'Renovação mensal', 12, 'programado', `Contrato vence todo dia ${dom(12)}`, undefined, 5),
+  aviso('galpao', 'renovacao', 'Renovação mensal', 9, 'programado', `Contrato vence todo dia ${dom(9)}`, undefined, 5),
+  aviso('smart', 'ocorrencia', 'Vazamento na PNE', 0, 'confirmado', 'Registro da equipe', 'Ok, obrigado pelo aviso. Podem vir às 14h.', 1, '16:00'),
+  aviso('torre36', 'ocorrencia', 'Falta de papel', 0, 'sem-resposta', 'Aviso pelo QR da unidade', undefined, 0, '09:15'),
   aviso('festival', 'retirada', 'Retirada após o festival', 3, 'programado', 'Fim do evento', undefined, 2),
   aviso('corrida', 'retirada', 'Retirada após a prova', 3, 'programado', 'Fim do evento', undefined, 1),
 ]
@@ -551,9 +611,9 @@ export const AVISOS: Aviso[] = [
 
 export const TEMPLATES: Record<AvisoKind, string> = {
   limpeza: 'Olá, {contato}! Aqui é a {empresa}.\nA limpeza dos banheiros em *{local}* foi concluída às {hora}: {unidades} higienizados e abastecidos.\nRelatório com fotos: {link}',
-  montagem: 'Olá, {contato}! Confirmando a montagem em *{local}* na *{data}* às {hora}.\nEquipe {equipe}, {caminhao}. Precisamos de acesso para caminhão no local.',
-  retirada: 'Olá, {contato}! A locação em *{local}* termina na *{data}*.\nPodemos fazer a retirada nesse dia pela manhã? Se quiser renovar, é só responder aqui.',
-  renovacao: 'Olá, {contato}! O contrato de *{local}* vence em *{data}*.\nQuer renovar por mais 30 dias nas mesmas condições?',
+  montagem: 'Olá, {contato}! Confirmando a montagem em *{local}* no dia *{data}* às {hora}.\nEquipe {equipe}, {caminhao}. Precisamos de acesso para caminhão no local.',
+  retirada: 'Olá, {contato}! A locação em *{local}* termina no dia *{data}*.\nPodemos fazer a retirada nesse dia pela manhã? Se quiser renovar, é só responder aqui.',
+  renovacao: 'Olá, {contato}! O contrato de *{local}* vence no dia *{data}*.\nQuer renovar por mais 30 dias nas mesmas condições?',
   ocorrencia: 'Olá, {contato}! Recebemos um aviso da unidade *{unidade}* em {local}: {problema}.\nNossa equipe passa hoje para resolver.',
 }
 
@@ -584,13 +644,23 @@ export const HEATMAP: Record<ZoneId, number[]> = {
 /* ───────────────────────── Estoque por dia ───────────────────────── */
 
 /** Quantas unidades de cada produto estão comprometidas no dia (locações no local + manutenção) */
-export function demandOn(offset: number): Record<ProductId, number> {
+export function demandOn(offset: number, unitState: Record<string, UnitState> = {}): Record<ProductId, number> {
   const out = Object.fromEntries(PRODUCTS.map((p) => [p.id, 0])) as Record<ProductId, number>
   for (const r of RENTALS) {
     if (!onSite(r, offset)) continue
     for (const it of r.items) out[it.productId] += it.qty
   }
-  for (const u of UNITS) if (u.state === 'manutencao') out[u.productId] += 1
+  for (const u of UNITS) if ((unitState[u.id] ?? u.state) === 'manutencao') out[u.productId] += 1
+  return out
+}
+
+/** Só o que está reservado para locações no dia (sem contar a oficina) */
+export function rentedOn(offset: number): Record<ProductId, number> {
+  const out = Object.fromEntries(PRODUCTS.map((p) => [p.id, 0])) as Record<ProductId, number>
+  for (const r of RENTALS) {
+    if (!onSite(r, offset)) continue
+    for (const it of r.items) out[it.productId] += it.qty
+  }
   return out
 }
 
@@ -600,10 +670,10 @@ export function rentalsUsing(productId: ProductId, offset: number) {
 }
 
 /** Dias com falta de estoque nos próximos N dias */
-export function shortages(daysAhead = 14) {
+export function shortages(daysAhead = 14, unitState: Record<string, UnitState> = {}) {
   const out: { offset: number; productId: ProductId; need: number; stock: number }[] = []
   for (let d = 0; d <= daysAhead; d++) {
-    const dem = demandOn(d)
+    const dem = demandOn(d, unitState)
     for (const p of PRODUCTS) if (dem[p.id] > p.stock) out.push({ offset: d, productId: p.id, need: dem[p.id], stock: p.stock })
   }
   return out

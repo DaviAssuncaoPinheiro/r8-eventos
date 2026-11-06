@@ -1,13 +1,12 @@
 // Ajudantes do app da equipe: serviço, locação, relógio simulado e textos curtos.
 import { BAIRRO, ZONE } from '@/data/geo'
-import { CLIENT, NOW, PRODUCT, RENTAL, TEAM, unitsOf, type Job, type Rental } from '@/data/mock'
+import { CLIENT, NOW, PRODUCT, RENTAL, TEAM, simNow, unitsOf, type Job, type Rental } from '@/data/mock'
 import { day, daysFromToday, fmt } from '@/data/time'
 import { jobReport } from '@/lib/history'
 import { useDemo, useJobs, type ServiceReport } from '@/store'
 
 /* Relógio simulado: começa às 10:40 de hoje e anda com o tempo real */
-const LOADED_AT = Date.now()
-export const simNow = () => new Date(+NOW + (Date.now() - LOADED_AT))
+export { simNow }
 export const minutesSince = (iso: string, now?: Date) => Math.max(0, Math.round((+(now ?? simNow()) - +new Date(iso)) / 60000))
 
 export const isToday = (d: string) => daysFromToday(d) === 0
@@ -100,4 +99,20 @@ export function jobTodo(job: Job, openOcc: { unitId: string; label: string }[]):
   }
   for (const o of openOcc) out.push(`Resolver ${o.unitId}: ${o.label.toLowerCase()}`)
   return out
+}
+
+/** Unidades do serviço: na manutenção, só a que tem defeito (citada no serviço ou com aviso aberto) */
+export function jobUnits(job: Job, rental: Rental) {
+  const all = cleanUnits(rental)
+  if (job.type !== 'Manutenção') return all
+  const open = useDemo.getState().occurrences.filter((o) => o.rentalId === rental.id && o.status === 'aberta' && o.kind !== 'sem-papel' && o.kind !== 'sujo' && o.kind !== 'cheio')
+  const byNote = all.filter((u) => job.note.includes(u.id))
+  if (byNote.length) return byNote
+  const byOcc = all.filter((u) => open.some((o) => o.unitId === u.id))
+  if (byOcc.length) return byOcc
+  if (/PNE/.test(job.note)) {
+    const pne = all.filter((u) => u.productId === 'bq-pne')
+    if (pne.length) return pne.slice(0, 1)
+  }
+  return all.slice(0, 1)
 }

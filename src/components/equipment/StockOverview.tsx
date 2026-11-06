@@ -76,7 +76,7 @@ export function ShortageAlert({ groups, onShowDay }: { groups: ShortageGroup[]; 
                   disabled={!!state}
                   onClick={() => {
                     setDone((d) => ({ ...d, [g.productId]: 'rem' }))
-                    toast.success('Remanejamento sugerido', { description: `Recolher ${g.deficit} unidades de obras com folga e devolver na segunda.` })
+                    toast.success('Remanejamento sugerido', { description: `Recolher ${g.deficit} unidades de obras com folga e devolver depois do pico.` })
                   }}
                   className="inline-flex h-10 items-center gap-2 rounded-full bg-card px-4 text-[13.5px] font-semibold text-ink shadow-pill transition-[background,transform] hover:bg-surface active:scale-[.97] disabled:opacity-40"
                 >

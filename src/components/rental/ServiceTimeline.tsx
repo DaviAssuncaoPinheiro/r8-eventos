@@ -140,7 +140,7 @@ function Entry({ item, index }: { item: HistoryItem; index: number }) {
                       </li>
                     ))}
                   </ul>
-                  {failed.length > 0 && <div className="mt-1.5 text-[12px] font-semibold text-red">{failed.length} item com pendência</div>}
+                  {failed.length > 0 && <div className="mt-1.5 text-[12px] font-semibold text-red">{failed.length} {failed.length === 1 ? 'item com pendência' : 'itens com pendência'}</div>}
                 </div>
                 <div className="flex flex-col gap-2">
                   {report.items && (
@@ -230,7 +230,7 @@ export function ServiceTimeline({ items, live, title }: { items: HistoryItem[]; 
         <div>
           <h3 className="text-[17px] font-bold tracking-[-0.02em] text-ink">Histórico de serviços</h3>
           <div className="mt-0.5 text-[12.5px] font-medium text-ink-3">
-            {items.length} registros{fresh ? ` · ${fresh} novo${fresh > 1 ? 's' : ''} hoje` : ''}
+            {items.length} {items.length === 1 ? 'registro' : 'registros'}{fresh ? ` · ${fresh} novo${fresh > 1 ? 's' : ''} hoje` : ''}
           </div>
         </div>
         <span className="hidden items-center gap-1.5 text-[12px] font-semibold text-ink-3 sm:inline-flex">

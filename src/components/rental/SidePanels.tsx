@@ -175,7 +175,7 @@ export function OccurrencesPanel({ rental, occurrences }: { rental: Rental; occu
   const nav = useNavigate()
   const setStatus = useDemo((s) => s.setOccurrenceStatus)
   return (
-    <Section title="Ocorrências" action={occurrences.some((o) => o.status === 'aberta') ? <span className="text-[12px] font-semibold text-red">{occurrences.filter((o) => o.status === 'aberta').length} abertas</span> : undefined}>
+    <Section title="Ocorrências" action={occurrences.some((o) => o.status === 'aberta') ? <span className="text-[12px] font-semibold text-red">{(() => { const n = occurrences.filter((o) => o.status === 'aberta').length; return `${n} ${n === 1 ? 'aberta' : 'abertas'}` })()}</span> : undefined}>
       {occurrences.length === 0 ? (
         <div className="py-3 text-[13px] font-medium text-ink-3">Nenhum aviso pelo QR ou pela equipe.</div>
       ) : (
@@ -269,7 +269,7 @@ export function AvisosPanel({ avisos }: { avisos: Aviso[] }) {
                   </span>
                 </div>
                 <div className="num mt-0.5 text-[12px] font-medium text-ink-3">
-                  {AVISO_KIND[a.kind].label} · {n === 0 ? 'hoje' : n === 1 ? 'amanhã' : n > 0 ? `em ${n} dias` : `há ${-n} dias`} · {fmt.short(a.dueDate)}
+                  {AVISO_KIND[a.kind].label} · {n === 0 ? 'hoje' : n === 1 ? 'amanhã' : n > 0 ? `em ${n} dias` : n === -1 ? 'ontem' : `há ${-n} dias`} · {fmt.short(a.dueDate)}
                 </div>
                 {a.reply && <div className="mt-2 rounded-[14px] rounded-tl-[5px] bg-blue-soft px-3 py-2 text-[12.5px] leading-snug font-medium text-ink-2">{a.reply}</div>}
               </li>

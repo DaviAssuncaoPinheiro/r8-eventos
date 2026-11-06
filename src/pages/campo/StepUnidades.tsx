@@ -9,7 +9,7 @@ import { jobItems } from '@/lib/fieldkit'
 import { OCC_KIND } from '@/lib/status'
 import { useDemo } from '@/store'
 import { notify } from './campoStore'
-import { cleanUnits } from './data'
+import { jobUnits } from './data'
 import { EASE_OUT, Pressable } from './kit'
 import { Block, StepFrame, StepIntro, type StepProps } from './stepKit'
 
@@ -21,7 +21,7 @@ export function StepUnidades(props: StepProps) {
 /* ───────────── limpeza e manutenção ───────────── */
 
 function Unidades({ job, rental, draft, patch, layout, eyebrow }: StepProps) {
-  const units = cleanUnits(rental)
+  const units = jobUnits(job, rental)
   const occurrences = useDemo((s) => s.occurrences)
   const open = occurrences.filter((o) => o.rentalId === rental.id && o.status === 'aberta')
   const maint = job.type === 'Manutenção'

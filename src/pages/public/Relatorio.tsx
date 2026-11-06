@@ -171,12 +171,12 @@ function ReportBody({ rental }: { rental: Rental }) {
     if (!entries.length) return `A montagem em ${rental.title} está marcada para ${fmt.weekday(rental.start)}, ${ddmm(rental.start)}. Este relatório vai mostrando cada serviço assim que a equipe finaliza.`
     const parts: string[] = []
     if (cleanings.length) {
-      const where = toilets ? ` nos ${toilets} ${toilets === 1 ? 'banheiro' : 'banheiros'}` : ''
+      const where = toilets ? (toilets === 1 ? ' no banheiro' : ` nos ${toilets} banheiros`) : ''
       const time = onTimeN === cleanings.length ? (cleanings.length === 1 ? 'no horário combinado' : 'todas no horário combinado') : `${onTimeN} no horário combinado`
-      parts.push(`De ${periodTxt} foram ${cleanings.length} ${cleanings.length === 1 ? 'limpeza' : 'limpezas'}${where}, ${time}.`)
+      parts.push(`De ${periodTxt} ${cleanings.length === 1 ? 'foi feita 1 limpeza' : `foram feitas ${cleanings.length} limpezas`}${where}, ${time}.`)
     }
-    else parts.push(`De ${periodTxt} foram ${entries.length} ${entries.length === 1 ? 'serviço' : 'serviços'} no local.`)
-    if (live) parts.push(`A equipe ${team.short} está fazendo a limpeza agora.`)
+    else parts.push(`De ${periodTxt} ${entries.length === 1 ? 'foi feito 1 serviço' : `foram feitos ${entries.length} serviços`} no local.`)
+    if (live) parts.push(`A equipe ${team.short} está fazendo a ${live.type === 'Manutenção' ? 'manutenção' : live.type.toLowerCase()} agora.`)
     else if (nextClean) parts.push(`A próxima ${nextClean.type === 'Limpeza' ? 'limpeza' : nextClean.type.toLowerCase()} está prevista para ${fmt.weekday(nextClean.start)}, ${ddmm(nextClean.start)}.`)
     return parts.join(' ')
   })()

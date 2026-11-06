@@ -7,7 +7,7 @@ import { LogoMark } from '@/components/AppShell'
 import { Button, IconCircle, ProductThumb, TeamAvatar } from '@/components/ui'
 import { ago, cleaningsOf, clientOf, nextCleaningOf, nextPickupOf, stateOf } from '@/components/equipment/model'
 import { BAIRRO } from '@/data/geo'
-import { COMPANY, PRODUCT, RENTAL, TEAM, UNIT, type OccKind } from '@/data/mock'
+import { COMPANY, PRODUCT, RENTAL, TEAM, UNIT, simNow, type OccKind } from '@/data/mock'
 import { fmt, relDays } from '@/data/time'
 import { OCC_KIND } from '@/lib/status'
 import { cn } from '@/lib/utils'
@@ -126,7 +126,7 @@ function UnitView({ unitId }: { unitId: string }) {
   const send = () => {
     if (!kind) return
     const n = String(Date.now()).slice(-5)
-    addOccurrence({ id: `qr-${Date.now().toString(36)}`, unitId, rentalId: r.id, kind, note: note.trim() || undefined, at: new Date().toISOString(), source: 'qr', status: 'aberta' })
+    addOccurrence({ id: `qr-${Date.now().toString(36)}`, unitId, rentalId: r.id, kind, note: note.trim() || undefined, at: simNow().toISOString(), source: 'qr', status: 'aberta' })
     setProtocol(n)
     setStep('sent')
     window.scrollTo({ top: 0, behavior: 'smooth' })

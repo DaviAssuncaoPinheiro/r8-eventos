@@ -1,13 +1,13 @@
 // Grava o serviço concluído no store global: relatório, status, ocorrências e aviso ao cliente.
-import { PRODUCT, RENTAL, TEAM, TEMPLATES, COMPANY, type AvisoKind, type Job } from '@/data/mock'
+import { JOBS, PRODUCT, RENTAL, TEAM, TEMPLATES, COMPANY, qtyLabel, type AvisoKind, type Job } from '@/data/mock'
 import { fmt } from '@/data/time'
 import { CHECKLISTS } from '@/lib/history'
 import { jobItems } from '@/lib/fieldkit'
 import { newId } from '@/lib/photos'
-import { fill } from '@/lib/utils'
+import { fill, lowerFirst, plural } from '@/lib/utils'
 import { useDemo, type ServiceReport } from '@/store'
 import { queueIfOffline, useCampo, type Draft } from './campoStore'
-import { cleanUnits, contactFirst, simNow } from './data'
+import { contactFirst, jobUnits, simNow } from './data'
 
 const AVISO_OF: Record<Job['type'], AvisoKind> = { Limpeza: 'limpeza', Montagem: 'montagem', Retirada: 'retirada', Manutenção: 'ocorrencia' }
 
@@ -28,10 +28,10 @@ export function buildSummary(job: Job, d: Draft, unitsDone: number) {
   const resolved = Object.values(d.resolved).filter(Boolean).length
   const extra = [occ ? `${occ} ${occ === 1 ? 'ocorrência registrada' : 'ocorrências registradas'}` : '', resolved ? `${resolved} ${resolved === 1 ? 'aviso resolvido' : 'avisos resolvidos'}` : ''].filter(Boolean)
   const tail = extra.length ? ` ${extra.join(', ').replace(/^./, (c) => c.toUpperCase())}.` : ''
-  if (job.type === 'Limpeza') return `${unitsTxt(unitsDone)} ${unitsDone === 1 ? 'higienizada' : 'higienizadas'} e abastecidas pela ${team.name}.${tail}${d.notes ? ` ${d.notes.trim()}` : ''}`
-  if (job.type === 'Manutenção') return `Manutenção feita: ${job.note.toLowerCase()}.${tail}${d.notes ? ` ${d.notes.trim()}` : ''}`
+  if (job.type === 'Limpeza') return `${unitsTxt(unitsDone)} ${unitsDone === 1 ? 'higienizada e abastecida' : 'higienizadas e abastecidas'} pela ${team.name}.${tail}${d.notes ? ` ${d.notes.trim()}` : ''}`
+  if (job.type === 'Manutenção') return `Manutenção feita: ${lowerFirst(job.note)}.${tail}${d.notes ? ` ${d.notes.trim()}` : ''}`
   const items = jobItems(job)
-    .map((i) => `${(d.items[i.productId] ?? 0).toLocaleString('pt-BR')} ${PRODUCT[i.productId].short.toLowerCase()}`)
+    .map((i) => qtyLabel(i.productId, d.items[i.productId] ?? 0))
     .join(', ')
   return `${job.type} concluída: ${items}.${tail}${d.notes ? ` ${d.notes.trim()}` : ''}`
 }
@@ -46,7 +46,7 @@ export function clientMessage(job: Job, rep: ServiceReport) {
       empresa: COMPANY.name,
       local: r.title,
       hora: fmt.time(rep.finishedAt),
-      unidades: `${rep.units.filter((u) => u.ok).length} banheiros`,
+      unidades: plural(rep.units.filter((u) => u.ok).length, 'banheiro', 'banheiros'),
       link,
     })
   const what = job.type === 'Manutenção' ? 'A manutenção' : `A ${job.type.toLowerCase()}`
@@ -58,7 +58,7 @@ export function commitJob(job: Job, d: Draft): ServiceReport {
   const r = RENTAL[job.rentalId]
   const now = simNow()
   const started = useCampo.getState().startedAt[job.id] ?? job.start
-  const units = cleanUnits(r)
+  const units = jobUnits(job, r)
   const maint = job.type === 'Manutenção'
   const unitRows =
     job.type === 'Limpeza'
@@ -92,6 +92,12 @@ export function commitJob(job: Job, d: Draft): ServiceReport {
   demo.saveReport(report)
   demo.setJobStatus(job.id, 'concluido')
 
+  // montagem concluída põe a locação no local; retirada concluída encerra
+  if (job.type === 'Montagem' || job.type === 'Retirada') {
+    const pending = useJobsSnapshot().some((j) => j.id !== job.id && j.rentalId === r.id && j.type === job.type && j.status !== 'concluido' && j.status !== 'cancelado')
+    if (!pending) demo.setRentalStatus(r.id, job.type === 'Montagem' ? 'ativa' : 'encerrada')
+  }
+
   // ocorrências novas (só as ligadas a uma unidade com patrimônio)
   for (const o of d.occurrences) {
     if (!o.unitId) continue
@@ -119,4 +125,25 @@ export function commitJob(job: Job, d: Draft): ServiceReport {
     ])
 
   return report
+}
+
+/** Serviços com o status atual, fora de componentes */
+function useJobsSnapshot() {
+  const st = useDemo.getState()
+  return [...JOBS, ...st.extraJobs].map((j) => ({ ...j, status: st.jobStatus[j.id] ?? j.status }))
+}
+
+/** Quando o sinal volta: relatórios salvos no aparelho são enviados ao cliente */
+export function flushOffline() {
+  const demo = useDemo.getState()
+  let sent = 0
+  for (const rep of Object.values(demo.reports)) {
+    if (!rep.savedOffline) continue
+    demo.saveReport({ ...rep, savedOffline: false })
+    const kind = AVISO_OF[rep.type]
+    const a = useDemo.getState().avisos.find((x) => x.rentalId === rep.rentalId && x.kind === kind && x.status === 'programado')
+    if (a) demo.setAvisoStatus(a.id, 'enviado')
+    sent++
+  }
+  return sent
 }

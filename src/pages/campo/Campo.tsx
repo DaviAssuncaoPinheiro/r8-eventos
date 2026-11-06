@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { AppShell } from '@/components/AppShell'
 import { useDemo } from '@/store'
 import { notify, useCampo } from './campoStore'
+import { flushOffline } from './finalize'
 import { EASE_IOS, PhoneCtx, PhoneToaster } from './kit'
 import { depthOf } from './nav'
 import JobScreen from './JobScreen'
@@ -31,25 +32,24 @@ function useSyncEngine() {
   const prev = React.useRef(offline)
   React.useEffect(() => {
     const c = useCampo.getState()
-    if (offline && !prev.current) {
-      c.setPending((p) => Math.max(p, 2))
-      notify({ kind: 'offline', title: 'Sem sinal', body: 'Pode seguir o serviço. Tudo fica salvo no aparelho.' })
-    } else if (offline && prev.current && c.pending === 0) {
-      c.setPending(2)
-    } else if (!offline && prev.current) {
-      const n = c.pending
-      if (n > 0) {
-        c.setSyncing(true)
-        const t = window.setTimeout(() => {
-          c.setSyncing(false)
-          c.setPending(0)
-          notify({ kind: 'sync', title: 'Sincronizado', body: `${n} ${n === 1 ? 'registro enviado' : 'registros enviados'} para a base.` })
-        }, 1900)
-        prev.current = offline
-        return () => window.clearTimeout(t)
-      }
-    }
+    const wasOffline = prev.current
     prev.current = offline
+    if (offline) {
+      if (!wasOffline) notify({ kind: 'offline', title: 'Sem sinal', body: 'Pode seguir o serviço. Tudo fica salvo no aparelho.' })
+      return
+    }
+    // com sinal: envia o que ficou guardado no aparelho (também depois de recarregar a página)
+    const saved = Object.values(useDemo.getState().reports).filter((r) => r.savedOffline).length
+    const n = Math.max(c.pending, saved)
+    if (n === 0) return
+    c.setSyncing(true)
+    const t = window.setTimeout(() => {
+      c.setSyncing(false)
+      c.setPending(0)
+      flushOffline()
+      notify({ kind: 'sync', title: 'Sincronizado', body: `${n} ${n === 1 ? 'registro enviado' : 'registros enviados'} para a base.` })
+    }, 1900)
+    return () => window.clearTimeout(t)
   }, [offline])
 }
 

@@ -1,5 +1,6 @@
+import { useDemo } from '@/store'
 import { BAIRRO, BASE, ZONE, type ZoneId } from '@/data/geo'
-import { JOB, NOW, RENTAL, RENTALS, TEAM, TEAMS, WEEK_PLAN, cleanableQty, onSite, type Job, type JobStatus, type JobType } from '@/data/mock'
+import { JOB, NOW, RENTAL, RENTALS, TEAM, TEAMS, weekPlan, cleanableQty, onSite, type Job, type JobStatus, type JobType } from '@/data/mock'
 import { TODAY, daysFromToday, day, fmt } from '@/data/time'
 import { KM_PER_UNIT } from '@/components/map/geometry'
 
@@ -112,46 +113,13 @@ export function toAJob(j: Job): AJob {
   }
 }
 
-const WESLEY_NOTES = ['Vistoria das unidades e do fechamento', 'Troca de unidade com avaria', 'Reforço do fechamento metálico', 'Reposição de painéis do fechamento']
-
-/**
- * A equipe de montagem não tem serviço todo dia no mock. Nos dias livres da escala,
- * cria manutenções nas obras da região para a semana não parecer vazia.
- */
-export function fillerJobs(real: AJob[]): AJob[] {
-  const out: AJob[] = []
-  const first = mondayOffset(-1)
-  for (let off = first; off < first + 21; off++) {
-    const dow = dowOf(off)
-    if (dow === 7) continue
-    const team = 'wesley'
-    if (real.some((v) => v.teamId === team && v.off === off)) continue
-    const plan = WEEK_PLAN[team][dow] ?? []
-    const sites = RENTALS.filter((r) => r.kind === 'obra' && onSite(r, off) && plan.includes(BAIRRO[r.bairro].zone))
-    if (!sites.length) continue
-    const h = hash(`${team}:${off}`)
-    const n = 1 + (h % 2)
-    for (let i = 0; i < Math.min(n, sites.length); i++) {
-      const r = sites[(h + i * 3) % sites.length]
-      out.push({
-        id: `w-${off}-${i}`,
-        teamId: team,
-        off,
-        startMin: i === 0 ? 8 * 60 : 13 * 60 + 30,
-        dur: 60 + ((h >>> (i + 2)) % 3) * 30,
-        rentalId: r.id,
-        bairro: r.bairro,
-        type: 'Manutenção',
-        note: WESLEY_NOTES[(h >>> 5) % WESLEY_NOTES.length],
-        status: off < 0 ? 'concluido' : 'agendado',
-        fixed: false,
-        units: 1,
-        origin: 'gerada',
-      })
-    }
-  }
-  return out
+/** As manutenções preventivas da equipe de montagem agora são serviços de verdade (data/mock.ts) */
+export function fillerJobs(_real: AJob[]): AJob[] {
+  return []
 }
+
+/** Escala vigente (com a sugestão da tela Regiões, se aplicada) */
+const currentPlan = () => weekPlan(useDemo.getState().scaleApplied)
 
 /* ───────────── derivados por equipe × dia ───────────── */
 
@@ -179,7 +147,7 @@ export function zonesOfDay(list: AJob[], teamId: string, off: number): ZoneId[] 
   for (const v of list) counts.set(BAIRRO[v.bairro].zone, (counts.get(BAIRRO[v.bairro].zone) ?? 0) + 1)
   const fromJobs = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([z]) => z)
   if (fromJobs.length) return fromJobs
-  return [...(WEEK_PLAN[teamId][dowOf(off)] ?? [])]
+  return [...(currentPlan()[teamId][dowOf(off)] ?? [])]
 }
 
 export function loadOf(list: AJob[]) {
@@ -242,7 +210,7 @@ export function suggest(all: AJob[], rentalId: string, type: JobType, urgency: '
       // o mesmo serviço já está marcado neste dia para esta locação
       if (all.some((v) => v.off === off && v.rentalId === rentalId && v.type === type && v.status !== 'cancelado')) continue
       const zones = zonesOfDay(vs, team.id, off)
-      const plan = WEEK_PLAN[team.id][dowOf(off)] ?? []
+      const plan = currentPlan()[team.id][dowOf(off)] ?? []
       if (!plan.length && !vs.length) continue
       let near: AJob | null = null
       let nearKm = Infinity

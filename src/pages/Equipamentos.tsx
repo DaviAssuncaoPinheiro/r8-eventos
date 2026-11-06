@@ -38,7 +38,7 @@ export default function Equipamentos() {
   const occurrences = useDemo((s) => s.occurrences)
 
   const splits = React.useMemo(() => productSplits(overrides), [overrides])
-  const groups = React.useMemo(() => shortageGroups(), [])
+  const groups = React.useMemo(() => shortageGroups(overrides), [overrides])
   const openByUnit = React.useMemo(() => {
     const m: Record<string, number> = {}
     for (const o of occurrences) if (o.status === 'aberta') m[o.unitId] = (m[o.unitId] ?? 0) + 1
@@ -94,7 +94,7 @@ export default function Equipamentos() {
       {/* números dos banheiros */}
       <div className="mb-4 grid grid-cols-1 divide-y divide-line rounded-[24px] bg-card shadow-card sm:grid-cols-2 sm:divide-y-0 xl:grid-cols-4 xl:divide-x">
         <Metric icon={Toilet} label="Banheiros em campo" value={sum('campo')} sub={`de ${stock}`} subTone="muted" />
-        <Metric icon={Warehouse} label="Livres na base" value={sum('livre')} sub={sum('livre') < 10 ? 'estoque apertado' : undefined} subTone="red" />
+        <Metric icon={Warehouse} label="Livres para reserva" value={sum('livre')} sub={sum('livre') < 10 ? 'estoque apertado' : undefined} subTone="red" />
         <Metric icon={Wrench} label="Em manutenção" value={sum('manutencao')} sub="na oficina" subTone="muted" />
         <Metric icon={Boxes} label="Pico do banheiro químico" value={`${occupancy}%`} sub={occupancy > 100 ? 'acima do estoque' : undefined} subTone="red" />
       </div>

@@ -7,7 +7,7 @@ import { Badge, Button, Card, IconButton, RentalAvatar, TeamAvatar } from '@/com
 import { TEAM } from '@/data/mock'
 import { fmt } from '@/data/time'
 import { AVISO_KIND, AVISO_STATUS, JOB_TYPE } from '@/lib/status'
-import { cn } from '@/lib/utils'
+import { cn, lowerFirst } from '@/lib/utils'
 import { useDemo } from '@/store'
 import { baseTemplate, buildMessage, dm, placeOf, VARIABLES, varsOf, zoneName, type Item } from './data'
 import { WhatsAppPhone } from './WhatsAppPhone'
@@ -106,7 +106,7 @@ export function AvisoDetail({ item, custom, onCustom, onClose }: { item: Item; c
   }
   const confirm = () => {
     setStatus(a.id, 'confirmado')
-    toast.success('Marcado como confirmado', { description: `${rental.title}, ${a.title.toLowerCase()}.` })
+    toast.success('Marcado como confirmado', { description: `${rental.title}, ${lowerFirst(a.title)}.` })
   }
 
   const sendLabel = a.status === 'programado' ? 'Enviar agora' : a.status === 'sem-resposta' ? 'Reenviar' : 'Reenviar'
@@ -161,7 +161,7 @@ export function AvisoDetail({ item, custom, onCustom, onClose }: { item: Item; c
               {st.label}
             </Badge>
           </Row>
-          {a.status === 'programado' && <Row label="Envio">{a.kind === 'limpeza' ? 'Quando a equipe finalizar' : <span className="num">{dm(a.sendDate)} às 09:00</span>}</Row>}
+          {a.status === 'programado' && <Row label="Envio">{a.kind === 'limpeza' ? 'Quando a equipe finalizar' : <span className="num">{dm(a.sendDate)} às {fmt.time(a.sendDate)}</span>}</Row>}
         </Card>
 
         <div className="mt-3 rounded-[24px] bg-muted px-3 py-6">

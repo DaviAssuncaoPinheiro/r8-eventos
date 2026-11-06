@@ -1,7 +1,7 @@
 // Cálculos da tela de Equipamentos e da página do QR (estoque, unidades, limpezas por unidade).
 import { BAIRRO, ZONE } from '@/data/geo'
-import { CLIENT, NOW, PRODUCT, PRODUCTS, RENTAL, RENTALS, UNITS, demandOn, onSite, rentalsUsing, shortages, type Job, type Product, type ProductId, type Rental, type Unit, type UnitState } from '@/data/mock'
-import { daysFromToday, day, fmt } from '@/data/time'
+import { CLIENT, NOW, simNow, PRODUCT, PRODUCTS, RENTAL, RENTALS, UNITS, demandOn, onSite, rentalsUsing, shortages, type Job, type Product, type ProductId, type Rental, type Unit, type UnitState } from '@/data/mock'
+import { daysFromToday, day, fmt, onWeekday } from '@/data/time'
 import { jobReport } from '@/lib/history'
 import type { ServiceReport } from '@/store'
 
@@ -24,7 +24,7 @@ export interface ProductSplit {
 export const stateOf = (u: Unit, overrides: Record<string, UnitState>): UnitState => overrides[u.id] ?? u.state
 
 export function productSplits(overrides: Record<string, UnitState>): ProductSplit[] {
-  const demand = Array.from({ length: HORIZON }, (_, d) => demandOn(d))
+  const demand = Array.from({ length: HORIZON }, (_, d) => demandOn(d, overrides))
   return PRODUCTS.map((p) => {
     let campo = 0
     let manutencao = 0
@@ -60,8 +60,8 @@ export interface DayCell {
   level: 'falta' | 'baixo' | 'ok'
 }
 
-export function availability(): Record<ProductId, DayCell[]> {
-  const days = Array.from({ length: HORIZON }, (_, d) => ({ d, dem: demandOn(d) }))
+export function availability(overrides: Record<string, UnitState> = {}): Record<ProductId, DayCell[]> {
+  const days = Array.from({ length: HORIZON }, (_, d) => ({ d, dem: demandOn(d, overrides) }))
   return Object.fromEntries(
     PRODUCTS.map((p) => [
       p.id,
@@ -84,9 +84,9 @@ export interface ShortageGroup {
   competing: { rental: Rental; qty: number }[]
 }
 
-export function shortageGroups(): ShortageGroup[] {
+export function shortageGroups(overrides: Record<string, UnitState> = {}): ShortageGroup[] {
   const by = new Map<ProductId, ShortageGroup>()
-  for (const s of shortages(HORIZON - 1)) {
+  for (const s of shortages(HORIZON - 1, overrides)) {
     const g = by.get(s.productId) ?? { productId: s.productId, days: [], deficit: 0, peakOffset: s.offset, competing: [] }
     g.days.push(s.offset)
     if (s.need - s.stock > g.deficit) {
@@ -116,7 +116,7 @@ export function rangeLabel(days: number[]) {
   const a = Math.min(...days)
   const b = Math.max(...days)
   const name = (d: number) => (d === 0 ? 'hoje' : d === 1 ? 'amanhã' : fmt.weekdayShort(day(d)))
-  if (a === b) return a <= 1 ? name(a) : `na ${fmt.weekday(day(a))}`
+  if (a === b) return a <= 1 ? name(a) : onWeekday(day(a))
   return `de ${name(a)} a ${name(b)}`
 }
 
@@ -200,7 +200,7 @@ export const qrUrl = (unitId: string) => `${window.location.origin}${window.loca
 
 /** "há 2 h", "há 3 dias" */
 export function ago(iso: string) {
-  const ref = Math.max(Date.now(), NOW.getTime())
+  const ref = simNow().getTime()
   const min = Math.max(1, Math.round((ref - new Date(iso).getTime()) / 60000))
   if (min < 60) return `há ${min} min`
   const h = Math.round(min / 60)
