@@ -19,3 +19,9 @@ Registro curto do que entrou, do que saiu e do que mudou de rumo. Uma entrada po
 - **Fonte mantida: Manrope variável.** Passou no teste do Chromium (algarismos tabulares com largura igual, acentos, pesos 400 a 700, legível a 12 px) e já estava instalada; trocar não trazia ganho que pagasse a dependência.
 - **Verde floresta `#275b3e` como marca padrão.** Presets da demo: verde, laranja R8 `#ee6a1c`, azul `#2557c7`, grafite `#3b4048`. A cor do cliente é derivada em OKLCH com contraste garantido (`src/lib/brand.ts`).
 - **Nenhuma biblioteca nova no design system.** `tailwind-merge` (já instalada) ganhou configuração própria em `src/ui/cn.ts` para reconhecer os tamanhos de texto novos.
+
+## Trocas de rumo
+
+- **Direção visual recalibrada para ficar fiel às referências.** A primeira versão seguiu à risca o piso da Impeccable (raio de cartão até 16 px, pílula só em controle pequeno, números contidos) e saiu seca, com cara de painel administrativo genérico. Reprovada na primeira olhada do cliente. Mudou: cartões com raio 22 e painéis 28, botões, busca e segmentado em pílula, botão primário e bloco de destaque em degradê da marca, números de 44 px, navegação lateral com indicador, verde padrão `#2d6a47` (mais vivo). O que ficou da Impeccable: contraste AA, foco, alvos de toque, sem cartão dentro de cartão, sem emoji. Onde a regra dela bate de frente com a referência, vale a referência.
+- **Aprovação de design por tela real, não por catálogo.** `/previa/painel` (Painel de Dinheiro) e `/previa/campo` (app de campo) usam os componentes de `src/ui` com dados fixos. O catálogo `/design-system` continua existindo como referência de quem constrói.
+- **Componentes novos:** `MoneyCard` (indicador em dinheiro com seta que abre a lista), `PillBars` (barras em pílula) e `ArcGauge` (medidor em meio arco), todos em SVG/CSS próprios, sem biblioteca.

@@ -8,7 +8,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg' | 'field'
 export type ForcedState = 'hover' | 'focus' | 'active'
 
 const base =
-  'relative inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-control font-semibold select-none ' +
+  'relative inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-pill font-semibold select-none ' +
   'transition-[background-color,color,box-shadow,transform] duration-150 ease-[var(--ease-ui)] ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ' +
   'data-[force=focus]:outline-2 data-[force=focus]:outline-offset-2 data-[force=focus]:outline-ring ' +
@@ -17,8 +17,8 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-active data-[force=hover]:bg-accent-hover data-[force=active]:bg-accent-active ' +
-    'disabled:bg-sunken disabled:text-fg-disabled',
+    'ds-hero text-on-accent hover:bg-none hover:bg-accent-hover active:bg-none active:bg-accent-active data-[force=hover]:bg-none data-[force=hover]:bg-accent-hover data-[force=active]:bg-none data-[force=active]:bg-accent-active ' +
+    'disabled:bg-none disabled:bg-sunken disabled:text-fg-disabled',
   secondary:
     'bg-raised text-fg ring-1 ring-inset ring-edge hover:bg-hover active:bg-sunken data-[force=hover]:bg-hover data-[force=active]:bg-sunken ' +
     'disabled:bg-raised disabled:text-fg-disabled disabled:ring-hairline',
@@ -32,10 +32,10 @@ const variants: Record<ButtonVariant, string> = {
 
 /* altura, padding horizontal, gap, texto, tamanho do ícone. Em toque (pointer: coarse), sm e md crescem para 44 (ds-touch). */
 const sizes: Record<ButtonSize, { cls: string; icon: number; square: string }> = {
-  sm: { cls: 'h-8 px-3 gap-1.5 text-body', icon: 16, square: 'w-8 px-0' },
-  md: { cls: 'h-10 px-4 gap-2 text-body', icon: 18, square: 'w-10 px-0' },
-  lg: { cls: 'h-12 px-5 gap-2 text-body-lg font-semibold', icon: 20, square: 'w-12 px-0' },
-  field: { cls: 'h-14 px-6 gap-2.5 text-body-lg font-bold', icon: 24, square: 'w-14 px-0' },
+  sm: { cls: 'h-9 px-4 gap-1.5 text-body', icon: 16, square: 'w-9 px-0' },
+  md: { cls: 'h-11 px-5 gap-2 text-body', icon: 18, square: 'w-11 px-0' },
+  lg: { cls: 'h-[52px] px-6 gap-2 text-body-lg font-semibold', icon: 20, square: 'w-[52px] px-0' },
+  field: { cls: 'h-14 px-7 gap-2.5 text-body-lg font-semibold', icon: 24, square: 'w-14 px-0' },
 }
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

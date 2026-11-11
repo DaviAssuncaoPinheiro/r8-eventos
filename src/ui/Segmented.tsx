@@ -34,7 +34,7 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
     <div
       role="radiogroup"
       aria-label={label}
-      className={cn('inline-flex items-center gap-0.5 rounded-control bg-sunken p-1', size === 'md' ? 'h-10' : 'h-8', block && 'flex w-full', className)}
+      className={cn('inline-flex items-center gap-0.5 rounded-pill bg-sunken p-1', size === 'md' ? 'h-11' : 'h-9', block && 'flex w-full', className)}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') (e.preventDefault(), move(1))
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') (e.preventDefault(), move(-1))
@@ -56,8 +56,8 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
             disabled={o.disabled}
             onClick={() => onChange(o.value)}
             className={cn(
-              'ds-hit inline-flex h-full items-center justify-center gap-1.5 rounded-[7px] font-semibold whitespace-nowrap transition-[background-color,color,box-shadow] duration-150 ease-[var(--ease-ui)]',
-              size === 'md' ? 'px-3 text-body' : 'px-2.5 text-caption',
+              'ds-hit inline-flex h-full items-center justify-center gap-1.5 rounded-pill font-semibold whitespace-nowrap transition-[background-color,color,box-shadow] duration-150 ease-[var(--ease-ui)]',
+              size === 'md' ? 'px-4 text-body' : 'px-3 text-caption',
               block && 'flex-1',
               on ? 'bg-raised text-fg shadow-[0_0_0_1px_var(--edge)]' : 'text-fg-2 hover:bg-hover hover:text-fg',
               'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring',

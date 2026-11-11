@@ -86,7 +86,7 @@ export function OfficeFrame({
 
         <div className="flex min-w-0 flex-1 flex-col gap-[var(--shell-gap)] @max-[1023px]/frame:gap-0">
           {topbar}
-          <Main className="min-h-0 flex-1 overflow-y-auto rounded-panel bg-panel p-8 @max-[1279px]/frame:p-6 @max-[1023px]/frame:rounded-none @max-[1023px]/frame:p-4">
+          <Main className="min-h-0 flex-1 overflow-y-auto rounded-panel bg-panel p-7 @max-[1279px]/frame:p-6 @max-[1023px]/frame:rounded-none @max-[1023px]/frame:p-4">
             <div className="mx-auto w-full max-w-[var(--content-max)]">{children}</div>
           </Main>
         </div>

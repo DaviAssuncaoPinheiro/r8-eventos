@@ -10,10 +10,10 @@
 */
 
 export const BRAND_STORAGE_KEY = 'r8.brand'
-export const DEFAULT_BRAND = '#275b3e'
+export const DEFAULT_BRAND = '#2d6a47'
 
 export const BRAND_PRESETS = [
-  { id: 'verde', label: 'Verde floresta', hex: '#275b3e' },
+  { id: 'verde', label: 'Verde floresta', hex: '#2d6a47' },
   { id: 'laranja', label: 'Laranja R8', hex: '#ee6a1c' },
   { id: 'azul', label: 'Azul', hex: '#2557c7' },
   { id: 'grafite', label: 'Grafite', hex: '#3b4048' },

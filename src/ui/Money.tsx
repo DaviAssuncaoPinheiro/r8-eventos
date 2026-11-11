@@ -20,7 +20,7 @@ export function Money({ value, variant = 'inline', sign, toneNegative = true, cl
     const m = /^([+-]?)R\$ (.+),(\d{2})$/.exec(full)
     const [, s, int, cents] = m ?? ['', '', full, '']
     return (
-      <span className={cn('tnum inline-flex items-baseline whitespace-nowrap', neg && 'text-danger-ink', className)}>
+      <span className={cn('inline-flex items-baseline whitespace-nowrap', neg && 'text-danger-ink', className)}>
         <span className="sr-only">{full}</span>
         {/* prefixo e centavos a 80%; no cartão destaque ficam inteiros (o acento já reduz o contraste) */}
         <span aria-hidden className="mr-1 text-[0.5em] font-semibold opacity-80 group-data-[variant=highlight]/card:opacity-100">

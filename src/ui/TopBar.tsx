@@ -33,7 +33,7 @@ export interface TopBarProps {
 }
 
 const iconBtn =
-  'ds-touch ds-touch-sq relative inline-flex size-10 shrink-0 items-center justify-center rounded-control text-fg-2 ' +
+  'ds-touch ds-touch-sq relative inline-flex size-11 shrink-0 items-center justify-center rounded-pill bg-raised text-fg-2 ' +
   'transition-[background-color,color] duration-150 ease-[var(--ease-ui)] hover:bg-hover hover:text-fg active:bg-sunken ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
@@ -44,7 +44,7 @@ export function TopBar({
   onBellClick,
   user,
   onUserAction,
-  placeholder = 'Buscar cliente, locação, equipamento',
+  placeholder = 'Buscar cliente, locação ou código',
   onSearchClick,
   onMenuClick,
   compact = false,
@@ -70,7 +70,7 @@ export function TopBar({
   const bellLabel = unreadCount > 0 ? `Avisos, ${unreadCount} não lidos` : 'Avisos'
 
   return (
-    <header className={cn('flex h-16 shrink-0 items-center gap-4 rounded-panel bg-panel px-6 text-fg', className)}>
+    <header className={cn('flex h-[72px] shrink-0 items-center gap-4 rounded-panel bg-panel px-5 text-fg', className)}>
       {onMenuClick ? (
         <Tooltip content="Abrir menu">
           <button type="button" aria-label="Abrir menu" onClick={onMenuClick} className={cn(iconBtn, 'size-11 @min-[1024px]/frame:hidden')}>
@@ -90,7 +90,7 @@ export function TopBar({
             placeholder={placeholder}
             prefix={<Search size={16} strokeWidth={2} aria-hidden />}
             suffix={<Badge>Ctrl K</Badge>}
-            className="w-full"
+            className="w-full rounded-pill bg-raised px-4 ring-hairline"
           />
         </div>
         <div className={cn('justify-center', compact ? 'flex' : 'hidden @max-[1279px]/frame:flex')}>
@@ -102,21 +102,21 @@ export function TopBar({
         </div>
       </div>
 
-      <div className="flex min-w-max flex-1 basis-0 items-center justify-end gap-1">
+      <div className="flex min-w-max flex-1 basis-0 items-center justify-end gap-2">
         {actions}
         <Tooltip content={bellLabel}>
           <button type="button" aria-label={bellLabel} onClick={onBellClick} className={iconBtn}>
             <Bell size={20} strokeWidth={2} aria-hidden />
-            {unreadCount > 0 ? <span aria-hidden className="absolute top-2 right-2 size-2 rounded-pill bg-danger ring-2 ring-panel" /> : null}
+            {unreadCount > 0 ? <span aria-hidden className="absolute top-2.5 right-3 size-2 rounded-pill bg-danger ring-2 ring-raised" /> : null}
           </button>
         </Tooltip>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button
               type="button"
-              className="ml-1 flex h-12 shrink-0 items-center gap-3 rounded-control pr-2 pl-2 text-left transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=open]:bg-hover"
+              className="ml-1 flex h-12 shrink-0 items-center gap-3 rounded-pill pr-3 pl-1 text-left transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=open]:bg-hover"
             >
-              <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-pill bg-accent-soft text-caption font-bold text-accent-ink">
+              <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-pill bg-accent-soft text-body font-semibold text-accent-ink">
                 {initialsOf(user.name)}
               </span>
               <span className="min-w-0">

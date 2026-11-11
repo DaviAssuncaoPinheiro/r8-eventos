@@ -8,7 +8,7 @@ const variants: Record<CardVariant, string> = {
   sunken: 'bg-sunken text-fg',
   /* um por tela: preenchido com a marca, leve degradê de 160° só no fundo */
   /* o anel de foco vira on-accent aqui dentro: a tinta do acento some sobre o próprio acento */
-  highlight: 'text-on-accent bg-accent bg-[linear-gradient(160deg,var(--accent)_0%,var(--accent-hover)_100%)] [--ring:var(--on-accent)]',
+  highlight: 'ds-hero',
 }
 
 export interface CardProps extends React.HTMLAttributes<HTMLElement> {
@@ -22,7 +22,7 @@ export function Card({ variant = 'default', as: Tag = 'section', padding = 'md',
   return (
     <Tag
       data-variant={variant}
-      className={cn('group/card relative min-w-0 rounded-card', variants[variant], padding === 'md' && 'p-4 sm:p-5', padding === 'sm' && 'p-4', className)}
+      className={cn('group/card relative min-w-0 rounded-card', variants[variant], padding === 'md' && 'p-5 sm:p-6', padding === 'sm' && 'p-4', className)}
       {...rest}
     />
   )

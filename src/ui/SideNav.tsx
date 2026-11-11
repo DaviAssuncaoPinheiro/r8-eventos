@@ -61,7 +61,7 @@ export interface SideNavItemProps {
 }
 
 const itemBase =
-  'ds-touch relative flex h-10 w-full shrink-0 cursor-pointer items-center overflow-hidden rounded-control text-left text-body font-medium text-fg-2 no-underline select-none ' +
+  'ds-touch relative flex h-11 w-full shrink-0 cursor-pointer items-center rounded-control text-left text-[15px] leading-5 font-medium text-fg-2 no-underline select-none ' +
   'transition-[background-color,color,padding] duration-150 ease-[var(--ease-ui)] ' +
   'hover:bg-hover hover:text-fg data-[force=hover]:bg-hover data-[force=hover]:text-fg ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ' +
@@ -87,7 +87,8 @@ export function SideNavItem({
 
   const content = (
     <>
-      <Icon size={18} strokeWidth={2} aria-hidden className={cn('shrink-0', active && !disabled && 'text-accent-ink')} />
+      {active && !disabled ? <span aria-hidden className="absolute top-1/2 -left-3 h-7 w-1 -translate-y-1/2 rounded-r-pill bg-accent" /> : null}
+      <Icon size={20} strokeWidth={2} aria-hidden className={cn('shrink-0', active && !disabled && 'text-accent-ink')} />
       <span className={cn('ml-3 min-w-0 flex-1 truncate transition-opacity duration-150 ease-[var(--ease-ui)]', collapsed && 'opacity-0')}>{label}</span>
       {count !== undefined ? (
         <span className={cn('ml-2 shrink-0 transition-opacity duration-150 ease-[var(--ease-ui)]', collapsed && 'opacity-0')}>
@@ -99,7 +100,7 @@ export function SideNavItem({
     </>
   )
 
-  const cls = cn(itemBase, collapsed ? 'px-[15px]' : 'px-3', className)
+  const cls = cn(itemBase, collapsed ? 'px-[14px]' : 'px-3', className)
   const handleClick: React.MouseEventHandler<HTMLElement> = (e) => {
     if (disabled) {
       e.preventDefault()
@@ -166,7 +167,7 @@ export function SideNavGroup({ label, children, className }: { label?: string; c
         collapsed ? (
           <div aria-hidden className="mx-3 mt-3 mb-2 h-px bg-hairline" />
         ) : (
-          <div id={id} className="px-3 pt-3 pb-1 text-caption font-semibold text-fg-3">
+          <div id={id} className="px-3 pt-4 pb-1.5 text-caption font-medium tracking-[0.08em] text-fg-3 uppercase">
             {label}
           </div>
         )
@@ -211,14 +212,14 @@ export function SideNav({ collapsed = false, onCollapsedChange, brand, footer, u
           className,
         )}
       >
-        <div className="flex h-16 shrink-0 items-center px-5">
+        <div className="flex h-[72px] shrink-0 items-center px-5">
           <span
             aria-hidden
-            className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-tip bg-accent text-body font-bold text-on-accent"
+            className="ds-hero grid size-9 shrink-0 place-items-center overflow-hidden rounded-control text-body font-bold"
           >
             {brand.logoSrc ? <img src={brand.logoSrc} alt="" className="size-full object-cover" /> : (brand.initials ?? initialsOf(brand.name))}
           </span>
-          <span className={cn('ml-3 min-w-0 flex-1 truncate text-title-card transition-opacity duration-150 ease-[var(--ease-ui)]', collapsed && 'opacity-0')}>
+          <span className={cn('ml-3 min-w-0 flex-1 truncate text-title-sub transition-opacity duration-150 ease-[var(--ease-ui)]', collapsed && 'opacity-0')}>
             {brand.name}
           </span>
           {onCollapsedChange && !collapsed ? (
@@ -239,9 +240,9 @@ export function SideNav({ collapsed = false, onCollapsedChange, brand, footer, u
                 aria-expanded={false}
                 aria-label={toggleLabel}
                 onClick={() => onCollapsedChange(false)}
-                className={cn(itemBase, 'px-[15px]')}
+                className={cn(itemBase, 'px-[14px]')}
               >
-                <ToggleIcon size={18} strokeWidth={2} aria-hidden className="shrink-0" />
+                <ToggleIcon size={20} strokeWidth={2} aria-hidden className="shrink-0" />
               </button>
             </Tooltip>
           ) : null}

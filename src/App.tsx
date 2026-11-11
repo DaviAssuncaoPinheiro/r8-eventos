@@ -15,6 +15,8 @@ const Campo = lazy(() => import('./pages/campo/Campo'))
 const Relatorio = lazy(() => import('./pages/public/Relatorio'))
 const Unidade = lazy(() => import('./pages/public/Unidade'))
 const DesignSystem = lazy(() => import('./pages/design-system/DesignSystem'))
+const PainelPrevia = lazy(() => import('./pages/previa/Painel'))
+const CampoPrevia = lazy(() => import('./pages/previa/Campo'))
 
 /* Links antigos do HashRouter (/#/locacoes/12) viram /locacoes/12 antes do primeiro render */
 if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
@@ -28,6 +30,8 @@ export default function App() {
         <Suspense fallback={<div className="h-dvh bg-surface" />}>
           <Routes>
             <Route path="/design-system" element={<DesignSystem />} />
+            <Route path="/previa/campo" element={<CampoPrevia />} />
+            <Route path="/previa/*" element={<PainelPrevia />} />
             <Route path="/campo/*" element={<Campo />} />
             <Route path="/relatorio/:rentalId" element={<Relatorio />} />
             <Route path="/u/:unitId" element={<Unidade />} />

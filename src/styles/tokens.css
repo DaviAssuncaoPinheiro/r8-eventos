@@ -4,27 +4,27 @@
   src/index.css até as telas antigas serem reescritas; nada aqui colide com eles.
 
   Camadas:
-  1. --brand-l-* / --brand-d-*: cor da marca derivada por src/lib/brand.ts (padrão: verde #275b3e)
+  1. --brand-l-* / --brand-d-*: cor da marca derivada por src/lib/brand.ts (padrão: verde #2d6a47)
   2. variáveis semânticas por tema (claro em :root, escuro em [data-theme='dark'])
   3. @theme inline: expõe as semânticas ao Tailwind (bg-raised, text-fg-2, border-hairline…)
 */
 
 :root {
   /* marca padrão, sobrescrita em tempo real por applyBrand() */
-  --brand-l-accent: #275b3e;
-  --brand-l-accent-hover: #194e32;
-  --brand-l-accent-active: #094227;
-  --brand-l-accent-soft: #e5f5ea;
-  --brand-l-accent-ink: #275b3e;
+  --brand-l-accent: #2d6a47;
+  --brand-l-accent-hover: #1f5d3b;
+  --brand-l-accent-active: #0e502f;
+  --brand-l-accent-soft: #e3f6e9;
+  --brand-l-accent-ink: #296643;
   --brand-l-on-accent: #ffffff;
-  --brand-l-on-accent-2: #c3d1c9;
-  --brand-d-accent: #3b6f51;
-  --brand-d-accent-hover: #46795b;
-  --brand-d-accent-active: #2a5e41;
-  --brand-d-accent-soft: #1c2f23;
-  --brand-d-accent-ink: #9dd3b1;
+  --brand-l-on-accent-2: #d1ded7;
+  --brand-d-accent: #427f5a;
+  --brand-d-accent-hover: #387451;
+  --brand-d-accent-active: #306d4a;
+  --brand-d-accent-soft: #193022;
+  --brand-d-accent-ink: #96d5ad;
   --brand-d-on-accent: #ffffff;
-  --brand-d-on-accent-2: #dce5e0;
+  --brand-d-on-accent-2: #f7faf8;
 
   /* movimento (iguais nos dois temas) */
   --dur-fast: 150ms;
@@ -34,9 +34,9 @@
 
   /* casca */
   --shell-gap: 12px;
-  --sidebar-w: 248px;
+  --sidebar-w: 256px;
   --sidebar-w-collapsed: 72px;
-  --topbar-h: 64px;
+  --topbar-h: 72px;
   --rail-w: 336px;
   --content-max: 1280px;
   --field-header-h: 56px;
@@ -46,11 +46,11 @@
 /* ───────── tema claro (padrão) ───────── */
 :root,
 :root[data-theme='light'] {
-  --app: #e9ebee;
-  --panel: #f5f6f8;
+  --app: #ebecee;
+  --panel: #f6f6f7;
   --raised: #ffffff;
-  --sunken: #eef0f3;
-  --hover: #eceef1;
+  --sunken: #f0f0f2;
+  --hover: #ededf0;
   --selected: var(--accent-soft);
   --overlay: #ffffff;
   --inverse: #14171b;
@@ -63,8 +63,8 @@
   --fg-3: #5c636d;
   --fg-disabled: #a1a7b0;
 
-  --hairline: #e3e6ea;
-  --edge: #cfd4da;
+  --hairline: #e8e8eb;
+  --edge: #d5d7db;
   --strong: #7d848e;
 
   --accent: var(--brand-l-accent);
@@ -242,37 +242,37 @@
   --text-body-lg--font-weight: 500;
   --text-title-card: 16px;
   --text-title-card--line-height: 22px;
-  --text-title-card--font-weight: 650;
+  --text-title-card--font-weight: 600;
   --text-title-card--letter-spacing: -0.005em;
   --text-title-sub: 18px;
   --text-title-sub--line-height: 24px;
-  --text-title-sub--font-weight: 650;
+  --text-title-sub--font-weight: 600;
   --text-title-sub--letter-spacing: -0.01em;
-  --text-title-section: 21px;
+  --text-title-section: 22px;
   --text-title-section--line-height: 28px;
-  --text-title-section--font-weight: 650;
+  --text-title-section--font-weight: 600;
   --text-title-section--letter-spacing: -0.015em;
   --text-title-field: 24px;
   --text-title-field--line-height: 30px;
-  --text-title-field--font-weight: 700;
+  --text-title-field--font-weight: 600;
   --text-title-field--letter-spacing: -0.02em;
-  --text-title-page: 28px;
-  --text-title-page--line-height: 34px;
-  --text-title-page--font-weight: 700;
-  --text-title-page--letter-spacing: -0.022em;
-  --text-kpi: 28px;
-  --text-kpi--line-height: 34px;
-  --text-kpi--font-weight: 650;
-  --text-kpi--letter-spacing: -0.02em;
-  --text-kpi-lg: 38px;
-  --text-kpi-lg--line-height: 44px;
-  --text-kpi-lg--font-weight: 650;
-  --text-kpi-lg--letter-spacing: -0.025em;
+  --text-title-page: 34px;
+  --text-title-page--line-height: 40px;
+  --text-title-page--font-weight: 600;
+  --text-title-page--letter-spacing: -0.03em;
+  --text-kpi: 32px;
+  --text-kpi--line-height: 38px;
+  --text-kpi--font-weight: 600;
+  --text-kpi--letter-spacing: -0.03em;
+  --text-kpi-lg: 44px;
+  --text-kpi-lg--line-height: 48px;
+  --text-kpi-lg--font-weight: 600;
+  --text-kpi-lg--letter-spacing: -0.035em;
 
-  --radius-control: 10px;
-  --radius-card: 14px;
-  --radius-panel: 18px;
-  --radius-tip: 8px;
+  --radius-control: 12px;
+  --radius-card: 22px;
+  --radius-panel: 28px;
+  --radius-tip: 10px;
   --radius-check: 5px;
   --radius-pill: 999px;
 
@@ -333,6 +333,22 @@
     font-feature-settings: 'tnum' 1;
   }
   /* hachura: só para dado "parado / sem uso / pendente" */
+  /* bloco preenchido com a marca: do tom pressionado (escuro) ao acento. Nunca mais claro que o acento, para o texto branco manter 4,5:1 */
+  .ds-hero {
+    background-color: var(--accent);
+    background-image: linear-gradient(140deg, var(--accent-active) 0%, var(--accent-hover) 45%, var(--accent) 100%);
+    color: var(--on-accent);
+    --ring: var(--on-accent);
+  }
+  /* cartão escuro do Copiloto: fixo nos dois temas, com anéis concêntricos na cor da marca */
+  .ds-copilot {
+    color: #ffffff;
+    background-color: #0d1f16;
+    background-image:
+      repeating-radial-gradient(circle at 115% 125%, transparent 0 22px, color-mix(in oklab, var(--brand-d-accent) 26%, transparent) 22px 23.5px),
+      radial-gradient(circle at 110% 120%, color-mix(in oklab, var(--brand-d-accent) 70%, #0d1f16) 0%, #0d1f16 62%);
+    --ring: #ffffff;
+  }
   .ds-hatch {
     background-image: repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 6px);
   }

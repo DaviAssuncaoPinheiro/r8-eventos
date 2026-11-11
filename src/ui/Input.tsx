@@ -27,7 +27,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
       data-invalid={isInvalid}
       data-disabled={isDisabled}
       data-force={forceState}
-      className={cn(controlFrame, controlFocus, 'flex items-center gap-2 px-3', size === 'md' ? 'h-10 ds-touch' : 'h-12 text-body-lg', className)}
+      className={cn(controlFrame, controlFocus, 'flex items-center gap-2 px-3', size === 'md' ? 'h-11' : 'h-[52px] text-body-lg', className)}
     >
       {prefix ? <span className={cn('shrink-0 text-fg-3', isDisabled && 'text-fg-disabled')}>{prefix}</span> : null}
       <input
