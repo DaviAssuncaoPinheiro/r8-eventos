@@ -58,7 +58,7 @@ export interface Scheduler {
   place(teamId: string, day: ISODate, durationMin: number, opts?: { earliest?: number; bairroId?: string }): { day: ISODate; startMin: number }
 }
 
-export function createScheduler(existing: readonly Service[] = [], rentalBairro?: (rentalId: string) => string | undefined): Scheduler {
+export function createScheduler(existing: readonly Service[] = [], rentalBairro?: (rentalId: string) => string | undefined, notBefore?: { day: ISODate; min: number }): Scheduler {
   const last = new Map<string, { end: number; bairro?: string }>()
   const key = (t: string, d: string) => `${t}|${d}`
   for (const s of existing) {
@@ -76,7 +76,8 @@ export function createScheduler(existing: readonly Service[] = [], rentalBairro?
         const k = key(teamId, d)
         const cur = last.get(k)
         const travel = cur ? (cur.bairro && opts.bairroId ? travelMinutes(cur.bairro, opts.bairroId) : 15) : 0
-        const start = Math.max(opts.earliest ?? WORK_START, cur ? cur.end + travel : WORK_START)
+        const floor = notBefore && notBefore.day === d ? notBefore.min : 0
+        const start = Math.max(opts.earliest ?? WORK_START, floor, cur ? cur.end + travel : WORK_START)
         const rounded = Math.ceil(start / 5) * 5
         if (rounded + durationMin <= WORK_END || guard === 29) {
           last.set(k, { end: rounded + durationMin, bairro: opts.bairroId })
@@ -202,7 +203,8 @@ export function planRentalServices(r: Rental, ctx: PlanCtx): Service[] {
 export const round2 = (n: number) => Math.round(n * 100) / 100
 
 export function defaultBilling(kind: RentalKind, start: ISODate, end: ISODate): Billing {
-  return kind === 'obra' && daysInclusive(start, end) >= 20 ? 'mensal' : 'diaria'
+  // obra a partir de 20 dias e evento a partir de 10 dias usam a tabela mensal (rateada pelos dias)
+  return daysInclusive(start, end) >= (kind === 'obra' ? 20 : 10) ? 'mensal' : 'diaria'
 }
 
 export interface BillingCycle {

@@ -75,16 +75,16 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
   const ev = (end: number, dur: number, bairro: string, qty: Record<string, number>, kinds: Client['kind'][], extra: Partial<Spec> = {}) =>
     specs.push({ cat: 'em_campo', kind: 'evento', clientId: rng.pick(ofKind(...kinds)).id, bairroId: bairro, start: end - dur + 1, end, qty, cpw: dur >= 2 && Object.keys(qty).some((k) => typeById.get(k)!.cleanable) ? 7 : 0, ...extra })
   ev(0, 4, 'lago-sul', { bq: 2, tnd5: 2 }, ['Cerimonial'])
-  ev(2, 4, 'mane-garrincha', { bq: 4, pcd: 1, trailer: 2, ala: 3, tnd10: 2, bal: 2 }, ['Produtora de eventos'])
-  ev(1, 3, 'ceilandia', { bq: 2, pcd: 1, tnd10: 1, trailer: 1 }, ['Igreja', 'Órgão público'])
-  ev(4, 6, 'aguas-claras', { bq: 1, trailer: 1, tnd5: 1, bal: 1, ala: 2, tnd10: 1 }, ['Produtora de eventos', 'Condomínio'])
-  ev(3, 6, 'sobradinho', { bq: 1, tnd10: 1, pia: 1 }, ['Órgão público', 'Igreja'])
-  ev(4, 7, 'gama', { bq: 1, tnd5: 1, ala: 2, pia: 1 }, ['Órgão público'])
-  ev(5, 8, 'planaltina', { bq: 1, tnd5: 1, tnd10: 1, bal: 2 }, ['Órgão público', 'Produtora de eventos'])
+  ev(2, 12, 'mane-garrincha', { bq: 4, pcd: 1, trailer: 2, ala: 3, tnd10: 2, bal: 2 }, ['Produtora de eventos'])
+  ev(1, 10, 'ceilandia', { bq: 2, pcd: 1, tnd10: 1, trailer: 1 }, ['Igreja', 'Órgão público'])
+  ev(4, 11, 'aguas-claras', { bq: 1, trailer: 1, tnd5: 1, bal: 1, ala: 2, tnd10: 1 }, ['Produtora de eventos', 'Condomínio'])
+  ev(3, 9, 'sobradinho', { bq: 1, tnd10: 1, pia: 1 }, ['Órgão público', 'Igreja'])
+  ev(4, 12, 'gama', { bq: 1, tnd5: 1, ala: 2, pia: 1 }, ['Órgão público'])
+  ev(5, 15, 'planaltina', { bq: 1, tnd5: 1, tnd10: 1, bal: 2 }, ['Órgão público', 'Produtora de eventos'])
 
   // Cliente de demonstração do portal
-  specs.push({ cat: 'em_campo', kind: 'obra', clientId: 'cli-001', bairroId: 'aguas-claras', start: -88, end: 64, qty: { bq: 4, pcd: 1, fec: 1 }, cpw: 3, tag: 'aurora-1', denseDays: 90, title: 'Residencial Vista Verde, torres A e B', contact: { name: 'Roberta Quintela', role: 'Engenheira residente', phone: '(61) 99731-4402' } })
-  specs.push({ cat: 'em_campo', kind: 'obra', clientId: 'cli-001', bairroId: 'jardim-botanico', start: -41, end: 80, qty: { bq: 2, pia: 1 }, cpw: 2, tag: 'aurora-2', denseDays: 60, title: 'Casas do Jardim Botânico, etapa 2', contact: { name: 'Valdir Souza', role: 'Mestre de obras', phone: '(61) 98455-0921' } })
+  specs.push({ cat: 'em_campo', kind: 'obra', clientId: 'cli-001', bairroId: 'aguas-claras', start: -88, end: 64, qty: { bq: 4, pcd: 1, fec: 1 }, cpw: 3, tag: 'aurora-1', denseDays: 70, title: 'Residencial Vista Verde, torres A e B', contact: { name: 'Roberta Quintela', role: 'Engenheira residente', phone: '(61) 99731-4402' } })
+  specs.push({ cat: 'em_campo', kind: 'obra', clientId: 'cli-001', bairroId: 'jardim-botanico', start: -41, end: 80, qty: { bq: 2, pia: 1 }, cpw: 2, tag: 'aurora-2', denseDays: 45, title: 'Casas do Jardim Botânico, etapa 2', contact: { name: 'Valdir Souza', role: 'Mestre de obras', phone: '(61) 98455-0921' } })
 
   // obra em campo já começou: começo no passado e pelo menos ~3 semanas de duração
   const obraStart = (end: number) => {
@@ -201,7 +201,7 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
       end = -Math.round(8 + 160 * Math.pow(rng.next(), 1.5))
       const dur = rng.int(24, 140)
       start = Math.max(-186, end - dur + 1)
-      if (rng.chance(0.9)) q.bq = rng.pick([2, 3, 3, 4, 5, 6, 8])
+      if (rng.chance(0.9)) q.bq = rng.pick([1, 2, 2, 3, 3, 4, 5])
       if (rng.chance(0.25)) q.pcd = rng.pick([1, 2])
       if (rng.chance(0.3)) q.pia = rng.pick([1, 2])
       if (rng.chance(0.5)) q.fec = rng.pick([1, 2, 3])
@@ -232,7 +232,7 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
     })
   }
   // A faturada de demonstração do portal
-  specs.push({ cat: 'faturada', kind: 'obra', clientId: 'cli-001', bairroId: 'noroeste', start: -128, end: -22, qty: { bq: 3, fec: 1 }, cpw: 2, tag: 'aurora-3', denseDays: 140, title: 'Edifício Noroeste 104, fundação e estrutura', contact: { name: 'Roberta Quintela', role: 'Engenheira residente', phone: '(61) 99731-4402' } })
+  specs.push({ cat: 'faturada', kind: 'obra', clientId: 'cli-001', bairroId: 'noroeste', start: -128, end: -22, qty: { bq: 3, fec: 1 }, cpw: 2, tag: 'aurora-3', denseDays: 90, title: 'Edifício Noroeste 104, fundação e estrutura', contact: { name: 'Roberta Quintela', role: 'Engenheira residente', phone: '(61) 99731-4402' } })
   specs.splice(specs.findIndex((s) => s.cat === 'faturada' && !s.tag), 1)
 
   /* ───────── alocação de unidades ───────── */
@@ -356,7 +356,7 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
     const unitMap = alloc.get(sp) ?? {}
     const start = D(sp.start)
     const end = D(sp.end)
-    const bill = sp.kind === 'obra' ? defaultBilling('obra', start, end) : 'diaria'
+    const bill = defaultBilling(sp.kind, start, end)
     const disc = discOf(client.id)
     const noUnits = sp.cat === 'orcamento' || sp.cat === 'cancelada'
     const entries: [string, number][] = noUnits ? Object.entries(sp.qty) : Object.entries(unitMap).map(([t, ids]) => [t, ids.length])
@@ -371,7 +371,7 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
     items.sort((a, b) => order.indexOf(a.typeId) - order.indexOf(b.typeId))
     const title = sp.title ?? (sp.kind === 'obra' ? obraTitle(rng, bairro.name) : eventTitle(rng, client.kind))
     const contact = sp.contact ?? { name: personName(rng), role: rng.pick(ROLES_BY_KIND[client.kind]), phone: phone(rng) }
-    const lead = sp.kind === 'obra' ? rng.int(2, 12) : rng.int(6, 40)
+    const lead = sp.kind === 'obra' ? rng.int(2, 12) : rng.int(10, 40)
     const createdDay = sp.cat === 'orcamento' ? D(-(sp.createdAgo ?? 1)) : addDays(start, -lead)
     const createdAt = atTime(createdDay, 9 * 60 + rng.int(0, 480))
     const total = rentalTotal(sp.kind, start, end, items)

@@ -96,14 +96,14 @@ export function buildActivity(env: ActivityEnv): Activity {
       types: typeById,
       scheduler: sched,
       horizon: r.status === 'em_campo' || r.status === 'confirmada' ? D(14) : r.end,
-      fromDay: faturadaSparse || r.status === 'confirmada' ? undefined : D(-Math.min(m.denseDays, 21 + (m.tag ? 100 : 0))),
+      fromDay: faturadaSparse || r.status === 'confirmada' ? undefined : D(-Math.min(m.denseDays, 16 + (m.tag ? 100 : 0))),
       newId: uid,
     })
     if (faturadaSparse) {
       const cleans = list.filter((s) => s.type === 'limpeza')
       const keep = new Set<string>()
-      if (cleans.length <= 3) cleans.forEach((c) => keep.add(c.id))
-      else for (const k of [0.15, 0.5, 0.85]) keep.add(cleans[Math.floor(cleans.length * k)].id)
+      if (cleans.length <= 2) cleans.forEach((c) => keep.add(c.id))
+      else for (const k of [0.3, 0.7]) keep.add(cleans[Math.floor(cleans.length * k)].id)
       planned.push(...list.filter((s) => s.type !== 'limpeza' || keep.has(s.id)))
     } else planned.push(...list)
   }
@@ -321,12 +321,13 @@ export function buildActivity(env: ActivityEnv): Activity {
     let cycles = billingCycles(r.kind, r.start, r.end)
     if (r.status === 'retirada' && cycles.length > 1) cycles = cycles.slice(0, -1) // a última sai no fechamento
     cycles.forEach((c, idx) => {
-      let issue = r.kind === 'obra' ? addDays(c.from, -2) : addDays(c.from, -21)
-      if (r.status === 'confirmada') issue = idx === 0 ? D(-1) : issue
       const created = dayOf(r.createdAt)
+      let issue = r.kind === 'obra' ? addDays(c.from, -2) : addDays(c.from, -3)
+      if (r.status === 'confirmada') issue = idx === 0 ? D(-1) : issue
       if (issue <= created) issue = addDays(created, 1)
       if (issue > today) return
-      const due = r.kind === 'obra' ? addDays(issue, 15) : r.status === 'confirmada' ? (addDays(c.from, -1) > issue ? addDays(c.from, -1) : addDays(issue, 5)) : addDays(c.from, -7) > issue ? addDays(c.from, -7) : addDays(issue, 5)
+      // evento: fatura na entrega e vence 10 dias após o fim; obra: vencimento em 15 dias
+      const due = r.kind === 'obra' ? addDays(issue, 15) : r.status === 'confirmada' ? (addDays(c.from, -1) > issue ? addDays(c.from, -1) : addDays(issue, 5)) : addDays(c.to, 10)
       const value = cycleAmount(r.items, c.days)
       let status: Charge['status'] = 'aberta'
       let paidAt: ISODate | undefined
@@ -354,7 +355,8 @@ export function buildActivity(env: ActivityEnv): Activity {
   // avarias com cobrança
   const damageCharge = (d: Damage, status: Charge['status'], paid?: ISODate) => {
     const r = rentalById.get(d.rentalId)!
-    const issue = addDays(d.date, 2)
+    // cobrança em aberto foi enviada há poucos dias e ainda está no prazo; rascunho nasce hoje
+    const issue = status === 'aberta' ? D(-rng.int(2, 5)) : status === 'rascunho' ? today : addDays(d.date, 2)
     const c = newCharge({
       clientId: d.clientId,
       rentalId: d.rentalId,
@@ -415,16 +417,32 @@ export function buildActivity(env: ActivityEnv): Activity {
     }
   })
 
+  // o cliente do portal tem uma única fatura aberta (a mais recente); as outras já foram pagas
+  const aurOpen = charges.filter((c) => c.clientId === 'cli-001' && c.status === 'aberta' && !c.damageId).sort((a, b) => a.dueAt.localeCompare(b.dueAt))
+  for (const c of aurOpen.slice(0, -1)) {
+    c.status = 'paga'
+    c.paidAt = c.issuedAt < D(-1) ? addDays(c.issuedAt, rng.int(1, 3)) : D(-1)
+    if (c.paidAt > D(-1)) c.paidAt = D(-1)
+  }
+
   // ajusta para ~30 abertas
   const openCount = () => charges.filter((c) => c.status === 'aberta').length
   const TARGET_OPEN = 30
   if (openCount() > TARGET_OPEN) {
-    const closable = charges.filter((c) => c.status === 'aberta' && !c.damageId && c.kind !== 'extra').sort((a, b) => a.dueAt.localeCompare(b.dueAt))
+    const closable = charges.filter((c) => c.status === 'aberta' && !c.damageId && c.kind !== 'extra').sort((a, b) => a.value - b.value)
     for (const c of closable) {
       if (openCount() <= TARGET_OPEN) break
       c.status = 'paga'
       c.paidAt = addDays(today, -rng.int(1, 3))
       if (c.paidAt < c.issuedAt) c.paidAt = c.issuedAt
+    }
+  } else if (openCount() < TARGET_OPEN) {
+    // pagas antecipadamente (vencimento ainda no futuro) voltam a abertas, das menores para as maiores
+    const reopen = charges.filter((c) => c.status === 'paga' && c.clientId !== 'cli-001' && !c.damageId && c.kind !== 'extra' && c.dueAt >= today && c.paidAt).sort((a, b) => a.value - b.value)
+    for (const c of reopen) {
+      if (openCount() >= TARGET_OPEN) break
+      c.status = 'aberta'
+      c.paidAt = undefined
     }
   }
 

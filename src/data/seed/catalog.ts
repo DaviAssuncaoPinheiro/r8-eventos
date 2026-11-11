@@ -9,7 +9,7 @@ export const TYPES: EquipmentType[] = [
   { id: 'bq', name: 'Banheiro químico padrão', short: 'Banheiro padrão', group: 'Banheiros', prefix: 'BQ', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 18.4, monthlyRate: 289.9, cleanable: true },
   { id: 'pcd', name: 'Cabine PcD acessível', short: 'Cabine PcD', group: 'Banheiros', prefix: 'PCD', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 34.9, monthlyRate: 419.9, cleanable: true },
   { id: 'pia', name: 'Pia e lavatório portátil', short: 'Pia portátil', group: 'Banheiros', prefix: 'PIA', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 22.6, monthlyRate: 168.9, cleanable: true },
-  { id: 'trailer', name: 'Trailer sanitário 4 boxes', short: 'Trailer sanitário', group: 'Banheiros', prefix: 'TRL', photo: '/produtos/trailer.jpg', dailyRate: 1384.9, monthlyRate: 4890.9, cleanable: true },
+  { id: 'trailer', name: 'Trailer sanitário 4 boxes', short: 'Trailer sanitário', group: 'Banheiros', prefix: 'TRL', photo: '/produtos/trailer.jpg', dailyRate: 1090.9, monthlyRate: 4290.9, cleanable: true },
   { id: 'tnd5', name: 'Tenda 5 x 5', short: 'Tenda 5 x 5', group: 'Estruturas', prefix: 'TND', photo: '/produtos/tenda.jpg', dailyRate: 284.5, monthlyRate: 1190.5, cleanable: false },
   { id: 'tnd10', name: 'Tenda 10 x 10', short: 'Tenda 10 x 10', group: 'Estruturas', prefix: 'TND', photo: '/produtos/tenda.jpg', dailyRate: 648.5, monthlyRate: 2690.9, cleanable: false },
   { id: 'ala', name: 'Alambrado (lote de 10 grades)', short: 'Alambrado', group: 'Estruturas', prefix: 'ALA', photo: '/produtos/alambrado.jpg', dailyRate: 94.5, monthlyRate: 318.9, cleanable: false },
