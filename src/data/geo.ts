@@ -81,48 +81,51 @@ export interface Bairro {
   zone: ZoneId
   x: number
   y: number
+  /** Coordenadas reais aproximadas (centro da região), para o mapa de verdade. */
+  lat: number
+  lng: number
 }
 
 /** Regiões administrativas e setores (chamados de "bairro" no código) */
 export const BAIRROS: Bairro[] = [
   // Plano Piloto
-  { id: 'asa-norte', name: 'Asa Norte', zone: 'plano', x: 590, y: 222 },
-  { id: 'noroeste', name: 'Noroeste', zone: 'plano', x: 522, y: 218 },
-  { id: 'esplanada', name: 'Esplanada', zone: 'plano', x: 598, y: 330 },
-  { id: 'sudoeste', name: 'Sudoeste', zone: 'plano', x: 506, y: 330 },
-  { id: 'asa-sul', name: 'Asa Sul', zone: 'plano', x: 572, y: 420 },
-  { id: 'setor-clubes', name: 'Setor de Clubes', zone: 'plano', x: 604, y: 456 },
-  { id: 'mane-garrincha', name: 'Eixo Monumental', zone: 'plano', x: 545, y: 300 },
+  { id: 'asa-norte', name: 'Asa Norte', zone: 'plano', x: 590, y: 222, lat: -15.765, lng: -47.883 },
+  { id: 'noroeste', name: 'Noroeste', zone: 'plano', x: 522, y: 218, lat: -15.742, lng: -47.915 },
+  { id: 'esplanada', name: 'Esplanada', zone: 'plano', x: 598, y: 330, lat: -15.799, lng: -47.864 },
+  { id: 'sudoeste', name: 'Sudoeste', zone: 'plano', x: 506, y: 330, lat: -15.797, lng: -47.925 },
+  { id: 'asa-sul', name: 'Asa Sul', zone: 'plano', x: 572, y: 420, lat: -15.812, lng: -47.9 },
+  { id: 'setor-clubes', name: 'Setor de Clubes', zone: 'plano', x: 604, y: 456, lat: -15.82, lng: -47.87 },
+  { id: 'mane-garrincha', name: 'Eixo Monumental', zone: 'plano', x: 545, y: 300, lat: -15.7835, lng: -47.899 },
   // Lagos
-  { id: 'lago-norte', name: 'Lago Norte', zone: 'lagos', x: 772, y: 302 },
-  { id: 'lago-sul', name: 'Lago Sul', zone: 'lagos', x: 742, y: 518 },
-  { id: 'paranoa', name: 'Paranoá', zone: 'lagos', x: 892, y: 322 },
-  { id: 'jardim-botanico', name: 'Jardim Botânico', zone: 'lagos', x: 876, y: 452 },
+  { id: 'lago-norte', name: 'Lago Norte', zone: 'lagos', x: 772, y: 302, lat: -15.735, lng: -47.835 },
+  { id: 'lago-sul', name: 'Lago Sul', zone: 'lagos', x: 742, y: 518, lat: -15.842, lng: -47.845 },
+  { id: 'paranoa', name: 'Paranoá', zone: 'lagos', x: 892, y: 322, lat: -15.775, lng: -47.78 },
+  { id: 'jardim-botanico', name: 'Jardim Botânico', zone: 'lagos', x: 876, y: 452, lat: -15.872, lng: -47.8 },
   // Guará e SIA
-  { id: 'sia', name: 'SIA', zone: 'guara', x: 436, y: 392 },
-  { id: 'guara', name: 'Guará', zone: 'guara', x: 470, y: 452 },
-  { id: 'nucleo-bandeirante', name: 'Núcleo Bandeirante', zone: 'guara', x: 528, y: 512 },
-  { id: 'park-way', name: 'Park Way', zone: 'guara', x: 594, y: 528 },
-  { id: 'riacho-fundo', name: 'Riacho Fundo', zone: 'guara', x: 440, y: 505 },
+  { id: 'sia', name: 'SIA', zone: 'guara', x: 436, y: 392, lat: -15.805, lng: -47.955 },
+  { id: 'guara', name: 'Guará', zone: 'guara', x: 470, y: 452, lat: -15.825, lng: -47.98 },
+  { id: 'nucleo-bandeirante', name: 'Núcleo Bandeirante', zone: 'guara', x: 528, y: 512, lat: -15.87, lng: -47.968 },
+  { id: 'park-way', name: 'Park Way', zone: 'guara', x: 594, y: 528, lat: -15.905, lng: -47.96 },
+  { id: 'riacho-fundo', name: 'Riacho Fundo', zone: 'guara', x: 440, y: 505, lat: -15.883, lng: -48.017 },
   // Oeste
-  { id: 'ceilandia', name: 'Ceilândia', zone: 'oeste', x: 140, y: 330 },
-  { id: 'taguatinga', name: 'Taguatinga', zone: 'oeste', x: 262, y: 336 },
-  { id: 'vicente-pires', name: 'Vicente Pires', zone: 'oeste', x: 318, y: 272 },
-  { id: 'aguas-claras', name: 'Águas Claras', zone: 'oeste', x: 334, y: 400 },
-  { id: 'samambaia', name: 'Samambaia', zone: 'oeste', x: 226, y: 462 },
+  { id: 'ceilandia', name: 'Ceilândia', zone: 'oeste', x: 140, y: 330, lat: -15.82, lng: -48.11 },
+  { id: 'taguatinga', name: 'Taguatinga', zone: 'oeste', x: 262, y: 336, lat: -15.833, lng: -48.057 },
+  { id: 'vicente-pires', name: 'Vicente Pires', zone: 'oeste', x: 318, y: 272, lat: -15.803, lng: -48.03 },
+  { id: 'aguas-claras', name: 'Águas Claras', zone: 'oeste', x: 334, y: 400, lat: -15.84, lng: -48.027 },
+  { id: 'samambaia', name: 'Samambaia', zone: 'oeste', x: 226, y: 462, lat: -15.878, lng: -48.09 },
   // Sul
-  { id: 'recanto', name: 'Recanto das Emas', zone: 'sul', x: 214, y: 566 },
-  { id: 'gama', name: 'Gama', zone: 'sul', x: 330, y: 604 },
-  { id: 'santa-maria', name: 'Santa Maria', zone: 'sul', x: 480, y: 606 },
+  { id: 'recanto', name: 'Recanto das Emas', zone: 'sul', x: 214, y: 566, lat: -15.915, lng: -48.062 },
+  { id: 'gama', name: 'Gama', zone: 'sul', x: 330, y: 604, lat: -16.015, lng: -48.065 },
+  { id: 'santa-maria', name: 'Santa Maria', zone: 'sul', x: 480, y: 606, lat: -16.018, lng: -48.013 },
   // Norte
-  { id: 'sobradinho', name: 'Sobradinho', zone: 'norte', x: 704, y: 112 },
-  { id: 'planaltina', name: 'Planaltina', zone: 'norte', x: 884, y: 92 },
+  { id: 'sobradinho', name: 'Sobradinho', zone: 'norte', x: 704, y: 112, lat: -15.652, lng: -47.79 },
+  { id: 'planaltina', name: 'Planaltina', zone: 'norte', x: 884, y: 92, lat: -15.62, lng: -47.65 },
 ]
 
 export const BAIRRO = Object.fromEntries(BAIRROS.map((b) => [b.id, b])) as Record<string, Bairro>
 
 /** Base da locadora no SIA (ponto de saída dos caminhões) */
-export const BASE = { name: 'Base, SIA', bairro: 'SIA', x: 452, y: 410 }
+export const BASE = { name: 'Base, SIA', bairro: 'SIA', x: 452, y: 410 , lat: -15.8046, lng: -47.9562 }
 
 /** Lago Paranoá: braço norte, corpo central e braço sul (Ponte JK) */
 export const LAKE_PATH =
