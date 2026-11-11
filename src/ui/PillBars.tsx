@@ -24,7 +24,7 @@ export interface PillBarsProps {
 }
 
 const tones: Record<NonNullable<PillBar['tone']>, string> = {
-  soft: 'bg-[color-mix(in_oklab,var(--accent)_55%,var(--raised))]',
+  soft: 'bg-[var(--bar-soft)]',
   solid: 'bg-accent',
   strong: 'bg-accent-active',
   idle: 'ds-hatch bg-sunken ring-1 ring-inset ring-edge',

@@ -6,7 +6,7 @@ type Tok = { v: string; name: string; use: string; text?: string }
 const GROUPS: { title: string; note: string; tokens: Tok[] }[] = [
   {
     title: 'Superfícies',
-    note: 'Separação por tom, sem sombra: app (fundo) < painel < cartão. Afundado para áreas dentro do painel.',
+    note: 'Tom, sem sombra: app < painel < cartão.',
     tokens: [
       { v: '--app', name: 'bg-app', use: 'Fundo da janela' },
       { v: '--panel', name: 'bg-panel', use: 'Lateral, painel principal, trilho' },
@@ -19,7 +19,7 @@ const GROUPS: { title: string; note: string; tokens: Tok[] }[] = [
   },
   {
     title: 'Texto e linhas',
-    note: 'Três níveis de texto, todos acima de 4,5:1 em qualquer superfície. Desabilitado é isento por norma.',
+    note: 'Três níveis de texto, todos acima de 4,5:1.',
     tokens: [
       { v: '--fg', name: 'text-fg', use: 'Texto principal, números' },
       { v: '--fg-2', name: 'text-fg-2', use: 'Rótulo, texto secundário' },
@@ -32,19 +32,20 @@ const GROUPS: { title: string; note: string; tokens: Tok[] }[] = [
   },
   {
     title: 'Marca',
-    note: 'Derivada da cor escolhida pelo cliente. Muda ao trocar a cor no topo da página.',
+    note: 'Derivada da cor escolhida. Laranja é o padrão.',
     tokens: [
-      { v: '--accent', name: 'bg-accent', use: 'Botão primário, bloco destaque', text: '--on-accent' },
+      { v: '--accent', name: 'bg-accent', use: 'Fim do degradê, barra, arco', text: '--on-accent' },
       { v: '--accent-hover', name: 'bg-accent-hover', use: 'Hover do primário', text: '--on-accent' },
-      { v: '--accent-active', name: 'bg-accent-active', use: 'Pressionado', text: '--on-accent' },
+      { v: '--accent-active', name: 'bg-accent-active', use: 'Início do degradê, pressionado', text: '--on-accent' },
       { v: '--accent-soft', name: 'bg-accent-soft', use: 'Seleção, item ativo', text: '--accent-ink' },
       { v: '--accent-ink', name: 'text-accent-ink', use: 'Link, item ativo, anel de foco' },
       { v: '--on-accent-2', name: 'text-on-accent-2', use: 'Texto secundário sobre a marca' },
+      { v: '--accent-glow', name: 'accent-glow', use: 'Só desenho de fundo: anéis e brilho' },
     ],
   },
   {
     title: 'Estados',
-    note: 'Cada estado tem cor base (ponto, ícone), fundo suave e tinta para texto.',
+    note: 'Base para ponto e ícone, fundo suave, tinta para texto.',
     tokens: [
       { v: '--ok', name: 'ok', use: 'Concluído, pago, disponível' },
       { v: '--ok-soft', name: 'ok-soft', use: 'Fundo', text: '--ok-ink' },
@@ -60,7 +61,7 @@ const GROUPS: { title: string; note: string; tokens: Tok[] }[] = [
   },
   {
     title: 'Gráficos',
-    note: 'Ordem fixa. Série única usa a cor da marca. Testada para deuteranopia e protanopia (ver DESIGN.md).',
+    note: 'Ordem fixa. Série única usa a marca.',
     tokens: [
       { v: '--viz-1', name: 'viz-1', use: 'Série 1' },
       { v: '--viz-2', name: 'viz-2', use: 'Série 2' },
@@ -68,6 +69,16 @@ const GROUPS: { title: string; note: string; tokens: Tok[] }[] = [
       { v: '--viz-4', name: 'viz-4', use: 'Série 4' },
       { v: '--viz-5', name: 'viz-5', use: 'Série 5' },
       { v: '--viz-6', name: 'viz-6', use: 'Série 6' },
+    ],
+  },
+  {
+    title: 'Mapa',
+    note: 'Neutros: só rota e pino levam cor.',
+    tokens: [
+      { v: '--map-land', name: 'map-land', use: 'Fundo e regiões' },
+      { v: '--map-park', name: 'map-park', use: 'Parque' },
+      { v: '--map-water', name: 'map-water', use: 'Lago' },
+      { v: '--map-road', name: 'map-road', use: 'Avenidas' },
     ],
   },
 ]
@@ -98,7 +109,7 @@ function Swatch({ t }: { t: Tok }) {
 
 export default function ColorSection() {
   return (
-    <DsSection id="cores" title="Cores" intro="Valores lidos do CSS em tempo real. Troque o tema e a cor da marca no topo para ver a derivação.">
+    <DsSection id="cores" title="Cores" intro="Valores lidos do CSS. Troque tema e cor da marca no topo.">
       {GROUPS.map((g) => (
         <Specimen key={g.title} title={g.title} note={g.note}>
           <ul className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 xl:grid-cols-3">

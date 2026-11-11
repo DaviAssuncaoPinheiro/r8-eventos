@@ -101,6 +101,7 @@
   --viz-4: #93266c;
   --viz-5: #9481e1;
   --viz-6: #685c1c;
+  --bar-soft: color-mix(in oklab, var(--accent) 70%, #ffffff);
   --map-land: #e4e5e8;
   --map-park: #d9e6dc;
   --map-water: #cfdbe8;
@@ -149,7 +150,8 @@
   --accent-glow: var(--brand-d-accent-glow);
   --ring: var(--brand-d-accent-ink);
 
-  --ok: #3db876;
+  /* ok e info mais escuros no tema escuro: o pino do mapa leva texto branco (4,5:1) e o ponto segue com 3:1 sobre o cartão */
+  --ok: #1d8449;
   --ok-soft: #132b1e;
   --ok-ink: #86dcaa;
   --warn: #e0a833;
@@ -160,7 +162,7 @@
   --danger-ink: #ffa8a3;
   --danger-solid: #c9333a;
   --danger-solid-hover: #b5262d;
-  --info: #6b9cf5;
+  --info: #2f72e0;
   --info-soft: #14223b;
   --info-ink: #a9c6ff;
   --idle: #7b838d;
@@ -171,6 +173,7 @@
   --viz-4: #be659a;
   --viz-5: #7b85e1;
   --viz-6: #f5c130;
+  --bar-soft: color-mix(in oklab, var(--accent) 74%, #191d21);
   --map-land: #1d2126;
   --map-park: #1b2a22;
   --map-water: #18242f;
@@ -356,6 +359,8 @@
   }
   /* variante de cartão: anéis concêntricos e brilho no canto superior direito, mais o foco de luz que segue o ponteiro */
   .ds-hero-card {
+    /* base mais escura que a do botão: sobra folga de contraste para o foco de luz passar sob o texto */
+    background-image: linear-gradient(140deg, var(--accent-active) 0%, var(--accent-hover) 100%);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -367,7 +372,7 @@
     z-index: -1;
     pointer-events: none;
     background-image:
-      radial-gradient(240px circle at var(--mx, 120%) var(--my, -20%), color-mix(in oklab, var(--accent-glow) 38%, transparent), transparent 70%),
+      radial-gradient(220px circle at var(--mx, 120%) var(--my, -20%), color-mix(in oklab, var(--accent-glow) 16%, transparent), transparent 70%),
       repeating-radial-gradient(circle at 108% -12%, transparent 0 26px, color-mix(in oklab, var(--accent-glow) 22%, transparent) 26px 27.5px),
       radial-gradient(circle at 105% -10%, color-mix(in oklab, var(--accent-glow) 46%, transparent) 0%, transparent 48%);
   }

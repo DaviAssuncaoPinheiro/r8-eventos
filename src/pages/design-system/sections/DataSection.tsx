@@ -299,20 +299,20 @@ export default function DataSection() {
     <DsSection
       id="dados"
       title="Dados"
-      intro="Tabela, linha de serviço, gráficos, linha do tempo do dossiê, foto e QR. Tudo lê tokens: troque o tema e a cor da marca lá em cima e os gráficos repintam na hora."
+      intro="Tabela, linha de serviço, gráficos, linha do tempo, foto e QR."
     >
       <Specimen
         title="Tabela de locações"
-        note="Ordene pelo cabeçalho, marque linhas, pagine e busque. Setas sobem e descem entre linhas, Enter abre, Espaço marca. Digite um nome que não existe para ver o estado sem resultado."
+        note="Ordene, marque, pagine e busque."
       >
         <InteractiveTable />
       </Specimen>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <Specimen title="Densidade compacta" note="40px por linha, para listas com mais de 50 itens. Cabeçalho de 36px nas duas.">
+        <Specimen title="Densidade compacta" note="40px por linha, para listas longas.">
           <Table label="Locações, lista compacta" density="compact" columns={makeColumns({ secondary: false }).filter((c) => c.key !== 'start')} rows={LOCACOES.slice(0, 12)} getRowId={(r) => r.id} title="Lista longa" countLabel="12 de 128 locações" maxBodyHeight={360} />
         </Specimen>
-        <Specimen title="Lista de linhas no celular" note="Abaixo de 768px a tabela vira lista dentro do mesmo cartão: título e apoio à esquerda, valor e status à direita.">
+        <Specimen title="Lista de linhas no celular" note="Abaixo de 768px a tabela vira lista.">
           <div className="max-w-[390px]">
             <Table
               label="Locações, lista"
@@ -331,7 +331,7 @@ export default function DataSection() {
         </Specimen>
       </div>
 
-      <Specimen title="Estados da tabela" note="Carregando (8 linhas de esqueleto), vazio, erro com nova tentativa e sem resultado de filtro.">
+      <Specimen title="Estados da tabela" note="Carregando, vazio, erro e sem resultado.">
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {(
             [
@@ -367,7 +367,7 @@ export default function DataSection() {
         </div>
       </Specimen>
 
-      <Specimen title="Linha de serviço" note="Agenda do escritório. De cima para baixo: concluído, em andamento (atual), atrasado, a caminho, hover e padrão.">
+      <Specimen title="Linha de serviço" note="Agenda do escritório, um item por situação.">
         <Card padding="none" className="max-w-3xl overflow-hidden">
           <ul className="m-0 list-none p-0">
             <ServiceRow time="07:30" duration="1 h 30" type="limpeza" title="Limpeza, 12 unidades" client="Construtora Planalto" address="SQN 308, Asa Norte" status="concluido" badges={[{ label: 'Equipe 2' }]} onOpen={() => {}} />
@@ -388,7 +388,7 @@ export default function DataSection() {
             <ServiceRow time="16:00" duration="3 h" type="montagem" title="Montagem, 1 tenda 6 x 6 m" client="Igreja Batista Central" address="EQS 706/707, Asa Sul" status="agendado" onOpen={() => {}} />
           </ul>
         </Card>
-        <p className="mt-6 mb-2 text-caption text-fg-3">App de campo: linha de 80px, texto 16, toque abre o serviço.</p>
+        <p className="mt-6 mb-2 text-caption text-fg-3">App de campo: linha de 80px, texto 16.</p>
         <Card padding="none" className="max-w-[390px] overflow-hidden">
           <ul className="m-0 list-none p-0">
             <ServiceRow variant="field" time="09:00" duration="2 h" type="entrega" title="Entrega, 6 unidades" client="Produtora Cerrado Vivo" address="Parque da Cidade" status="em-andamento" onOpen={() => {}} />
@@ -398,7 +398,7 @@ export default function DataSection() {
         </Card>
       </Specimen>
 
-      <Specimen title="Gráficos" note="Série única na cor da marca, com o período atual cheio e os anteriores a 40%. Duas séries usam a paleta categórica. Passe o mouse para ver o valor completo; 'Ver dados' mostra a tabela equivalente.">
+      <Specimen title="Gráficos" note="Série única na marca, período atual cheio. Para poucos meses, veja as barras em pílula.">
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <ChartCard
             title="Faturamento por mês"
@@ -504,7 +504,7 @@ export default function DataSection() {
         </div>
       </Specimen>
 
-      <Specimen title="Linha do tempo do dossiê" note="Agrupada por dia, com foto e valor anexados ao evento. Cabe no trilho direito de 336px.">
+      <Specimen title="Linha do tempo do dossiê" note="Agrupada por dia. Cabe no trilho de 336px.">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Card className="min-w-0">
             <Timeline groups={TIMELINE} />
@@ -520,7 +520,7 @@ export default function DataSection() {
         </div>
       </Specimen>
 
-      <Specimen title="Foto" note="Miniatura de 64px na lista e 96px na grade do campo. Toque abre a tela cheia: setas do teclado trocam de foto, Esc fecha.">
+      <Specimen title="Foto" note="64px na lista, 96px na grade do campo.">
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-end gap-6">
             <div className="flex flex-col items-start gap-2">
@@ -559,7 +559,7 @@ export default function DataSection() {
         </div>
       </Specimen>
 
-      <Specimen title="QR do equipamento" note="Módulos pretos sobre quadrado branco com padding 12, também no tema escuro. Nível de correção M, 160px na tela e 3 cm na impressão.">
+      <Specimen title="QR do equipamento" note="Preto sobre branco nos dois temas. 160px na tela, 3 cm na impressão.">
         <div className="flex flex-wrap items-start gap-8">
           <QrTile value="https://app.r8.example/equipamentos/BQ-0142" code="BQ-0142" name="Banheiro químico standard" />
           <QrTile value="https://app.r8.example/equipamentos/PCD-0017" code="PCD-0017" name="Banheiro químico PCD" />

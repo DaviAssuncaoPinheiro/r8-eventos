@@ -27,7 +27,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(function 
       data-invalid={isInvalid}
       data-disabled={isDisabled}
       data-force={forceState}
-      className={cn(controlFrame, controlFocus, 'relative flex items-center', size === 'md' ? 'h-10 ds-touch' : 'h-12 text-body-lg', className)}
+      className={cn(controlFrame, controlFocus, 'relative flex items-center', size === 'md' ? 'h-11' : 'h-[52px] text-body-lg', className)}
     >
       <select
         ref={ref}

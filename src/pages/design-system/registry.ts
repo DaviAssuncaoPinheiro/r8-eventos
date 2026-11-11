@@ -7,6 +7,7 @@ import ButtonSection from './sections/ButtonSection'
 import { ChoiceSection, InputSection } from './sections/FormSection'
 import { CardSection, MoneySection, SkeletonSection, StatusSection, TooltipSection } from './sections/DisplaySection'
 import DataSection from './sections/DataSection'
+import PainelSection from './sections/PainelSection'
 import OverlaySection from './sections/OverlaySection'
 import ShellSection from './sections/ShellSection'
 
@@ -37,6 +38,7 @@ export const DS_GROUPS: DsGroup[] = [
       { id: 'status', title: 'Badge e status', Component: StatusSection },
       { id: 'cartoes', title: 'Cartão e indicador', Component: CardSection },
       { id: 'dinheiro', title: 'Dinheiro', Component: MoneySection },
+      { id: 'painel', title: 'Painel', Component: PainelSection },
       { id: 'tooltip', title: 'Tooltip', Component: TooltipSection },
       { id: 'carregando', title: 'Carregando', Component: SkeletonSection },
     ],

@@ -1,13 +1,13 @@
 import { DsSection, Specimen } from '../kit'
 
 const ROLES = [
-  { cls: 'text-kpi-lg', name: 'kpi-lg', spec: '38/44 · 650 · -0,025em', sample: 'R$ 48.312,90', tnum: true },
-  { cls: 'text-title-page', name: 'title-page', spec: '28/34 · 700 · -0,022em', sample: 'Locações em andamento' },
-  { cls: 'text-kpi', name: 'kpi', spec: '28/34 · 650 · -0,02em', sample: '1.284 unidades', tnum: true },
-  { cls: 'text-title-field', name: 'title-field', spec: '24/30 · 700 · -0,02em (app de campo)', sample: 'Limpeza, 12 unidades' },
-  { cls: 'text-title-section', name: 'title-section', spec: '21/28 · 650 · -0,015em', sample: 'Cobranças da semana' },
-  { cls: 'text-title-sub', name: 'title-sub', spec: '18/24 · 650 · -0,01em', sample: 'Construtora Planalto' },
-  { cls: 'text-title-card', name: 'title-card', spec: '16/22 · 650 · -0,005em', sample: 'Equipamentos parados' },
+  { cls: 'text-kpi-lg', name: 'kpi-lg', spec: '44/48 · 600 · -0,035em', sample: 'R$ 48.312,90', tnum: true },
+  { cls: 'text-title-page', name: 'title-page', spec: '34/40 · 600 · -0,03em', sample: 'Locações em andamento' },
+  { cls: 'text-kpi', name: 'kpi', spec: '32/38 · 600 · -0,03em', sample: '1.284 unidades', tnum: true },
+  { cls: 'text-title-field', name: 'title-field', spec: '24/30 · 600 · -0,02em (app de campo)', sample: 'Limpeza, 12 unidades' },
+  { cls: 'text-title-section', name: 'title-section', spec: '22/28 · 600 · -0,015em', sample: 'Cobranças da semana' },
+  { cls: 'text-title-sub', name: 'title-sub', spec: '18/24 · 600 · -0,01em', sample: 'Construtora Planalto' },
+  { cls: 'text-title-card', name: 'title-card', spec: '16/22 · 600 · -0,005em', sample: 'Equipamentos parados' },
   { cls: 'text-body-lg', name: 'body-lg', spec: '16/24 · 500 (corpo do app de campo)', sample: 'Fotografe a porta e o interior da unidade antes de limpar.' },
   { cls: 'text-body', name: 'body', spec: '14/20 · 500 (corpo do escritório)', sample: 'Avaria registrada na BQ-0142 durante a retirada de 03/11/2026.' },
   { cls: 'text-body font-semibold', name: 'body + 600', spec: '14/20 · 600 (rótulo, botão)', sample: 'Gerar cobrança' },
@@ -19,7 +19,7 @@ export default function TypeSection() {
     <DsSection
       id="tipografia"
       title="Tipografia"
-      intro="Uma família: Manrope variável (400 a 800). Escala fixa em px com razão entre 1,125 e 1,2: 12, 14, 16, 18, 21, 24, 28, 38. Números sempre com algarismos tabulares."
+      intro="Manrope variável. Escala: 12, 14, 16, 18, 22, 24, 32, 34, 44. Peso 500 no texto, 600 em título e número. Números tabulares."
     >
       <Specimen title="Papéis">
         <ul className="divide-y divide-hairline rounded-card bg-raised">
@@ -34,7 +34,7 @@ export default function TypeSection() {
           ))}
         </ul>
       </Specimen>
-      <Specimen title="Algarismos tabulares" note="Com .tnum, 1111 e 8888 ocupam a mesma largura. Colunas de dinheiro alinham pela vírgula.">
+      <Specimen title="Algarismos tabulares" note="Com .tnum, 1111 e 8888 têm a mesma largura.">
         <div className="grid max-w-md grid-cols-2 gap-x-6 rounded-card bg-raised p-5 text-body">
           <span className="text-fg-3">Tabular</span>
           <span className="text-fg-3">Proporcional</span>

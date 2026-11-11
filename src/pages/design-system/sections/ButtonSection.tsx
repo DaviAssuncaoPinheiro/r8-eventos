@@ -14,7 +14,7 @@ export default function ButtonSection() {
     <DsSection
       id="botoes"
       title="Botão"
-      intro="Um primário por área de ação. Raio 10px, texto 14px peso 600. Desabilitado troca a cor (sem transparência) e mantém o rótulo legível."
+      intro="Pílula, texto peso 600. O primário é degradê da marca; no hover e no clique fica liso. Um primário por área de ação."
     >
       {VARIANTS.map(({ v, label, text, icon }) => (
         <Specimen key={v} title={label}>
@@ -52,19 +52,19 @@ export default function ButtonSection() {
           </div>
         </Specimen>
       ))}
-      <Specimen title="Tamanhos" note="sm 32px, md 40px (padrão), lg 48px, field 56px (app de campo, botão principal). Em tela de toque o sm cresce para 44px.">
+      <Specimen title="Tamanhos" note="sm 36, md 44 (padrão), lg 52, field 56. Em tela de toque o sm cresce para 44.">
         <div className="flex flex-wrap items-end gap-4">
-          <StateCell label="sm · 32">
+          <StateCell label="sm · 36">
             <Button size="sm" variant="primary" icon={Plus}>
               Novo serviço
             </Button>
           </StateCell>
-          <StateCell label="md · 40">
+          <StateCell label="md · 44">
             <Button size="md" variant="primary" icon={Plus}>
               Novo serviço
             </Button>
           </StateCell>
-          <StateCell label="lg · 48">
+          <StateCell label="lg · 52">
             <Button size="lg" variant="primary" icon={Plus}>
               Novo serviço
             </Button>
@@ -76,7 +76,7 @@ export default function ButtonSection() {
           </StateCell>
         </div>
       </Specimen>
-      <Specimen title="Só ícone" note="Quadrado do tamanho da altura. aria-label obrigatório e tooltip com o mesmo texto.">
+      <Specimen title="Só ícone" note="Círculo do tamanho da altura. aria-label e tooltip obrigatórios.">
         <div className="flex flex-wrap items-end gap-4">
           {(['sm', 'md', 'lg'] as const).map((s) => (
             <StateCell key={s} label={s}>
@@ -91,7 +91,7 @@ export default function ButtonSection() {
           </StateCell>
         </div>
       </Specimen>
-      <Specimen title="Largura total" note="No celular, a ação principal ocupa a largura e fica no rodapé fixo.">
+      <Specimen title="Largura total" note="No celular, a ação principal ocupa a largura.">
         <div className="max-w-sm">
           <Button size="field" variant="primary" block icon={Check}>
             Concluir limpeza

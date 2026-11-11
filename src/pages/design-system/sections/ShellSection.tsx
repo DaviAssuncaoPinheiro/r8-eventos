@@ -89,7 +89,7 @@ function OfficeSideNav({
         </>
       }
     >
-      <SideNavGroup>{NAV_MAIN.map(item)}</SideNavGroup>
+      <SideNavGroup label="Hoje">{NAV_MAIN.map(item)}</SideNavGroup>
       <SideNavGroup label="Gestão">{NAV_MANAGE.map(item)}</SideNavGroup>
     </SideNav>
   )
@@ -158,12 +158,10 @@ function OfficeMiniature() {
           ]}
         />
         <p className="max-w-[60ch] text-caption text-fg-3">
-          {mode === '1280'
-            ? 'Lateral aberta. O trilho direito, quando ligado, fica fixo ao lado do conteúdo.'
-            : 'Lateral recolhida e busca só ícone. O trilho direito vira gaveta pela direita.'}
+          {mode === '1280' ? 'Lateral aberta, trilho fixo.' : 'Lateral recolhida, trilho em gaveta.'}
         </p>
       </div>
-      <ScaledFrame width={width} height={600}>
+      <ScaledFrame width={width} height={680}>
         <OfficeFrame
           embedded
           rail={
@@ -211,10 +209,7 @@ function OfficeMiniature() {
           }
         >
           <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-            <div>
-              <h4 className="text-title-page">Serviços de hoje</h4>
-              <p className="mt-1 text-body text-fg-2">11/11/2026, 5 serviços na agenda</p>
-            </div>
+            <h4 className="text-title-page">Serviços de hoje</h4>
             <Button variant="primary" icon={Plus}>
               Nova locação
             </Button>
@@ -258,8 +253,7 @@ function PhoneFrame() {
             </BottomNav>
           }
         >
-          <h4 className="text-title-field">Hoje</h4>
-          <p className="mt-1 mb-4 text-body-lg text-fg-2">5 serviços, 1 em andamento</p>
+          <h4 className="mb-4 text-title-field">Hoje</h4>
           <ul className="rounded-card bg-raised">
             {SERVICES.map((s) => (
               <li key={s.time} className="flex min-h-20 items-center gap-3 border-b border-hairline px-4 py-3 last:border-b-0">
@@ -294,11 +288,11 @@ export default function ShellSection() {
     <DsSection
       id="casca"
       title="Casca"
-      intro="Lateral, topo, navegação inferior do celular, botões grandes do app de campo e faixa de demonstração. Os componentes preenchem o contêiner pai; o aplicativo real dá a eles a janela inteira."
+      intro="Lateral, topo, navegação do celular, botões do campo e faixa de demonstração."
     >
       <Specimen
         title="Item da lateral"
-        note="40 px de altura, ícone 18, rótulo 14/500. O ativo sobe um tom (fundo cartão, texto 600, ícone na tinta do acento), sem barra colorida. Recebe href, onClick ou render; com o roteador: render={(p) => <NavLink to=&quot;/locacoes&quot; {...p} />}."
+        note="44 px, ícone 20, rótulo 15/500. Ativo: fundo cartão, ícone na marca e indicador de 4 × 28 à esquerda."
       >
         <div className="rounded-panel bg-panel p-4 ring-1 ring-hairline ring-inset">
           <div className="grid grid-cols-[repeat(auto-fill,minmax(232px,1fr))] gap-x-6 gap-y-6">
@@ -334,12 +328,12 @@ export default function ShellSection() {
         </div>
       </Specimen>
 
-      <Specimen title="Lateral aberta e recolhida" note="248 e 72 px, animação de largura em 200 ms. A marca, o rodapé e o usuário permanecem; recolhida, os rótulos somem e o tooltip aparece à direita. Os botões de recolher funcionam.">
+      <Specimen title="Lateral aberta e recolhida" note="256 e 72 px. Recolhida, o rótulo de grupo vira filete e o tooltip aparece à direita.">
         <div className="flex flex-wrap items-start gap-4">
-          <div className="h-[672px] rounded-panel bg-app p-3">
+          <div className="h-[760px] rounded-panel bg-app p-3">
             <OfficeSideNav collapsed={openCollapsed} onCollapsedChange={setOpenCollapsed} active={openActive} onActive={setOpenActive} />
           </div>
-          <div className="h-[672px] rounded-panel bg-app p-3">
+          <div className="h-[760px] rounded-panel bg-app p-3">
             <OfficeSideNav collapsed={closedCollapsed} onCollapsedChange={setClosedCollapsed} active={closedActive} onActive={setClosedActive} />
           </div>
         </div>
@@ -347,7 +341,7 @@ export default function ShellSection() {
 
       <Specimen
         title="Topo"
-        note="64 px: título da tela, busca central (Ctrl K), avisos com ponto de não lidos e usuário com menu. Com o quadro em 1280 px ou mais a busca é um campo; de 1024 a 1279 vira só ícone. O slot actions recebe botões da tela."
+        note="72 px. Busca em pílula e botões circulares de 44. De 1024 a 1279 a busca vira só ícone."
       >
         <div className="flex flex-col gap-3 overflow-x-auto rounded-panel bg-app p-3">
           <div className="min-w-[760px]">
@@ -365,14 +359,14 @@ export default function ShellSection() {
 
       <Specimen
         title="Casca do escritório"
-        note="OfficeFrame com lateral, topo, conteúdo e trilho direito opcional. O quadro tem 600 px de altura e corta o que passar. Experimente recolher a lateral, ligar o trilho no topo e trocar a largura."
+        note="Lateral, topo, conteúdo e trilho opcional."
       >
         <OfficeMiniature />
       </Specimen>
 
       <Specimen
         title="App de campo"
-        note="390 por 720. Cabeçalho de 56 px com título e indicador de sincronização, conteúdo rolável, ação principal no rodapé e navegação inferior de 64 px. Itens com no mínimo 48 px de alvo."
+        note="390 por 720. Cabeçalho de 56, navegação de 64, ação principal de 56."
       >
         <div className="flex flex-wrap items-start gap-x-10 gap-y-8">
           <PhoneFrame />
@@ -415,7 +409,7 @@ export default function ShellSection() {
 
       <Specimen
         title="Botões grandes do campo"
-        note="Ação de etapa: grade de 2 colunas, 96 px de altura, ícone 24 em cima e rótulo 16/600 embaixo. Ação principal: Button field primário em largura total. Avaria: Button field secundário com ícone na tinta de perigo."
+        note="Etapa: 96 px, grade de 2 colunas. Principal: botão field. Avaria: field secundário."
       >
         <div className="flex flex-wrap items-start gap-x-10 gap-y-8 rounded-panel bg-app p-5">
           <div className="grid w-full max-w-[560px] grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3">
@@ -462,14 +456,14 @@ export default function ShellSection() {
               <FieldActionTile icon={Camera} label="Fotos" />
               <FieldActionTile icon={PenLine} label="Assinatura" disabled />
             </FieldActionGrid>
-            <p className="mt-2 text-caption text-fg-3">Grade de etapas, 2 colunas com gap de 12 px.</p>
+            <p className="mt-2 text-caption text-fg-3">Grade de etapas, gap 12.</p>
           </div>
         </div>
       </Specimen>
 
       <Specimen
         title="Faixa Ambiente de demonstração"
-        note="Fixa no topo da janela (z 95) e empurra a casca: publica a altura em --demo-strip-h, 32 px no escritório e 28 px no celular. Aqui aparece no fluxo, sem fixar."
+        note="32 px no escritório, 28 no celular. Aqui fora de posição fixa."
       >
         <div className="flex flex-col gap-5">
           <StateCell label="Escritório, 32 px" className="w-full">

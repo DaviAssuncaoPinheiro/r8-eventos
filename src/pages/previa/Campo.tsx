@@ -37,7 +37,7 @@ function Tela() {
       {/* o próximo serviço é a única coisa preenchida com a marca */}
       <section aria-label="Próximo serviço" className="ds-hero mt-4 rounded-card p-5">
         <div className="flex items-center justify-between gap-3">
-          <span className="rounded-pill bg-on-accent/15 px-3 py-1 text-caption font-semibold">Próximo, 10:30</span>
+          <span className="rounded-pill bg-on-accent px-3 py-1 text-caption font-semibold text-accent-active">Próximo, 10:30</span>
           <span className="text-caption font-medium text-on-accent-2">a 4,2 km</span>
         </div>
         <h2 className="mt-3 text-[26px] leading-8 font-semibold tracking-[-0.02em]">Limpeza, 12 unidades</h2>

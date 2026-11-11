@@ -5,16 +5,16 @@ import { DsSection, Specimen } from '../kit'
 const SPACE = [4, 8, 12, 16, 20, 24, 32, 40, 48, 64]
 const RADII = [
   { name: 'rounded-check', px: '5px', use: 'Caixa de seleção' },
-  { name: 'rounded-tip', px: '8px', use: 'Tooltip, miniatura' },
-  { name: 'rounded-control', px: '10px', use: 'Botão, campo, segmentado' },
-  { name: 'rounded-card', px: '14px', use: 'Cartão, menu, diálogo' },
-  { name: 'rounded-panel', px: '18px', use: 'Painéis da casca' },
-  { name: 'rounded-pill', px: '999px', use: 'Badge, switch, ponto' },
+  { name: 'rounded-tip', px: '10px', use: 'Tooltip, miniatura' },
+  { name: 'rounded-control', px: '12px', use: 'Campo, select' },
+  { name: 'rounded-card', px: '22px', use: 'Cartão, menu, diálogo' },
+  { name: 'rounded-panel', px: '28px', use: 'Painéis da casca' },
+  { name: 'rounded-pill', px: '999px', use: 'Botão, busca, segmentado, badge' },
 ]
 
 export function SpaceSection() {
   return (
-    <DsSection id="espacamento" title="Espaçamento" intro="Base 4px. Dentro de um grupo 8 a 12px; entre grupos 24 a 32px; acima de um título o dobro do espaço abaixo dele.">
+    <DsSection id="espacamento" title="Espaçamento" intro="Base 4px. Entre cartões 16px, padding de cartão 20px (24px a partir de 640).">
       <ul className="flex flex-col gap-2 rounded-card bg-raised p-5">
         {SPACE.map((s) => (
           <li key={s} className="grid grid-cols-[56px_1fr] items-center gap-4">
@@ -29,7 +29,7 @@ export function SpaceSection() {
 
 export function RadiusSection() {
   return (
-    <DsSection id="raios" title="Raios" intro="Cartão 14px. Pílula só em controles pequenos (badge, switch). Botões e campos usam 10px.">
+    <DsSection id="raios" title="Raios" intro="Cartão 22, painel 28, campo 12. Botão, busca e segmentado são pílula.">
       <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {RADII.map((r) => (
           <li key={r.name} className="flex flex-col gap-2">
@@ -78,6 +78,8 @@ const MOTION = [
   { name: 'dur-fast', ms: 150, use: 'Hover, cor, foco, switch' },
   { name: 'dur-base', ms: 200, use: 'Menu, tooltip, troca de aba' },
   { name: 'dur-slow', ms: 250, use: 'Gaveta, diálogo, toast' },
+  { name: 'número, barras', ms: 600, use: 'Entra uma vez ao montar' },
+  { name: 'arco, rota', ms: 900, use: 'Traço desenhado uma vez' },
 ]
 
 export function MotionSection() {
@@ -86,7 +88,7 @@ export function MotionSection() {
     <DsSection
       id="movimento"
       title="Movimento"
-      intro="Só para mudança de estado, resposta, carregamento e revelação. Curva ease-ui = cubic-bezier(0.16, 1, 0.3, 1). Com movimento reduzido, tudo vira troca instantânea."
+      intro="Estado, resposta e entrada de dado, uma vez. Curva ease-ui. Com movimento reduzido, troca instantânea."
     >
       <div className="flex flex-col gap-3 rounded-card bg-raised p-5">
         {MOTION.map((m) => (

@@ -8,7 +8,7 @@ export function InputSection() {
     <DsSection
       id="campos"
       title="Campo de texto"
-      intro="Rótulo sempre visível acima (14px peso 600), altura 40px (48px no app de campo), borda border-strong com 3:1. Erro abaixo do campo, antes da ajuda."
+      intro="Rótulo sempre visível acima. Altura 44px (52px no app de campo), raio 12, borda com 3:1. Erro abaixo do campo."
     >
       <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
         <Field label="Cliente" help="Nome fantasia ou razão social.">
@@ -35,7 +35,7 @@ export function InputSection() {
         <Field label="Valor da diária" disabled help="Definido no contrato. Edite pela locação.">
           <Input prefix="R$" numeric defaultValue="85,00" />
         </Field>
-        <Field label="Placa do caminhão" help="Tamanho lg, usado no app de campo.">
+        <Field label="Placa do caminhão" help="Tamanho lg, do app de campo.">
           <Input size="lg" defaultValue="PAW-4B21" />
         </Field>
       </div>
@@ -49,7 +49,7 @@ export function InputSection() {
           </Field>
         </div>
       </Specimen>
-      <Specimen title="Seleção (nativo)" note="Nativo de propósito: no celular abre o seletor do sistema. Para lista com busca, use o Combobox (DESIGN.md).">
+      <Specimen title="Seleção (nativo)" note="Nativo: no celular abre o seletor do sistema. Altura 40px, menor que a do campo (ver DESIGN.md).">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <Field label="Equipe">
             <Select defaultValue="b">
@@ -89,7 +89,7 @@ export function ChoiceSection() {
   const [period, setPeriod] = React.useState<'dia' | 'semana' | 'mes'>('semana')
   const [view, setView] = React.useState<'lista' | 'mapa'>('lista')
   return (
-    <DsSection id="escolhas" title="Caixa, rádio, switch e segmentado" intro="Caixa e rádio de 18px, switch 36×20. A linha inteira é clicável: 32px no desktop, 44px em tela de toque.">
+    <DsSection id="escolhas" title="Caixa, rádio, switch e segmentado" intro="Caixa e rádio de 18px, switch 36×20, segmentado em pílula de 44px (36px no sm). A linha inteira é clicável.">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
         <Specimen title="Caixa de seleção">
           <Checkbox label="Cobrar avaria na próxima fatura" />
@@ -118,7 +118,7 @@ export function ChoiceSection() {
           <Switch label="Desabilitado ligado" disabled defaultChecked />
         </Specimen>
       </div>
-      <Specimen title="Segmentado" note="Troca de visão ou período. Setas do teclado movem a seleção. Até 4 opções; acima disso use Select.">
+      <Specimen title="Segmentado" note="Troca de visão ou período. Até 4 opções.">
         <div className="flex flex-col items-start gap-4">
           <Segmented
             label="Período"

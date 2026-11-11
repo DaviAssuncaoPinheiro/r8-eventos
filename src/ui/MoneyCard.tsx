@@ -75,7 +75,7 @@ export function MoneyCard({ title, value, display, hero, tag, formula, onOpen, o
           <span
             className={cn(
               'inline-flex h-6 shrink-0 items-center gap-1 rounded-pill px-2 text-caption font-semibold whitespace-nowrap',
-              hero ? 'bg-on-accent/20 text-on-accent' : tag.good === false ? 'bg-danger-soft text-danger-ink' : tag.good ? 'bg-ok-soft text-ok-ink' : 'bg-sunken text-fg-2',
+              hero ? 'bg-on-accent text-accent-active' : tag.good === false ? 'bg-danger-soft text-danger-ink' : tag.good ? 'bg-ok-soft text-ok-ink' : 'bg-sunken text-fg-2',
             )}
           >
             {TagIcon ? <TagIcon size={14} strokeWidth={2} aria-hidden /> : null}
