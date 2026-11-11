@@ -115,7 +115,7 @@ export default function Estoque() {
 
       {stock.error && !stock.data ? null : <Indicadores rows={stock.data} loading={stock.initialLoading} onRendendo={() => go({ status: 'em_campo' })} onParado={() => go({ status: 'disponivel' })} onOcupacao={() => go({ visao: 'linha' })} />}
 
-      {stock.error && !stock.data ? (
+      {aba === 'linha' ? null : stock.error && !stock.data ? (
         <Banner tone="danger" title="Não foi possível carregar o estoque." action={<Button size="sm" onClick={() => void stock.refetch()}>Tentar de novo</Button>} />
       ) : (
         <TypeStrip rows={stock.data} loading={stock.initialLoading} selected={tipo} onSelect={(id) => setParam('tipo', id)} />

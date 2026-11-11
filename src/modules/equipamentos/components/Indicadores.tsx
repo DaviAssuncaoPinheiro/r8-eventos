@@ -37,7 +37,7 @@ export function Indicadores({ rows, loading, onRendendo, onParado, onOcupacao }:
       <MoneyCard
         title="Parado"
         value={t.idleValue}
-        tag={t.idleLong ? { label: `${t.idleLong} há mais de 30 dias`, good: false } : undefined}
+        tag={t.idleLong ? { label: `${t.idleLong} unidades há mais de 30 dias`, good: false } : undefined}
         onOpen={onParado}
         openLabel="Ver equipamentos parados"
         formula="Valor mensal de tabela dos equipamentos disponíveis, sem locação."
