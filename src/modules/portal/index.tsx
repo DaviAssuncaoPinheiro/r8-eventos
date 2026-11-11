@@ -14,6 +14,8 @@ import { buildReportHtml, printReport } from './report'
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const CODES_SHOWN = 12
+/** O acervo repete a foto do tipo: cada grupo mostra um recorte diferente. */
+const CROPS = ['center', '85% 60%', '15% 40%', '50% 90%']
 
 function Hero({ data, cleaningsLabel }: { data: PortalData; cleaningsLabel: string }) {
   const units = new Set(data.activeRentals.flatMap((r) => r.units.map((u) => u.id))).size
@@ -64,9 +66,9 @@ function RentalCard({ rental, cleaningLabel }: { rental: PortalRental; cleaningL
         <StatusDot tone={st.tone}>{st.label}</StatusDot>
       </div>
       <div className="mt-4 flex flex-col gap-5">
-        {groups.map((g) => (
+        {groups.map((g, gi) => (
           <div key={g.name} className="flex gap-4">
-            <img src={g.photo} alt={g.name} loading="lazy" className="size-20 shrink-0 rounded-control bg-sunken object-cover sm:size-24" />
+            <img src={g.photo} alt={g.name} loading="lazy" style={{ objectPosition: CROPS[gi % CROPS.length] }} className="size-24 shrink-0 rounded-control bg-sunken object-cover sm:size-28" />
             <div className="min-w-0 flex-1">
               <p className="text-body-lg font-semibold">
                 <span className="tnum mr-1.5 text-title-sub">{g.codes.length}</span>

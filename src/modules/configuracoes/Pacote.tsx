@@ -82,7 +82,7 @@ export default function Pacote() {
         </div>
       ) : null}
 
-      <section aria-label={`Prévia do pacote ${pack.name}`} className="grid grid-cols-1 gap-6 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:grid-cols-3">
+      <section aria-label={`Prévia do pacote ${pack.name}`} className="grid grid-cols-1 gap-6 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:grid-cols-[1.7fr_1fr_1fr]">
         <div>
           <h2 className="text-title-sub">Nomes no sistema</h2>
           <ul className="m-0 mt-4 flex list-none flex-col p-0">

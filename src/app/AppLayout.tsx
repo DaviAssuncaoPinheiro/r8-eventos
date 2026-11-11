@@ -11,8 +11,9 @@ import { TopBar } from '@/ui/TopBar'
 import { applyBrand } from '@/lib/brand'
 import { useTheme } from '@/lib/theme'
 import { formatDateTime } from '@/lib/format'
-import { getMoneyPanel, listNotifications, markAllRead, resetDemo, useQuery, useSettings } from '@/services'
+import { getMoneyPanel, listNotifications, markAllRead, useQuery, useSettings } from '@/services'
 import { Copiloto, CopilotoButton } from '@/modules/copiloto'
+import { ResetDialog } from '@/modules/configuracoes/ResetDialog'
 import { CommandPalette } from './CommandPalette'
 import { NAV_ITEMS } from './nav'
 import { Tour } from './Tour'
@@ -81,19 +82,12 @@ export default function AppLayout() {
   )
   const today = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
 
-  const onReset = async () => {
-    try {
-      await resetDemo()
-      notify.success('Dados de demonstração restaurados')
-    } catch {
-      notify.error('Não foi possível restaurar. Tente de novo.')
-    }
-  }
+  const [resetOpen, setResetOpen] = React.useState(false)
 
   return (
     <TooltipProvider>
       <div className="ds-root min-h-dvh">
-        <DemoStrip fixed onReset={onReset} />
+        <DemoStrip fixed onReset={() => setResetOpen(true)} />
         <div style={{ paddingTop: 'var(--demo-strip-h, 0px)' }}>
           <OfficeFrame
             viewport
@@ -192,6 +186,7 @@ export default function AppLayout() {
           </OfficeFrame>
         </div>
         <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+        <ResetDialog open={resetOpen} onOpenChange={setResetOpen} />
         <Copiloto />
         <Tour />
         <AppToaster />

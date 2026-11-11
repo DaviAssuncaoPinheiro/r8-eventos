@@ -161,7 +161,9 @@ export interface FieldFrameProps {
 }
 
 export function FieldFrame({ title, onBack, pending = 0, action, actionBar, nav, children, viewport, embedded, className }: FieldFrameProps) {
-  const Title = embedded ? 'p' : 'h1'
+  // o título do quadro é rótulo de contexto; o h1 é o título que cada tela põe no conteúdo
+  const Title = 'p'
+  void embedded
   const [scrolled, setScrolled] = React.useState(false)
   return (
     <div

@@ -118,8 +118,8 @@ export default function Usuarios() {
                 <div className="flex items-start gap-3.5">
                   <Avatar user={u} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-body-lg font-semibold">{u.name}</p>
-                    <p className="truncate text-body text-fg-2">{u.email}</p>
+                    <p className="text-body-lg font-semibold [overflow-wrap:anywhere]">{u.name}</p>
+                    <p className="text-body text-fg-2 [overflow-wrap:anywhere]">{u.email}</p>
                   </div>
                   <div className="-mt-1 -mr-2 flex shrink-0">
                     <Tooltip content="Editar">
