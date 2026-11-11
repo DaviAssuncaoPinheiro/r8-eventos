@@ -219,7 +219,7 @@ export function SideNav({ collapsed = false, onCollapsedChange, brand, footer, u
           >
             {brand.logoSrc ? <img src={brand.logoSrc} alt="" className="size-full object-cover" /> : (brand.initials ?? initialsOf(brand.name))}
           </span>
-          <span className={cn('ml-3 min-w-0 flex-1 truncate text-title-sub transition-opacity duration-150 ease-[var(--ease-ui)]', collapsed && 'opacity-0')}>
+          <span className={cn('ml-3 min-w-0 flex-1 truncate text-title-card transition-opacity duration-150 ease-[var(--ease-ui)]', collapsed && 'opacity-0')}>
             {brand.name}
           </span>
           {onCollapsedChange && !collapsed ? (
