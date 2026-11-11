@@ -486,9 +486,9 @@ export default function Painel() {
               Ocupação do estoque
               <InfoTip label="Ocupação do estoque" text={`${occupancy.inField} de ${occupancy.total} ${l.unitPlural} em campo hoje. Limpeza, manutenção e parados ficam fora da conta.`} />
             </h2>
-            <div className="mt-4 flex items-center gap-5">
+            <div className="mt-4 flex items-center gap-4">
               <ArcGauge
-                className="max-w-[196px] shrink-0 [&>div>span:first-child]:text-[32px] [&>div>span:first-child]:leading-[36px]"
+                className="max-w-[168px] shrink-0 [&>div>span:first-child]:text-[28px] [&>div>span:first-child]:leading-[32px]"
                 center={`${Math.round(occupancy.pct)}%`}
                 caption=""
                 label={`Ocupação do estoque: ${Math.round(occupancy.pct)}%. ${occupancy.inField} em campo, ${gaugeLimpeza} em ${cleaningLabel.toLowerCase()}, ${occupancy.idle} parados.`}
@@ -498,21 +498,21 @@ export default function Painel() {
                   { label: 'Parados', value: occupancy.idle, tone: 'idle' },
                 ]}
               />
-              <ul className="flex min-w-0 flex-1 flex-col gap-2.5 text-caption text-fg-2">
+              <ul className="flex min-w-0 flex-1 flex-col gap-3 text-caption text-fg-2">
                 <li className="flex items-center gap-2">
+                  <span className="w-8 shrink-0 text-title-card text-fg tnum">{occupancy.inField}</span>
                   <span aria-hidden className="size-3 shrink-0 rounded-pill bg-accent" />
-                  <span className="min-w-0 flex-1 leading-4">Em campo</span>
-                  <span className="font-semibold text-fg tnum">{occupancy.inField}</span>
+                  <span className="min-w-0 truncate">Em campo</span>
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center gap-2" title={cleaningLabel}>
+                  <span className="w-8 shrink-0 text-title-card text-fg tnum">{gaugeLimpeza}</span>
                   <span aria-hidden className="size-3 shrink-0 rounded-pill bg-accent-active" />
-                  <span className="min-w-0 flex-1 leading-4">{cleaningLabel}</span>
-                  <span className="font-semibold text-fg tnum">{gaugeLimpeza}</span>
+                  <span className="min-w-0 truncate">{cap(l.cleaning)}</span>
                 </li>
                 <li className="flex items-center gap-2">
+                  <span className="w-8 shrink-0 text-title-card text-fg tnum">{occupancy.idle}</span>
                   <span aria-hidden className="ds-hatch size-3 shrink-0 rounded-pill bg-sunken ring-1 ring-idle ring-inset" />
-                  <span className="min-w-0 flex-1 leading-4">Parados</span>
-                  <span className="font-semibold text-fg tnum">{occupancy.idle}</span>
+                  <span className="min-w-0 truncate">Parados</span>
                 </li>
               </ul>
             </div>

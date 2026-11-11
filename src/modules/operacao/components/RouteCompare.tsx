@@ -69,7 +69,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
         </div>
       </dl>
 
-      <ul className="mt-3 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5" aria-label="Equipes que mudam">
+      <ul className="mt-3 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5 pb-4 [mask-image:linear-gradient(to_bottom,black_calc(100%-24px),transparent)]" aria-label="Equipes que mudam">
         {changed.map((t) => {
           const team = teamOf(t.teamId)
           const route = visibleOf(routeOf(services, t.teamId))
@@ -81,13 +81,13 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
           const cur = t.current.map((s) => s.serviceId)
           const next = t.optimized.map((s) => s.serviceId)
           return (
-            <li key={t.teamId} className="rounded-control bg-sunken p-3">
+            <li key={t.teamId} className="shrink-0 rounded-control bg-sunken p-2.5">
               <div className="flex items-center gap-2.5">
                 {team ? <TeamAvatar team={team} size={32} /> : null}
                 <span className="min-w-0 flex-1 truncate text-title-card">{t.teamName}</span>
                 <span className="inline-flex h-6 items-center rounded-pill bg-ok-soft px-2 text-caption font-semibold text-ok-ink tnum">-{km(t.kmSaved)} km</span>
               </div>
-              <div className="mt-2.5 flex flex-col gap-2">
+              <div className="mt-2 flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
                   <span className="w-11 shrink-0 text-caption font-semibold text-fg-3">Atual</span>
                   <ol className="m-0 flex min-w-0 flex-1 list-none flex-wrap gap-1 p-0" aria-label="Ordem atual">

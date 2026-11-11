@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion, MotionConfig } from 'motion/react'
 import { ArrowRight, ChevronDown, Hammer, PackageOpen, ReceiptText, Truck, Wallet, type LucideIcon } from 'lucide-react'
 import { Button, RollingMoney, RollingNumber, Stagger, TooltipProvider, cn } from '@/ui'
 import { AppToaster } from '@/ui/Toast'
@@ -111,7 +110,7 @@ function Causes({ items }: { items: DiagnosisItem[] }) {
   return (
     <ul className="flex flex-col gap-4" aria-label="De onde vem a perda">
       {sorted.map((c) => (
-        <motion.li key={c.key} layout="position" transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
+        <li key={c.key}>
           <div className="flex items-baseline justify-between gap-3 text-body-lg">
             <span className="font-semibold">{CAUSE[c.key].label}</span>
             <span className="tnum font-semibold">{formatMoney(c.monthly)}</span>
@@ -119,7 +118,7 @@ function Causes({ items }: { items: DiagnosisItem[] }) {
           <div className="mt-1.5 h-4 rounded-pill bg-sunken">
             <div className={cn('h-full rounded-pill transition-[width] duration-200 ease-out motion-reduce:transition-none', CAUSE[c.key].bar)} style={{ width: c.monthly > 0 ? `max(12px, ${(c.monthly / max) * 100}%)` : '0%' }} />
           </div>
-        </motion.li>
+        </li>
       ))}
     </ul>
   )
@@ -147,7 +146,7 @@ function Page() {
   const go = () => navigate('/')
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <header className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           {logoDataUrl ? (
@@ -250,6 +249,6 @@ function Page() {
         <span className="text-body font-semibold">Você perde por mês</span>
         <span className="text-title-sub"><RollingMoney value={d.monthlyLoss} /></span>
       </div>
-    </MotionConfig>
+    </>
   )
 }
