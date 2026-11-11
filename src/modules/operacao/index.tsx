@@ -183,6 +183,7 @@ export default function Operacao() {
   }
 
   const selTeam = teams.find((t) => t.id === selectedTeamId)
+  const summary = <DaySummary services={live} live={isToday ? { paused, onToggle: () => setPaused((p) => !p) } : undefined} />
 
   return (
     <>
@@ -223,9 +224,7 @@ export default function Operacao() {
         <section aria-label="Mapa do dia" className="min-w-0 rounded-card bg-raised p-2 @min-[1180px]/frame:col-span-7">
           <DayMap services={services} teams={teams} selectedTeamId={selectedTeamId} onSelectTeam={selectTeam} className="h-[220px] sm:h-[380px]" />
         </section>
-        <div className="min-w-0 @min-[1180px]/frame:col-span-5">
-          <DaySummary services={live} live={isToday ? { paused, onToggle: () => setPaused((p) => !p) } : undefined} />
-        </div>
+        {wide ? <div className="min-w-0 @min-[1180px]/frame:col-span-5">{summary}</div> : null}
       </div>
 
       {wide ? (
@@ -318,6 +317,8 @@ export default function Operacao() {
           ) : null}
         </section>
       )}
+
+      {wide ? null : <div className="mt-3">{summary}</div>}
 
       {drawers}
     </>

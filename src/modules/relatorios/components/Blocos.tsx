@@ -60,7 +60,7 @@ export function Ocupacao({ range, onData }: { range: DateRange; onData?: (d: Occ
       className="h-full"
       title="Ocupação"
       state={q.initialLoading ? 'loading' : d && d.points.length ? 'ready' : 'empty'}
-      height={260}
+      height={360}
       ariaLabel={d && current ? `Ocupação do estoque hoje: ${pct1(current.pct)}. Média no período: ${pct1(d.avgPct)}. Pico de ${pct1(d.peak.pct)} em ${formatDate(d.peak.date)}.` : 'Ocupação do estoque'}
       dataTable={
         d
@@ -128,6 +128,7 @@ export function ReceitaClientes({ range, onData }: { range: DateRange; onData?: 
           <HBars
             className="mt-4"
             labelWidth={150}
+            max={top[0]?.value}
             label="Receita dos oito maiores clientes"
             rows={[
               ...top.map((r) => ({ key: r.client.id, label: r.client.name, value: r.value, valueLabel: formatMoney(r.value), href: `/clientes/${r.client.id}` })),
@@ -244,7 +245,7 @@ export function Equipes({ range, onData }: { range: DateRange; onData?: (d: Team
         rows: rows.map((r) => [r.team.name, r.scheduled, r.completed, pct1(r.onTimePct), r.avgDurationMin, r.late, r.photos]),
       }}
     >
-      <ul aria-label="Desempenho por equipe" className="m-0 flex list-none flex-col gap-1 p-0">
+      <ul aria-label="Desempenho por equipe" className="m-0 flex list-none flex-col gap-3 p-0">
         {rows.map((r) => {
           const tone = r.onTimePct >= 90 ? 'ok' : r.onTimePct >= 75 ? 'warn' : 'danger'
           return (
@@ -263,7 +264,9 @@ export function Equipes({ range, onData }: { range: DateRange; onData?: (d: Team
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Ring pct={r.onTimePct} tone={tone} label={`Pontualidade da ${r.team.name}: ${pct1(r.onTimePct)}`} />
+                <span className="hidden min-[480px]:block">
+                  <Ring pct={r.onTimePct} tone={tone} label={`Pontualidade da ${r.team.name}: ${pct1(r.onTimePct)}`} />
+                </span>
                 <div className="w-14 text-left">
                   <p className="tnum text-body-lg leading-5 font-semibold">{pct1(r.onTimePct)}</p>
                   <p className="text-caption text-fg-3">pontual</p>

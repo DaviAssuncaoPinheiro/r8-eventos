@@ -67,7 +67,7 @@ function MiniPortal({ name, logo, client, units, cleanings, open }: { name: stri
             <p className="text-caption text-on-accent-2">No mês</p>
           </div>
           <div className="min-w-0">
-            <p className="tnum truncate text-title-card leading-[28px]">{formatMoney(open).replace(',00', '')}</p>
+            <p className="tnum truncate text-body-lg font-semibold leading-[28px]">{formatMoney(open).replace(/,\d{2}$/, '')}</p>
             <p className="text-caption text-on-accent-2">Em aberto</p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function Marca() {
             })}
           </ul>
           <div className="mt-4 flex items-end gap-3">
-            <Field label="Outra cor" error={invalid ? 'Use o formato #e8590c.' : undefined} className="flex-1">
+            <Field label="Outra cor" error={invalid ? 'Use o formato #f04e0a.' : undefined} className="flex-1">
               <Input
                 value={hex}
                 onChange={(e) => onType(e.target.value)}

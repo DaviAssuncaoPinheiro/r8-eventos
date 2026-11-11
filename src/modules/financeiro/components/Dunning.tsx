@@ -153,7 +153,7 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
                           'ds-touch ds-touch-sq relative grid size-12 place-items-center rounded-pill transition-[background-color,color,box-shadow] duration-150 ease-[var(--ease-ui)]',
                           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
                           m.step.enabled ? 'bg-accent-soft text-accent-ink hover:bg-accent hover:text-on-accent' : 'bg-sunken text-fg-3 hover:bg-hover',
-                          m.step.id === selected && 'ring-2 ring-accent ring-offset-2 ring-offset-raised',
+                          m.step.id === selected && 'shadow-[0_0_0_2px_var(--raised),0_0_0_4px_var(--accent)]',
                         )}
                       >
                         {m.step.channel === 'email' ? <Mail size={20} strokeWidth={2} aria-hidden /> : <MessageCircle size={20} strokeWidth={2} aria-hidden />}
@@ -162,7 +162,7 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
                         checked={m.step.enabled}
                         onCheckedChange={(v) => patch(m.step.id, { enabled: v })}
                         label={<span className="sr-only">{`Passo ${offsetLabel(m.step.dayOffset)} ligado`}</span>}
-                        className="min-h-9 justify-center py-0"
+                        className="min-h-9 justify-center gap-0 py-0"
                       />
                     </>
                   )}

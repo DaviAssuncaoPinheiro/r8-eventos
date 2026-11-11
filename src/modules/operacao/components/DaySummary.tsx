@@ -72,14 +72,14 @@ export function DaySummary({ services, live }: DaySummaryProps) {
         ))}
       </div>
 
-      <dl className="mt-auto grid grid-cols-2 gap-3 pt-6">
-        <div className="rounded-control bg-sunken px-4 py-5">
+      <dl className="mt-8 grid flex-1 grid-cols-2 gap-3">
+        <div className="flex min-h-[112px] flex-col justify-end rounded-control bg-sunken p-4">
           <dd className="text-kpi-lg">
             <Big value={going} />
           </dd>
           <dt className="mt-1 text-body font-semibold text-fg-2">Em andamento</dt>
         </div>
-        <div className={cn('rounded-control px-4 py-5', late > 0 ? 'bg-danger-soft' : 'bg-sunken')}>
+        <div className={cn('flex min-h-[112px] flex-col justify-end rounded-control p-4', late > 0 ? 'bg-danger-soft' : 'bg-sunken')}>
           <dd className={cn('text-kpi-lg', late > 0 && 'text-danger-ink')}>
             <Big value={late} />
           </dd>

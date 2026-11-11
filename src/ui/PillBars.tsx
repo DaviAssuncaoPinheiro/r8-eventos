@@ -48,7 +48,10 @@ export function PillBars({ data, format, defaultActive, height = 184, label, cla
               <span
                 aria-hidden
                 className={cn(
-                  'mb-1.5 h-[26px] rounded-tip px-2 text-caption leading-[26px] font-semibold whitespace-nowrap transition-opacity duration-150',
+                  'relative z-10 mb-1.5 h-[26px] rounded-tip px-2 text-caption leading-[26px] font-semibold whitespace-nowrap transition-opacity duration-150',
+                  // nas pontas a etiqueta alinha pela borda da barra, para não sair do cartão
+                  i === 0 && data.length > 3 && 'self-start',
+                  i === data.length - 1 && data.length > 3 && 'self-end',
                   on ? 'bg-inverse text-on-inverse opacity-100' : 'opacity-0',
                 )}
               >

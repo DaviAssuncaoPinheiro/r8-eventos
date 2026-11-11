@@ -57,7 +57,7 @@ export function ContaAzul({ paidThisMonth }: { paidThisMonth: number }) {
               <p className="text-caption text-fg-3">{shown ? `Última sincronização ${formatDateTime(shown)}` : 'Ainda não sincronizado'}</p>
             </>
           ) : (
-            <p className="text-body font-semibold">Lançamentos pagos seguem para o Conta Azul</p>
+            <p className="text-body font-semibold">Sem conexão</p>
           )}
         </div>
       </div>

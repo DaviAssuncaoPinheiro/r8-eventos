@@ -22,7 +22,7 @@ export function updateCompany(patch: Partial<Company>): Promise<Settings> {
 export function setBrand(hex: string, logoDataUrl?: string | null): Promise<Settings> {
   return call(() => {
     const data = getData()
-    if (!/^#[0-9a-fA-F]{6}$/.test(hex)) throw new ServiceError('Cor inválida. Use o formato #e8590c.')
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex)) throw new ServiceError('Cor inválida. Use o formato #f04e0a.')
     const logo = logoDataUrl === null ? undefined : logoDataUrl ?? data.settings.logoDataUrl
     commit({ settings: { ...data.settings, brandHex: hex.toLowerCase(), logoDataUrl: logo } })
     return getData().settings

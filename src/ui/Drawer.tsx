@@ -73,7 +73,7 @@ export function Drawer({ open, defaultOpen, onOpenChange, trigger, side, width =
         <DialogPrimitive.Content
           {...(description ? {} : { 'aria-describedby': undefined })}
           className={cn(
-            'ds-drawer-side ds-root fixed top-3 right-3 bottom-3 z-[60] flex max-w-[calc(100vw-24px)] flex-col rounded-panel bg-overlay text-fg shadow-overlay outline-none',
+            'ds-drawer-side ds-root fixed top-[calc(12px+var(--demo-strip-h,0px))] right-3 bottom-3 z-[60] flex max-w-[calc(100vw-24px)] flex-col rounded-panel bg-overlay text-fg shadow-overlay outline-none',
             sideWidth[width],
             className,
           )}

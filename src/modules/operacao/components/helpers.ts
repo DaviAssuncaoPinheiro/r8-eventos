@@ -68,8 +68,8 @@ export function buildMap(services: ServiceView[], teams: Team[], aspect: number)
       const n = used.get(s.bairroId) ?? 0
       used.set(s.bairroId, n + 1)
       const ang = n * 2.4
-      const x = Math.round(b.x + (n ? Math.cos(ang) * 32 : 0))
-      const y = Math.round(b.y + (n ? Math.sin(ang) * 32 : 0))
+      const x = Math.round(b.x + (n ? Math.cos(ang) * 46 : 0))
+      const y = Math.round(b.y + (n ? Math.sin(ang) * 46 : 0))
       path.push({ x, y })
       pts.push({ x, y })
       if (s.status === 'concluido' || s.status === 'em_andamento' || s.status === 'a_caminho') lastDone = path.length - 1

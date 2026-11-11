@@ -20,17 +20,17 @@ const TONE = {
 }
 
 /** Barras horizontais em pílula: nome, barra proporcional ao maior valor e valor. Crescem uma vez ao montar. */
-export function HBars({ rows, label, className, labelWidth = 168 }: { rows: HBarRow[]; label: string; className?: string; labelWidth?: number }) {
+export function HBars({ rows, label, className, labelWidth = 168, max: maxProp }: { rows: HBarRow[]; label: string; className?: string; labelWidth?: number; max?: number }) {
   const [on, setOn] = React.useState(false)
   React.useEffect(() => {
     const id = requestAnimationFrame(() => setOn(true))
     return () => cancelAnimationFrame(id)
   }, [])
-  const max = Math.max(...rows.map((r) => r.value), 1)
+  const max = maxProp ?? Math.max(...rows.map((r) => r.value), 1)
   return (
     <ul aria-label={label} className={cn('m-0 flex list-none flex-col gap-1.5 p-0', className)}>
       {rows.map((r, i) => {
-        const pct = Math.max((r.value / max) * 100, 3)
+        const pct = Math.min(Math.max((r.value / max) * 100, 3), 100)
         const inner = (
           <>
             <span className="min-w-0 truncate text-body-lg font-medium text-fg">{r.label}</span>
