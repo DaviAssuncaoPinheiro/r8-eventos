@@ -164,7 +164,7 @@ export function BarSeriesChart({ data, currentKey, valueFormat, axisFormat = for
               </defs>
             ) : null}
             <CartesianGrid vertical={false} stroke="var(--viz-grid)" strokeWidth={1} />
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} tickMargin={8} />
+            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} interval={0} minTickGap={0} tickMargin={8} />
             <YAxis axisLine={false} tickLine={false} tick={axisTick} tickFormatter={axisFormat} ticks={ticks} width={64} domain={[0, ticks[ticks.length - 1]]} />
             <RTooltip
               {...tipProps}

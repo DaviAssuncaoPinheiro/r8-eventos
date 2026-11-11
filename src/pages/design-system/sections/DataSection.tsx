@@ -238,10 +238,10 @@ const DIAS = [
 ] as const
 
 const CATEGORIAS = [
-  { key: 'bq', label: 'Banheiros', value: 21480 },
-  { key: 'tnd', label: 'Tendas', value: 12960 },
-  { key: 'trl', label: 'Trailers', value: 9240 },
-  { key: 'ala', label: 'Alambrados', value: 4632.9 },
+  { key: 'bq', label: 'Banheiro', value: 21480 },
+  { key: 'tnd', label: 'Tenda', value: 12960 },
+  { key: 'trl', label: 'Trailer', value: 9240 },
+  { key: 'ala', label: 'Alambrado', value: 4632.9 },
   { key: 'par', label: 'Parado', value: 3980, idle: true },
 ]
 
