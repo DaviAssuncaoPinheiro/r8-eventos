@@ -61,9 +61,9 @@ export function PillBars({ data, format, defaultActive, height = 184, label, cla
                 onClick={() => setActive(i)}
                 aria-label={`${d.fullLabel ?? d.label}: ${format(d.value)}`}
                 aria-pressed={on}
-                style={{ height: h }}
+                style={{ height: h, animationDelay: `${i * 40}ms` }}
                 className={cn(
-                  'w-full max-w-[64px] rounded-pill transition-[height,filter] duration-250 ease-[var(--ease-ui)]',
+                  'ds-grow-y w-full max-w-[64px] rounded-pill transition-[height,filter] duration-250 ease-[var(--ease-ui)]',
                   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
                   tones[d.tone ?? 'soft'],
                   on && d.tone !== 'idle' && 'brightness-95',

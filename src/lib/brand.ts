@@ -10,11 +10,11 @@
 */
 
 export const BRAND_STORAGE_KEY = 'r8.brand'
-export const DEFAULT_BRAND = '#2d6a47'
+export const DEFAULT_BRAND = '#f04e0a'
 
 export const BRAND_PRESETS = [
+  { id: 'laranja', label: 'Laranja', hex: '#f04e0a' },
   { id: 'verde', label: 'Verde floresta', hex: '#2d6a47' },
-  { id: 'laranja', label: 'Laranja R8', hex: '#ee6a1c' },
   { id: 'azul', label: 'Azul', hex: '#2557c7' },
   { id: 'grafite', label: 'Grafite', hex: '#3b4048' },
 ] as const
@@ -123,6 +123,8 @@ export interface BrandTheme {
   accentInk: string
   onAccent: string
   onAccent2: string
+  /** Tom mais claro e vivo, só para brilho e desenho de fundo no bloco de destaque. Nunca fica sob texto. */
+  accentGlow: string
 }
 
 /** Maior luminosidade (mesmo matiz e croma) em que o branco ainda tem >= 4,5:1. */
@@ -160,7 +162,8 @@ function deriveLight(base: Lch): BrandTheme {
     inkL -= 0.01
     accentInk = oklchToHex({ l: inkL, c: inkC, h: base.h })
   }
-  return { accent, accentHover, accentActive, accentSoft, accentInk, onAccent: '#ffffff', onAccent2: onAccentSecondary(accent) }
+  const accentGlow = oklchToHex({ ...base, l: Math.min(0.8, l + 0.14) })
+  return { accent, accentHover, accentActive, accentSoft, accentInk, onAccent: '#ffffff', onAccent2: onAccentSecondary(accent), accentGlow }
 }
 
 function deriveDark(base: Lch): BrandTheme {
@@ -179,7 +182,8 @@ function deriveDark(base: Lch): BrandTheme {
     inkL += 0.01
     accentInk = oklchToHex({ l: inkL, c: inkC, h: base.h })
   }
-  return { accent, accentHover, accentActive, accentSoft, accentInk, onAccent: '#ffffff', onAccent2: onAccentSecondary(accent) }
+  const accentGlow = oklchToHex({ ...base, l: Math.min(0.82, l + 0.14) })
+  return { accent, accentHover, accentActive, accentSoft, accentInk, onAccent: '#ffffff', onAccent2: onAccentSecondary(accent), accentGlow }
 }
 
 export function deriveBrand(hex: string): { light: BrandTheme; dark: BrandTheme } {
@@ -196,6 +200,7 @@ const KEYS: [keyof BrandTheme, string][] = [
   ['accentInk', 'accent-ink'],
   ['onAccent', 'on-accent'],
   ['onAccent2', 'on-accent-2'],
+  ['accentGlow', 'accent-glow'],
 ]
 
 export function brandVars(hex: string): BrandVars {

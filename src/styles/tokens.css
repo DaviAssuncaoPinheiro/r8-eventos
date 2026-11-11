@@ -4,27 +4,29 @@
   src/index.css até as telas antigas serem reescritas; nada aqui colide com eles.
 
   Camadas:
-  1. --brand-l-* / --brand-d-*: cor da marca derivada por src/lib/brand.ts (padrão: verde #2d6a47)
+  1. --brand-l-* / --brand-d-*: cor da marca derivada por src/lib/brand.ts (padrão: laranja #f04e0a)
   2. variáveis semânticas por tema (claro em :root, escuro em [data-theme='dark'])
   3. @theme inline: expõe as semânticas ao Tailwind (bg-raised, text-fg-2, border-hairline…)
 */
 
 :root {
   /* marca padrão, sobrescrita em tempo real por applyBrand() */
-  --brand-l-accent: #2d6a47;
-  --brand-l-accent-hover: #1f5d3b;
-  --brand-l-accent-active: #0e502f;
-  --brand-l-accent-soft: #e3f6e9;
-  --brand-l-accent-ink: #296643;
+  --brand-l-accent: #d54200;
+  --brand-l-accent-hover: #c03a00;
+  --brand-l-accent-active: #ab3200;
+  --brand-l-accent-soft: #ffebe5;
+  --brand-l-accent-ink: #963310;
   --brand-l-on-accent: #ffffff;
-  --brand-l-on-accent-2: #d1ded7;
-  --brand-d-accent: #427f5a;
-  --brand-d-accent-hover: #387451;
-  --brand-d-accent-active: #306d4a;
-  --brand-d-accent-soft: #193022;
-  --brand-d-accent-ink: #96d5ad;
+  --brand-l-on-accent-2: #ffffff;
+  --brand-d-accent: #d54200;
+  --brand-d-accent-hover: #c53c00;
+  --brand-d-accent-active: #b93700;
+  --brand-d-accent-soft: #431e13;
+  --brand-d-accent-ink: #ffad93;
   --brand-d-on-accent: #ffffff;
-  --brand-d-on-accent-2: #f7faf8;
+  --brand-d-on-accent-2: #ffffff;
+  --brand-l-accent-glow: #ff7950;
+  --brand-d-accent-glow: #ff7950;
 
   /* movimento (iguais nos dois temas) */
   --dur-fast: 150ms;
@@ -74,6 +76,7 @@
   --accent-ink: var(--brand-l-accent-ink);
   --on-accent: var(--brand-l-on-accent);
   --on-accent-2: var(--brand-l-on-accent-2);
+  --accent-glow: var(--brand-l-accent-glow);
   --ring: var(--brand-l-accent-ink);
 
   --ok: #1b7f48;
@@ -98,6 +101,10 @@
   --viz-4: #93266c;
   --viz-5: #9481e1;
   --viz-6: #685c1c;
+  --map-land: #e4e5e8;
+  --map-park: #d9e6dc;
+  --map-water: #cfdbe8;
+  --map-road: #f6f6f7;
   --viz-grid: #e8eaee;
   --viz-axis: #5c636d;
   --hatch: rgba(18, 20, 23, 0.16);
@@ -139,6 +146,7 @@
   --accent-ink: var(--brand-d-accent-ink);
   --on-accent: var(--brand-d-on-accent);
   --on-accent-2: var(--brand-d-on-accent-2);
+  --accent-glow: var(--brand-d-accent-glow);
   --ring: var(--brand-d-accent-ink);
 
   --ok: #3db876;
@@ -163,6 +171,10 @@
   --viz-4: #be659a;
   --viz-5: #7b85e1;
   --viz-6: #f5c130;
+  --map-land: #1d2126;
+  --map-park: #1b2a22;
+  --map-water: #18242f;
+  --map-road: #2a2f35;
   --viz-grid: #23282d;
   --viz-axis: #9198a2;
   --hatch: rgba(236, 238, 241, 0.2);
@@ -204,6 +216,7 @@
   --color-accent-active: var(--accent-active);
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
+  --color-accent-glow: var(--accent-glow);
   --color-on-accent: var(--on-accent);
   --color-on-accent-2: var(--on-accent-2);
 
@@ -333,20 +346,38 @@
     font-feature-settings: 'tnum' 1;
   }
   /* hachura: só para dado "parado / sem uso / pendente" */
-  /* bloco preenchido com a marca: do tom pressionado (escuro) ao acento. Nunca mais claro que o acento, para o texto branco manter 4,5:1 */
+  /* bloco preenchido com a marca: do tom pressionado (escuro) ao acento. A base nunca é mais clara que o acento,
+     para o texto branco manter 4,5:1; o brilho (--accent-glow) é só desenho de fundo, no canto oposto ao texto */
   .ds-hero {
     background-color: var(--accent);
     background-image: linear-gradient(140deg, var(--accent-active) 0%, var(--accent-hover) 45%, var(--accent) 100%);
     color: var(--on-accent);
     --ring: var(--on-accent);
   }
+  /* variante de cartão: anéis concêntricos e brilho no canto superior direito, mais o foco de luz que segue o ponteiro */
+  .ds-hero-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .ds-hero-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(240px circle at var(--mx, 120%) var(--my, -20%), color-mix(in oklab, var(--accent-glow) 38%, transparent), transparent 70%),
+      repeating-radial-gradient(circle at 108% -12%, transparent 0 26px, color-mix(in oklab, var(--accent-glow) 22%, transparent) 26px 27.5px),
+      radial-gradient(circle at 105% -10%, color-mix(in oklab, var(--accent-glow) 46%, transparent) 0%, transparent 48%);
+  }
   /* cartão escuro do Copiloto: fixo nos dois temas, com anéis concêntricos na cor da marca */
   .ds-copilot {
     color: #ffffff;
-    background-color: #0d1f16;
+    background-color: #14110f;
     background-image:
-      repeating-radial-gradient(circle at 115% 125%, transparent 0 22px, color-mix(in oklab, var(--brand-d-accent) 26%, transparent) 22px 23.5px),
-      radial-gradient(circle at 110% 120%, color-mix(in oklab, var(--brand-d-accent) 70%, #0d1f16) 0%, #0d1f16 62%);
+      repeating-radial-gradient(circle at 115% 125%, transparent 0 22px, color-mix(in oklab, var(--accent-glow) 24%, transparent) 22px 23.5px),
+      radial-gradient(circle at 110% 120%, color-mix(in oklab, var(--accent) 62%, #14110f) 0%, #14110f 62%);
     --ring: #ffffff;
   }
   .ds-hatch {
@@ -396,6 +427,37 @@
     background: linear-gradient(90deg, var(--sunken) 0%, var(--hover) 50%, var(--sunken) 100%);
     background-size: 200% 100%;
     animation: ds-shimmer 1.4s linear infinite;
+  }
+  .ds-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ds-pulse 1.8s var(--ease-ui) infinite;
+  }
+  @keyframes ds-pulse {
+    0% { transform: scale(1); opacity: 0.45; }
+    100% { transform: scale(2.3); opacity: 0; }
+  }
+  .ds-route[pathLength] {
+    stroke-dasharray: 1;
+    animation: ds-draw 900ms var(--ease-ui) both;
+  }
+  @keyframes ds-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  .ds-pin-focus { opacity: 0; }
+  .ds-pin:focus-visible .ds-pin-focus { opacity: 1; }
+  .ds-grow-y {
+    transform-origin: bottom;
+    animation: ds-grow-y 600ms var(--ease-ui) both;
+  }
+  @keyframes ds-grow-y {
+    from { transform: scaleY(0.08); }
+    to { transform: scaleY(1); }
+  }
+  .ds-arc {
+    stroke-dasharray: 1;
+    animation: ds-draw 900ms var(--ease-ui) both;
   }
   @keyframes ds-spin {
     to {

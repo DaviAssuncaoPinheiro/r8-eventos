@@ -67,13 +67,15 @@ export function ArcGauge({ segments, center, caption, label, className }: ArcGau
             fill="none"
             strokeWidth={STROKE}
             strokeLinecap="round"
+            pathLength={p.tone === 'idle' ? undefined : 1}
+            className={p.tone === 'idle' ? undefined : 'ds-arc'}
             stroke={p.tone === 'idle' ? `url(#h${id})` : p.tone === 'strong' ? 'var(--accent-active)' : 'var(--accent)'}
           />
         ))}
       </svg>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center">
         <span className="text-[52px] leading-[56px] font-semibold tracking-[-0.035em] text-fg">{center}</span>
-        <span className="text-caption font-medium text-accent-ink">{caption}</span>
+        {caption ? <span className="text-caption font-medium text-accent-ink">{caption}</span> : null}
       </div>
     </div>
   )
