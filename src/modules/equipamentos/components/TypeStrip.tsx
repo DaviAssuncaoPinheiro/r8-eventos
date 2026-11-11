@@ -1,6 +1,6 @@
-import { Money, Skeleton, cn } from '@/ui'
+import { Money, Skeleton, Stagger, cn } from '@/ui'
 import type { StockRow } from '@/services'
-import { TypeThumb } from './TypeThumb'
+import { TypeArtTile } from './TypeArt'
 
 /** Barra de ocupação em segmentos: em campo, limpeza, manutenção, parado. Soma sempre o total do tipo. */
 export function OccupancyBar({ row, className }: { row: StockRow; className?: string }) {
@@ -25,7 +25,7 @@ export function OccupancyBar({ row, className }: { row: StockRow; className?: st
 
 export function TypeStrip({ rows, loading, selected, onSelect }: { rows?: StockRow[]; loading: boolean; selected?: string; onSelect: (typeId: string | undefined) => void }) {
   return (
-    <div aria-busy={loading || undefined} className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
+    <Stagger delay={0.1} gap={0.045} aria-busy={loading || undefined} className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
       {loading || !rows
         ? Array.from({ length: 6 }, (_, i) => (
             <div key={i} aria-hidden className="w-[236px] shrink-0 rounded-card bg-raised p-2">
@@ -51,7 +51,7 @@ export function TypeStrip({ rows, loading, selected, onSelect }: { rows?: StockR
                   on ? 'ring-2 ring-accent ring-inset' : 'ring-1 ring-transparent ring-inset',
                 )}
               >
-                <TypeThumb src={r.type.photo} alt={r.type.name} typeId={r.type.id} tag={r.type.short} className="aspect-[4/3] w-full rounded-[16px]" />
+                <TypeArtTile typeId={r.type.id} prefix={r.type.prefix} label={r.type.name} tag={r.type.short} className="aspect-[4/3] w-full rounded-[16px]" />
                 <span className="block px-3 pt-3 pb-2">
                   <span className="block truncate text-title-card">{r.type.name}</span>
                   <OccupancyBar row={r} className="mt-3" />
@@ -66,6 +66,6 @@ export function TypeStrip({ rows, loading, selected, onSelect }: { rows?: StockR
               </button>
             )
           })}
-    </div>
+    </Stagger>
   )
 }

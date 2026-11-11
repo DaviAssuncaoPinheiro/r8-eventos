@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Boxes, LayoutGrid, List, Printer, Search, X } from 'lucide-react'
+import { Boxes, GanttChart, LayoutGrid, List, Printer, Search, X } from 'lucide-react'
 import { Banner, Button, EmptyState, Input, Money, Segmented, Skeleton, StatusDot, Table, cn, type TableColumn } from '@/ui'
 import { PageHeader } from '@/app/PageHeader'
 import { useUnitStatus } from '@/app/status'
 import { getStockSummary, listUnits, useLabels, useQuery, type UnitStatus, type UnitView } from '@/services'
-import { AvailabilityCalendar } from './components/AvailabilityCalendar'
+import { Indicadores } from './components/Indicadores'
+import { Timeline } from './components/Timeline'
 import { TypeStrip } from './components/TypeStrip'
 import { IDLE_LIMIT, UnitCard } from './components/UnitCard'
-import { TypeThumb } from './components/TypeThumb'
+import { TypeArtTile } from './components/TypeArt'
 import { useLabelPrinter } from './components/useLabelPrinter'
 
 const PAGE = 24
@@ -17,7 +18,7 @@ const isStatus = (v: string | null): v is UnitStatus => !!v && (STATUSES as stri
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-type Aba = 'unidades' | 'disponibilidade'
+type Aba = 'unidades' | 'linha'
 type Visao = 'grade' | 'lista'
 
 export default function Estoque() {
@@ -27,7 +28,8 @@ export default function Estoque() {
   const [params, setParams] = useSearchParams()
   const status = isStatus(params.get('status')) ? (params.get('status') as UnitStatus) : undefined
   const tipo = params.get('tipo') ?? undefined
-  const aba: Aba = params.get('aba') === 'disponibilidade' ? 'disponibilidade' : 'unidades'
+  // /equipamentos?visao=linha abre a linha do tempo (o antigo aba=disponibilidade cai nela também)
+  const aba: Aba = params.get('visao') === 'linha' || params.get('aba') === 'disponibilidade' ? 'linha' : 'unidades'
   const [visao, setVisao] = React.useState<Visao>('grade')
   const [busca, setBusca] = React.useState('')
   const [shown, setShown] = React.useState(PAGE)
@@ -37,12 +39,14 @@ export default function Estoque() {
     setParams(
       (p) => {
         const n = new URLSearchParams(p)
+        n.delete('aba')
         if (v) n.set(k, v)
         else n.delete(k)
         return n
       },
       { replace: true },
     )
+  const go = (q: Record<string, string>) => setParams(new URLSearchParams(q), { replace: false })
 
   const stock = useQuery(() => getStockSummary(), [])
   const all = useQuery(() => listUnits({ typeId: tipo }), [tipo])
@@ -63,7 +67,6 @@ export default function Estoque() {
   React.useEffect(() => setShown(PAGE), [status, tipo, busca, visao])
 
   const visible = rows.slice(0, shown)
-  const typeForCalendar = stock.data?.find((r) => r.type.id === tipo)?.type ?? stock.data?.[0]?.type
   const pills: { key: 'todos' | UnitStatus; label: string }[] = [
     { key: 'todos', label: 'Todos' },
     { key: 'em_campo', label: UNIT_STATUS.em_campo.label },
@@ -80,7 +83,7 @@ export default function Estoque() {
       width: 150,
       render: (u) => (
         <span className="flex items-center gap-3">
-          <TypeThumb src={u.type.photo} alt="" typeId={u.type.id} className="size-8 rounded-tip" />
+          <TypeArtTile typeId={u.type.id} prefix={u.type.prefix} className="size-8 rounded-tip" />
           <span className="tnum font-semibold">{u.code}</span>
         </span>
       ),
@@ -110,6 +113,8 @@ export default function Estoque() {
         }
       />
 
+      {stock.error && !stock.data ? null : <Indicadores rows={stock.data} loading={stock.initialLoading} onRendendo={() => go({ status: 'em_campo' })} onParado={() => go({ status: 'disponivel' })} onOcupacao={() => go({ visao: 'linha' })} />}
+
       {stock.error && !stock.data ? (
         <Banner tone="danger" title="Não foi possível carregar o estoque." action={<Button size="sm" onClick={() => void stock.refetch()}>Tentar de novo</Button>} />
       ) : (
@@ -120,10 +125,10 @@ export default function Estoque() {
         <Segmented<Aba>
           label="Seção"
           value={aba}
-          onChange={(v) => setParam('aba', v === 'unidades' ? undefined : v)}
+          onChange={(v) => setParam('visao', v === 'unidades' ? undefined : v)}
           options={[
-            { value: 'unidades', label: cap(l.unitPlural) },
-            { value: 'disponibilidade', label: 'Disponibilidade' },
+            { value: 'unidades', label: cap(l.unitPlural), icon: Boxes },
+            { value: 'linha', label: 'Linha do tempo', icon: GanttChart },
           ]}
         />
         {aba === 'unidades' ? (
@@ -139,8 +144,10 @@ export default function Estoque() {
         ) : null}
       </div>
 
-      {aba === 'disponibilidade' ? (
-        <div className="mt-4">{typeForCalendar ? <AvailabilityCalendar type={typeForCalendar} /> : <Skeleton shape="block" className="h-72 rounded-card" />}</div>
+      {aba === 'linha' ? (
+        <div className="mt-4">
+          <Timeline initialType={tipo} />
+        </div>
       ) : (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">

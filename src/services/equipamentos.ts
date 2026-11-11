@@ -1,8 +1,8 @@
 /* Equipamentos: tipos, unidades com patrimônio, estoque por tipo e calendário de disponibilidade. */
 import { commit, getData } from '@/data/db'
-import { addDays, atTime, diffDays, monthEnd, monthKey, monthStart, today as todayFn } from '@/domain/dates'
+import { addDays, addMonths, atTime, diffDays, monthEnd, monthKey, monthStart, today as todayFn } from '@/domain/dates'
 import { getSegment } from '@/domain/segments'
-import type { Damage, EquipmentGroup, EquipmentType, ISODate, ISODateTime, Rental, Unit, UnitStatus, DbData } from '@/domain/types'
+import type { Damage, EquipmentGroup, EquipmentType, ISODate, ISODateTime, Rental, RentalStatus, Unit, UnitStatus, DbData } from '@/domain/types'
 import { call, ServiceError } from './config'
 import { holdsUnits, itemRevenue, lookup, mapById, normalize, overlapDays } from './common'
 
@@ -249,3 +249,172 @@ export function getAvailabilityCalendar(typeId: string, from: ISODate = todayFn(
   })
 }
 
+
+/* ───────────────────────── Linha do tempo de disponibilidade ───────────────────────── */
+
+export interface TimelineBlock {
+  rentalId: string
+  code: string
+  title: string
+  clientName: string
+  status: RentalStatus
+  start: ISODate
+  end: ISODate
+}
+
+export interface TimelineUnit {
+  id: string
+  code: string
+  status: UnitStatus
+  idleSince?: ISODate
+  /** dias parada (só disponíveis) */
+  idleDays?: number
+  /** locações que seguram esta unidade, em ordem de início */
+  blocks: TimelineBlock[]
+  /** faixas sem locação em que a unidade não pode sair (manutenção ou limpeza em andamento) */
+  blocked: { kind: 'manutencao' | 'limpeza'; start: ISODate; end: ISODate }[]
+}
+
+export interface TimelineQuote {
+  rentalId: string
+  code: string
+  title: string
+  clientName: string
+  start: ISODate
+  end: ISODate
+  /** quantidade pedida deste tipo no orçamento */
+  qty: number
+}
+
+export interface TimelineDay {
+  date: ISODate
+  /** unidades utilizáveis ocupadas neste dia */
+  booked: number
+  free: number
+}
+
+export interface TimelineType {
+  type: EquipmentType
+  total: number
+  /** utilizáveis (fora de manutenção) */
+  usable: number
+  /** uma entrada por dia da janela */
+  days: TimelineDay[]
+  units: TimelineUnit[]
+  /** orçamentos ainda sem unidade alocada (a alocação acontece na confirmação) */
+  quotes: TimelineQuote[]
+}
+
+export interface Timeline {
+  from: ISODate
+  to: ISODate
+  types: TimelineType[]
+}
+
+/** Linha do tempo: por tipo, ocupação dia a dia, unidades com suas locações e orçamentos pendentes. */
+export function getTimeline(from: ISODate = todayFn(), days = 21): Promise<Timeline> {
+  return call(() => {
+    const data = getData()
+    const today = todayFn()
+    const to = addDays(from, days - 1)
+    const clients = mapById(data.clients)
+    const rentals = data.rentals.filter((r) => r.status !== 'cancelada')
+    const effEnd = (r: Rental) => (r.status === 'em_campo' && r.end < today ? today : r.end)
+    const types: TimelineType[] = data.types.map((type) => {
+      const us = data.units.filter((u) => u.typeId === type.id)
+      const usable = us.filter((u) => u.status !== 'manutencao')
+      const byUnit = new Map<string, TimelineBlock[]>()
+      const quotes: TimelineQuote[] = []
+      for (const r of rentals) {
+        const end = effEnd(r)
+        if (r.start > to || end < from) continue
+        if (r.status === 'orcamento') {
+          const qty = r.items.filter((i) => i.typeId === type.id).reduce((a, i) => a + i.qty, 0)
+          if (qty) quotes.push({ rentalId: r.id, code: r.code, title: r.title, clientName: clients.get(r.clientId)?.name ?? '', start: r.start, end, qty })
+          continue
+        }
+        for (const it of r.items) {
+          if (it.typeId !== type.id) continue
+          for (const uid of it.unitIds) {
+            const list = byUnit.get(uid) ?? []
+            list.push({ rentalId: r.id, code: r.code, title: r.title, clientName: clients.get(r.clientId)?.name ?? '', status: r.status, start: r.start, end })
+            byUnit.set(uid, list)
+          }
+        }
+      }
+      const usableIds = new Set(usable.map((u) => u.id))
+      const daysOut: TimelineDay[] = []
+      for (let i = 0; i < days; i++) {
+        const date = addDays(from, i)
+        let booked = 0
+        for (const [uid, bs] of byUnit) if (usableIds.has(uid) && bs.some((b) => b.start <= date && date <= b.end)) booked++
+        daysOut.push({ date, booked, free: Math.max(0, usable.length - booked) })
+      }
+      const units: TimelineUnit[] = us
+        .map((u) => {
+          const blocks = (byUnit.get(u.id) ?? []).sort((a, b) => a.start.localeCompare(b.start))
+          const blocked: TimelineUnit['blocked'] = []
+          if (u.status === 'manutencao') blocked.push({ kind: 'manutencao', start: today, end: addDays(today, 3) })
+          if (u.status === 'limpeza') blocked.push({ kind: 'limpeza', start: today, end: today })
+          return { id: u.id, code: u.code, status: u.status, idleSince: u.idleSince, idleDays: u.status === 'disponivel' && u.idleSince ? Math.max(0, diffDays(u.idleSince, today)) : undefined, blocks, blocked }
+        })
+        .sort((a, b) => b.blocks.length - a.blocks.length || a.code.localeCompare(b.code))
+      return { type, total: us.length, usable: usable.length, days: daysOut, units, quotes: quotes.sort((a, b) => a.start.localeCompare(b.start)) }
+    })
+    return { from, to, types }
+  })
+}
+
+/* ───────────────────────── Retorno da unidade sobre o custo ───────────────────────── */
+
+export interface UnitPayback {
+  purchasePrice: number
+  /** receita acumulada ao fim de cada mês, do primeiro mês com receita até o mês atual */
+  months: { key: string; cumulative: number }[]
+  total: number
+  /** média mensal usada na projeção */
+  perMonth: number
+  /** meses desde o primeiro mês com receita até se pagar; null se ainda não se pagou */
+  paidInMonths: number | null
+  /** meses que faltam a partir de hoje; 0 se já se pagou */
+  remainingMonths: number
+}
+
+/** Receita acumulada da unidade contra o custo de aquisição do tipo, com projeção a partir da média recente. */
+export function getUnitPayback(idOrCode: string): Promise<UnitPayback | null> {
+  return call(() => {
+    const data = getData()
+    const key = idOrCode.trim().toLowerCase()
+    const u = data.units.find((x) => x.id.toLowerCase() === key || x.code.toLowerCase() === key)
+    if (!u) throw new ServiceError('Equipamento não encontrado.')
+    const price = (data.types.find((t) => t.id === u.typeId) as { purchasePrice?: number } | undefined)?.purchasePrice
+    if (!price) return null
+    const today = todayFn()
+    const rentals = rentalsWithUnit(data.rentals, u.id).filter((r) => r.status !== 'confirmada')
+    const nowKey = monthKey(today)
+    const perMonthRev = new Map<string, number>()
+    for (const r of rentals) {
+      const rEnd = r.status === 'em_campo' && r.end > today ? today : r.end
+      for (const it of r.items.filter((i) => i.unitIds.includes(u.id))) {
+        for (let k = monthKey(r.start); k <= nowKey && k <= monthKey(rEnd); k = addMonths(k, 1)) {
+          const rev = itemRevenue({ ...it, qty: 1 }, r.start, rEnd, monthStart(k), monthEnd(k) < today ? monthEnd(k) : today)
+          perMonthRev.set(k, (perMonthRev.get(k) ?? 0) + rev)
+        }
+      }
+    }
+    const keys = [...perMonthRev.keys()].sort()
+    const first = keys[0] ?? nowKey
+    const months: UnitPayback['months'] = []
+    let cum = 0
+    for (let k = first; k <= nowKey; k = addMonths(k, 1)) {
+      cum += perMonthRev.get(k) ?? 0
+      months.push({ key: k, cumulative: Math.round(cum * 100) / 100 })
+    }
+    const recent = months.slice(-6)
+    const base = recent.length > 1 ? (recent[recent.length - 1].cumulative - recent[0].cumulative) / (recent.length - 1) : cum / Math.max(1, months.length)
+    const perMonth = Math.max(0, Math.round(base * 100) / 100)
+    const paidIdx = months.findIndex((m) => m.cumulative >= price)
+    const remaining = cum >= price ? 0 : perMonth > 0 ? Math.ceil((price - cum) / perMonth) : 999
+    return { purchasePrice: price, months, total: Math.round(cum * 100) / 100, perMonth, paidInMonths: paidIdx >= 0 ? paidIdx + 1 : null, remainingMonths: remaining }
+  })
+}

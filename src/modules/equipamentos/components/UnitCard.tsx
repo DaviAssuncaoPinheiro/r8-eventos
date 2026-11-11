@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { cn, StatusDot } from '@/ui'
 import { useUnitStatus } from '@/app/status'
 import type { UnitView } from '@/services'
-import { TypeThumb } from './TypeThumb'
+import { TypeArtTile } from './TypeArt'
 
 export const IDLE_LIMIT = 30
 
@@ -19,7 +19,7 @@ export function UnitCard({ unit }: { unit: UnitView }) {
         'hover:-translate-y-0.5 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
       )}
     >
-      <TypeThumb src={unit.type.photo} alt={unit.type.name} typeId={unit.type.id} className="size-14 rounded-control" />
+      <TypeArtTile typeId={unit.type.id} prefix={unit.type.prefix} label={unit.type.name} className="size-14 rounded-control" />
       <span className="min-w-0 flex-1">
         <span className="tnum block truncate text-title-card">{unit.code}</span>
         <StatusDot tone={st.tone} className="mt-0.5 text-caption">

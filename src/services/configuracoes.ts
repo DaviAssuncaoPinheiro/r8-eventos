@@ -1,7 +1,7 @@
 /* Configurações: empresa, marca, segmento, copiloto, usuários, integrações e reinício da demonstração. */
 import { commit, getData, newIds, resetDemo as resetDb } from '@/data/db'
 import { demoNowISO } from '@/domain/dates'
-import type { Company, IntegrationKey, SegmentId, Settings, User } from '@/domain/types'
+import type { Company, IntegrationKey, LegacyIntegrationKey, SegmentId, Settings, User } from '@/domain/types'
 import { SEGMENTS } from '@/domain/segments'
 import { call, ServiceError } from './config'
 
@@ -89,8 +89,8 @@ export function setCurrentUser(id: string): Promise<Settings> {
   })
 }
 
-const ACCOUNTS: Record<IntegrationKey, string> = {
-  whatsapp: '(61) 99641-0087',
+const ACCOUNTS: Record<Exclude<IntegrationKey, LegacyIntegrationKey>, string> = {
+  email: 'cobranca@cerradolocacoes.com.br',
   pix: 'Chave CNPJ cadastrada',
   boleto: 'Conta 4410-7 · Banco Cooperativo',
   nfse: 'Prefeitura de Brasília · certificado A1',
@@ -102,7 +102,7 @@ export function setIntegration(key: IntegrationKey, connected: boolean, account?
   return call(() => {
     const data = getData()
     if (!(key in data.settings.integrations)) throw new ServiceError('Integração desconhecida.')
-    const integration = connected ? { connected: true, account: account ?? ACCOUNTS[key], connectedAt: demoNowISO() } : { connected: false }
+    const integration = connected ? { connected: true, account: account ?? ACCOUNTS[key as keyof typeof ACCOUNTS], connectedAt: demoNowISO() } : { connected: false }
     commit({ settings: { ...data.settings, integrations: { ...data.settings.integrations, [key]: integration } } })
     return getData().settings
   })

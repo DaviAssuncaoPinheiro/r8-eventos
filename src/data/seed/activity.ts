@@ -38,7 +38,10 @@ export function buildActivity(env: ActivityEnv): Activity {
   const clientById = new Map(clients.map((c) => [c.id, c]))
   const rentalById = new Map(rentals.map((r) => [r.id, r]))
   let seq = 0
-  const uid = (p: string) => `${p}-${String(++seq).padStart(4, '0')}`
+  // registros do histórico de recuperação e dos encaixes de hoje usam ids próprios, para não deslocar os ids das demais regras
+  let altSeq = 0
+  let alt = false
+  const uid = (p: string) => (alt ? `${p}-x${String(++altSeq).padStart(3, '0')}` : `${p}-${String(++seq).padStart(4, '0')}`)
   const checklists = SEGMENTS.eventos.checklists
 
   /* ───────── relatórios ───────── */
@@ -164,10 +167,12 @@ export function buildActivity(env: ActivityEnv): Activity {
     ['eq-3', 'setor-clubes', hhmm(11, 10)],
     ['eq-3', 'guara', hhmm(13, 40)],
   ]
+  alt = true
   for (const [team, bairro, at] of lateFit) {
     const r = pickIn(bairro)
     if (r) addToday(team, r, 'limpeza', at, 'agendado')
   }
+  alt = false
   // entregas e retiradas de hoje que vêm das locações
   const setTodayService = (pred: (s: Service) => boolean, startMin: number, status: Service['status'], team?: string) => {
     const s = services.find((x) => dayOf(x.start) === today && pred(x))
@@ -189,7 +194,11 @@ export function buildActivity(env: ActivityEnv): Activity {
     const day = dayOf(s.start)
     if (day < today) return { ...s, status: 'concluido' as const, startedAt: undefined, report: makeReport(s) }
     if (day > today) return { ...s, status: 'agendado' as const }
-    if (s.status === 'concluido') return { ...s, report: makeReport(s, 0) }
+    if (s.status === 'concluido') {
+      // duas das equipes chegaram atrasadas hoje cedo (a automação de rota reagiu)
+      const lateStart = s.teamId === 'eq-4' ? 31 : s.teamId === 'eq-2' ? 24 : 0
+      return { ...s, report: makeReport(s, lateStart) }
+    }
     if (s.status === 'em_andamento') {
       const startedAt = atTime(today, minutesOf(s.start) + 5)
       return { ...s, startedAt }
@@ -243,6 +252,7 @@ export function buildActivity(env: ActivityEnv): Activity {
   ]
   // extras faturados no mês anterior e neste mês (dinheiro que o sistema recupera). Sorteio próprio: não mexe na semente das demais regras.
   const rng2 = createRng(0x2b7e1516)
+  alt = true
   const curKey = monthKey(today)
   const prevKey = addMonths(curKey, -1)
   const dayIn = (key: string, dd: number) => `${key}-${String(dd).padStart(2, '0')}`
@@ -262,6 +272,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     const issue = addDays(d, 2) > today ? today : addDays(d, 2)
     addRecExtra('cur', d, 'limpeza', 'Limpeza extra para vistoria', issue, addDays(issue, 3))
   }
+  alt = false
   services = renumberOrders(services).sort((a, b) => a.start.localeCompare(b.start))
 
   /* ───────── avarias ───────── */
@@ -433,6 +444,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     for (const s of g) extraChargeOf.set(s.id, c.id)
   }
   // extras faturados do histórico recente (mês anterior e atual)
+  alt = true
   for (const g of recExtras) {
     const r = rentalById.get(g.services[0].rentalId)!
     const c = newCharge({
@@ -449,6 +461,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     }, rng2)
     for (const s of g.services) extraChargeOf.set(s.id, c.id)
   }
+  alt = false
   const dueByCharge = (c: Charge) => c.dueAt
 
   // 6 atrasadas de 4 clientes
@@ -480,6 +493,7 @@ export function buildActivity(env: ActivityEnv): Activity {
   /* ───────── dinheiro recuperado: avarias e atrasados do mês anterior e do atual ───────── */
   // O total do mês anterior fica na casa de R$ 7,4 mil: o que vem das unidades paradas que voltaram a alugar sai das locações,
   // e as avarias cobradas absorvem a diferença (valores quebrados). Sorteio próprio (rng2).
+  alt = true
   {
     const TARGET_PREV = 7418.4
     const sumValues = (l: { value: number }[]) => round2(l.reduce((a, x) => a + x.value, 0))
@@ -510,7 +524,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     }
     best.forEach(remind)
     const overduePrev = sumValues(best)
-    for (const c of lateCands(curKey).slice(0, 2)) remind(c, 1)
+    for (const c of lateCands(curKey).slice(0, 1)) remind(c, 1)
     // avarias cobradas (e pagas) no mês anterior: três, com o valor que falta para fechar o total
     const dmgTotal = Math.max(900, round2(rest - overduePrev))
     const v1 = oddMoney(dmgTotal * 0.46, rng2)
@@ -545,6 +559,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     const ci = addDays(cd, 2) > today ? today : addDays(cd, 2)
     addRec(1, cd, oddMoney(520 + rng2.int(0, 220), rng2), ci, addDays(ci, 3), 4)
   }
+  alt = false
 
   // ajusta para ~30 abertas
   const openCount = () => charges.filter((c) => c.status === 'aberta').length

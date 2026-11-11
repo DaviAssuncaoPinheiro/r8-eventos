@@ -59,9 +59,22 @@ export function getDailySummary(): Promise<DailySummary> {
 
 /* ───────────────────────── Sugestões ───────────────────────── */
 
-function whatsDamage(clientName: string, contact: string, items: string[], total: number) {
-  return `Olá, ${contact}! Aqui é da ${getData().settings.company.name}. Encontramos ${items.length === 1 ? 'uma avaria' : items.length + ' avarias'} nos equipamentos da locação, registrada${items.length === 1 ? '' : 's'} com foto: ${items.join('; ')}. O valor de reparo é ${formatMoney(total)}. Posso enviar a cobrança por Pix? As fotos ficam no portal do cliente.`.replace(clientName, clientName)
+/** Rascunho de e-mail: saudação, texto curto e assinatura da empresa */
+function mail(subject: string, first: string, text: string): { subject: string; body: string } {
+  return { subject, body: `Olá, ${first},\n\n${text}\n\nAtenciosamente,\n${getData().settings.company.name}` }
 }
+
+function emailDamage(contact: string, items: string[], total: number) {
+  const one = items.length === 1
+  return mail(
+    one ? 'Avaria registrada na sua locação' : `${items.length} avarias registradas na sua locação`,
+    contact,
+    `Encontramos ${one ? 'uma avaria' : items.length + ' avarias'} nos equipamentos da locação, registrada${one ? '' : 's'} com foto: ${items.join('; ')}. O valor de reparo é ${formatMoney(total)}. Vamos enviar a cobrança com o link de pagamento. As fotos ficam no portal do cliente.`,
+  )
+}
+
+/** Campos do rascunho: `draft` (assunto e corpo) e `draftMessage` (só o corpo, para as telas atuais) */
+const withDraft = (d: { subject: string; body: string }) => ({ draft: d, draftMessage: d.body })
 
 function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
   const L = lookup(data)
@@ -79,7 +92,7 @@ function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
       title: `Cobrar ${ds.length === 1 ? 'a avaria' : `${ds.length} avarias`} de ${c.name}`,
       value,
       detail: `${items.join(', ')}. Registrada${ds.length === 1 ? '' : 's'} há ${Math.max(...ds.map((d) => diffDays(d.date, today)))} dias, sem cobrança.`,
-      draftMessage: whatsDamage(c.name, firstName(c.contacts[0]?.name ?? c.name), items, value),
+      ...withDraft(emailDamage(firstName(c.contacts[0]?.name ?? c.name), items, value)),
       payload: { clientId, damageIds: ds.map((d) => d.id) },
       status: 'pendente',
     })
@@ -97,7 +110,7 @@ function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
       title: `Faturar ${ss.length === 1 ? '1 serviço extra' : `${ss.length} serviços extras`} de ${r.title}`,
       value,
       detail: `${c.name}. ${ss.map((s) => s.note ?? 'Serviço extra').join('; ')}.`,
-      draftMessage: `Olá, ${firstName(c.contacts[0]?.name ?? c.name)}! Aqui é da ${data.settings.company.name}. Fizemos ${ss.length === 1 ? 'um serviço extra' : ss.length + ' serviços extras'} em ${r.title}, fora do contrato, no total de ${formatMoney(value)}. Vou enviar a cobrança por Pix.`,
+      ...withDraft(mail(`Serviços extras em ${r.title}`, firstName(c.contacts[0]?.name ?? c.name), `Fizemos ${ss.length === 1 ? 'um serviço extra' : ss.length + ' serviços extras'} em ${r.title}, fora do contrato, no total de ${formatMoney(value)}. Vamos enviar a cobrança com o link de pagamento.`)),
       payload: { rentalId, serviceIds: ss.map((s) => s.id) },
       status: 'pendente',
     })
@@ -115,7 +128,7 @@ function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
       title: `Lembrar ${c.name} do pagamento em atraso`,
       value,
       detail: `${cs.length === 1 ? '1 cobrança vencida' : cs.length + ' cobranças vencidas'}, a mais antiga em ${formatDate(oldest)} (${diffDays(oldest, today)} dias).`,
-      draftMessage: `Olá, ${firstName(c.contacts[0]?.name ?? c.name)}! Aqui é da ${data.settings.company.name}. Não encontramos o pagamento de ${cs.map((x) => `${x.code} (${formatMoney(x.value)}, venceu em ${formatDate(x.dueAt)})`).join(', ')}. Se já pagou, envie o comprovante por aqui. Se precisar de ajuda para regularizar, é só falar.`,
+      ...withDraft(mail(`Pagamento em atraso: ${cs.map((x) => x.code).join(', ')}`, firstName(c.contacts[0]?.name ?? c.name), `Não encontramos o pagamento de ${cs.map((x) => `${x.code} (${formatMoney(x.value)}, venceu em ${formatDate(x.dueAt)})`).join(', ')}. Se já pagou, envie o comprovante respondendo este e-mail. Se precisar de ajuda para regularizar, é só falar.`)),
       payload: { clientId, chargeIds: cs.map((x) => x.id) },
       status: 'pendente',
     })
@@ -140,7 +153,7 @@ function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
       kind: 'mensagem_cliente',
       title: `Avisar ${c.name} sobre o atraso`,
       detail: `O serviço em ${r.title} estava previsto para ${new Date(s.start).toTimeString().slice(0, 5)}.`,
-      draftMessage: `Olá, ${firstName(r.contact.name)}! Aqui é da ${data.settings.company.name}. Nossa equipe está um pouco atrasada e deve chegar em ${r.title} em até 40 minutos. Pedimos desculpas pelo transtorno.`,
+      ...withDraft(mail(`Nossa equipe chega em até 40 minutos: ${r.title}`, firstName(r.contact.name), `Nossa equipe está um pouco atrasada e deve chegar em ${r.title} em até 40 minutos. Pedimos desculpas pelo transtorno.`)),
       payload: { serviceId: s.id, clientId: c.id },
       status: 'pendente',
     })
@@ -177,18 +190,18 @@ export function approveSuggestion(id: string): Promise<CopilotSuggestion> {
       const p = s.payload as Record<string, any>
       if (s.kind === 'cobrar_avaria') {
         const charges = await chargeDamage(p.damageIds as string[])
-        for (const c of charges) await sendCharge(c.id, { via: 'whatsapp', method: 'pix' })
+        for (const c of charges) await sendCharge(c.id, { via: 'email', method: 'pix' })
       } else if (s.kind === 'faturar_extra') {
         const c = await billExtras(p.rentalId as string)
-        await sendCharge(c.id, { via: 'whatsapp', method: c.method })
+        await sendCharge(c.id, { via: 'email', method: c.method })
       } else if (s.kind === 'lembrar_atraso') {
-        for (const cid of p.chargeIds as string[]) await sendReminder(cid, 'whatsapp')
+        for (const cid of p.chargeIds as string[]) await sendReminder(cid, 'email')
       } else if (s.kind === 'redistribuir_rota') {
         for (const m of p.moves as { serviceId: string; toTeamId: string; newOrder: number }[]) await moveService(m.serviceId, { teamId: m.toTeamId, order: m.newOrder })
       } else if (s.kind === 'mensagem_cliente') {
         const data = getData()
         const ids = newIds()
-        commit({ notifications: [{ id: ids.next('ntf'), kind: 'copiloto', title: 'Mensagem enviada ao cliente', text: s.draftMessage ?? '', at: demoNowISO(), read: true }, ...data.notifications], seq: ids.seq() })
+        commit({ notifications: [{ id: ids.next('ntf'), kind: 'copiloto', title: 'E-mail enviado ao cliente', text: s.draftMessage ?? '', at: demoNowISO(), read: true }, ...data.notifications], seq: ids.seq() })
       }
     })
     const done: CopilotSuggestion = { ...s, status: 'aprovada' }
@@ -208,10 +221,10 @@ export function dismissSuggestion(id: string): Promise<CopilotSuggestion> {
 }
 
 /**
- * Texto de mensagem pronto. refId depende do tipo: cobrar_avaria = id da avaria, faturar_extra = id da locação,
+ * E-mail pronto (assunto e corpo). refId depende do tipo: cobrar_avaria = id da avaria, faturar_extra = id da locação,
  * lembrar_atraso = id da cobrança, redistribuir_rota e mensagem_cliente = id do serviço.
  */
-export function draftMessage(kind: SuggestionKind, refId: string): Promise<string> {
+export function draftEmail(kind: SuggestionKind, refId: string): Promise<{ subject: string; body: string }> {
   return call(() => {
     const data = getData()
     const L = lookup(data)
@@ -220,25 +233,30 @@ export function draftMessage(kind: SuggestionKind, refId: string): Promise<strin
       const d = data.damages.find((x) => x.id === refId)
       if (!d) throw new ServiceError('Avaria não encontrada.')
       const c = L.client(d.clientId)
-      return whatsDamage(c.name, firstName(c.contacts[0]?.name ?? c.name), [`${d.kind} (${L.unit(d.unitId).code})`], d.value)
+      return emailDamage(firstName(c.contacts[0]?.name ?? c.name), [`${d.kind} (${L.unit(d.unitId).code})`], d.value)
     }
     if (kind === 'faturar_extra') {
       const r = L.rental(refId)
       const c = L.client(r.clientId)
       const ss = data.services.filter((s) => s.rentalId === refId && s.extra && s.status === 'concluido' && !s.extraBilled)
       const v = ss.reduce((a, s) => a + (s.extraValue ?? 0), 0)
-      return `Olá, ${firstName(c.contacts[0]?.name ?? c.name)}! Aqui é da ${co}. Fizemos ${ss.length} ${ss.length === 1 ? 'serviço extra' : 'serviços extras'} em ${r.title}, fora do contrato, no total de ${formatMoney(Math.round(v * 100) / 100)}. Vou enviar a cobrança por Pix.`
+      return mail(`Serviços extras em ${r.title}`, firstName(c.contacts[0]?.name ?? c.name), `Fizemos ${ss.length} ${ss.length === 1 ? 'serviço extra' : 'serviços extras'} em ${r.title}, fora do contrato, no total de ${formatMoney(Math.round(v * 100) / 100)}. Vamos enviar a cobrança com o link de pagamento.`)
     }
     if (kind === 'lembrar_atraso') {
       const ch = data.charges.find((x) => x.id === refId)
       if (!ch) throw new ServiceError('Cobrança não encontrada.')
       const c = L.client(ch.clientId)
-      return `Olá, ${firstName(c.contacts[0]?.name ?? c.name)}! Aqui é da ${co}. Não encontramos o pagamento de ${ch.code} (${formatMoney(ch.value)}, venceu em ${formatDate(ch.dueAt)}). Se já pagou, envie o comprovante por aqui. Se precisar de ajuda para regularizar, é só falar.`
+      return mail(`Pagamento em atraso: ${ch.code}`, firstName(c.contacts[0]?.name ?? c.name), `Não encontramos o pagamento de ${ch.code} (${formatMoney(ch.value)}, venceu em ${formatDate(ch.dueAt)}). Se já pagou, envie o comprovante respondendo este e-mail. Se precisar de ajuda para regularizar, é só falar.`)
     }
     const s = data.services.find((x) => x.id === refId)
     if (!s) throw new ServiceError('Serviço não encontrado.')
     const r = L.rental(s.rentalId)
-    if (kind === 'redistribuir_rota') return `Equipe, a ${data.teams.find((t) => t.id === s.teamId)?.name ?? 'equipe'} está atrasada. Vamos passar ${r.title} (${r.address}) para outra equipe mais perto. Confirmem no app quando chegarem.`
-    return `Olá, ${firstName(r.contact.name)}! Aqui é da ${co}. Nossa equipe está um pouco atrasada e deve chegar em ${r.title} em até 40 minutos. Pedimos desculpas pelo transtorno.`
+    if (kind === 'redistribuir_rota') return { subject: 'Rota redistribuída', body: `Equipe, a ${data.teams.find((t) => t.id === s.teamId)?.name ?? 'equipe'} está atrasada. Vamos passar ${r.title} (${r.address}) para outra equipe mais perto. Confirmem no app quando chegarem.\n\n${co}` }
+    return mail(`Nossa equipe chega em até 40 minutos: ${r.title}`, firstName(r.contact.name), `Nossa equipe está um pouco atrasada e deve chegar em ${r.title} em até 40 minutos. Pedimos desculpas pelo transtorno.`)
   })
+}
+
+/** Texto do e-mail pronto (só o corpo). Mantida para as telas atuais; prefira `draftEmail`. */
+export function draftMessage(kind: SuggestionKind, refId: string): Promise<string> {
+  return draftEmail(kind, refId).then((d) => d.body)
 }

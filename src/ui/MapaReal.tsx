@@ -76,6 +76,27 @@ export interface MapaRealProps {
 const STYLE_URL = { light: 'https://tiles.openfreemap.org/styles/positron', dark: 'https://tiles.openfreemap.org/styles/dark' }
 const BRASILIA: [number, number] = [-47.93, -15.8]
 
+/*
+  O estilo é baixado e limpo antes de ir para o mapa: saem as plaquinhas de rodovia (poluem e disparam
+  avisos de expressão no console) e as texturas que o estilo referencia sem fornecer a imagem.
+*/
+const styleCache = new Map<string, StyleSpecification>()
+async function loadStyle(theme: 'light' | 'dark'): Promise<StyleSpecification> {
+  const hit = styleCache.get(theme)
+  if (hit) return hit
+  const res = await fetch(STYLE_URL[theme])
+  if (!res.ok) throw new Error(`estilo do mapa: ${res.status}`)
+  const style = (await res.json()) as StyleSpecification
+  style.layers = style.layers.filter((l) => {
+    if (/shield/.test(l.id)) return false
+    const paint = (l as { paint?: Record<string, unknown> }).paint
+    if (paint && ('fill-pattern' in paint || 'line-pattern' in paint)) return false
+    return true
+  })
+  styleCache.set(theme, style)
+  return style
+}
+
 const toneVar: Record<MapTone, { bg: string; fg: string }> = {
   accent: { bg: 'var(--accent)', fg: 'var(--on-accent)' },
   ok: { bg: 'var(--ok)', fg: '#ffffff' },
@@ -202,13 +223,12 @@ export function MapaReal(props: MapaRealProps) {
     const giveUp = window.setTimeout(() => !dead && mapRef.current == null && setState('failed'), 9000)
     ;(async () => {
       try {
-        const lib = await import('maplibre-gl')
-        await import('maplibre-gl/dist/maplibre-gl.css')
+        const [lib, style] = await Promise.all([import('maplibre-gl'), loadStyle(themeNow()), import('maplibre-gl/dist/maplibre-gl.css')])
         if (dead) return
         libRef.current = lib
         const map = new lib.Map({
           container: el,
-          style: STYLE_URL[themeNow()] as unknown as StyleSpecification,
+          style,
           center: BRASILIA,
           zoom: 10.2,
           attributionControl: { compact: true },
@@ -261,7 +281,10 @@ export function MapaReal(props: MapaRealProps) {
       const next = themeNow()
       if (next !== current) {
         current = next
-        map.setStyle(STYLE_URL[next] as unknown as StyleSpecification)
+        loadStyle(next).then(
+          (st) => mapRef.current === map && map.setStyle(st),
+          () => undefined,
+        )
       } else {
         setStyleTick((n) => n + 1) // marca mudou: repinta as rotas
       }

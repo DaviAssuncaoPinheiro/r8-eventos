@@ -1,7 +1,7 @@
 /* Financeiro: cobranças, extras, envio, baixa, régua de cobrança, Pix e exportação. */
 import { commit, getData, newIds } from '@/data/db'
 import { addDays, demoNowISO, diffDays, monthKey, today as todayFn } from '@/domain/dates'
-import type { Channel, Charge, ChargeKind, ChargeStatus, Client, Damage, DunningStep, ISODate, PayMethod, Rental, Service, DbData } from '@/domain/types'
+import type { Channel, Charge, ChargeKind, ChargeStatus, Client, Damage, DunningStep, ISODate, LegacyChannel, PayMethod, Rental, Service, DbData } from '@/domain/types'
 import { call, ServiceError } from './config'
 import { formatMoney, lookup, mkNotification, normalize } from './common'
 import { nextCode } from './rules'
@@ -184,15 +184,21 @@ export function billExtras(rentalId: string): Promise<Charge> {
   })
 }
 
-/** Envia a cobrança ao cliente (WhatsApp ou e-mail): rascunho vira `aberta` e ganha `sentAt` */
-export function sendCharge(id: string, opts: { via: Channel; method: PayMethod }): Promise<Charge> {
+/** Canal aceito por compatibilidade: o canal antigo é tratado como e-mail */
+const toChannel = (c: Channel | LegacyChannel): Channel => (c === 'portal' ? 'portal' : 'email')
+
+/**
+ * Envia a cobrança ao cliente (e-mail ou aviso no portal): rascunho vira `aberta` e ganha `sentAt`.
+ * `via: 'whatsapp'` ainda é aceito em tempo de execução e tratado como `'email'` (@deprecated, telas antigas).
+ */
+export function sendCharge(id: string, opts: { via: Channel | LegacyChannel; method: PayMethod }): Promise<Charge> {
   return call(() => {
     const data = getData()
     const c = data.charges.find((x) => x.id === id)
     if (!c) throw new ServiceError('Cobrança não encontrada.')
     if (c.status === 'paga' || c.status === 'cancelada') throw new ServiceError('Esta cobrança já foi paga ou cancelada.')
     const today = todayFn()
-    const upd: Charge = { ...c, status: c.dueAt < today ? 'atrasada' : 'aberta', method: opts.method, sentVia: opts.via, sentAt: demoNowISO() }
+    const upd: Charge = { ...c, status: c.dueAt < today ? 'atrasada' : 'aberta', method: opts.method, sentVia: toChannel(opts.via), sentAt: demoNowISO() }
     commit({ charges: data.charges.map((x) => (x.id === id ? upd : x)) })
     return upd
   })
@@ -220,14 +226,14 @@ export function markPaid(id: string): Promise<Charge> {
   })
 }
 
-/** Registra um lembrete enviado (WhatsApp por padrão) */
-export function sendReminder(id: string, channel: Channel = 'whatsapp'): Promise<Charge> {
+/** Registra um lembrete enviado (e-mail por padrão; o canal antigo é tratado como e-mail) */
+export function sendReminder(id: string, channel: Channel | LegacyChannel = 'email'): Promise<Charge> {
   return call(() => {
     const data = getData()
     const c = data.charges.find((x) => x.id === id)
     if (!c) throw new ServiceError('Cobrança não encontrada.')
     if (c.status !== 'aberta' && c.status !== 'atrasada') throw new ServiceError('Só cobranças abertas ou atrasadas recebem lembrete.')
-    const upd: Charge = { ...c, reminders: [...c.reminders, { at: demoNowISO(), channel }] }
+    const upd: Charge = { ...c, reminders: [...c.reminders, { at: demoNowISO(), channel: toChannel(channel) }] }
     commit({ charges: data.charges.map((x) => (x.id === id ? upd : x)) })
     return upd
   })
@@ -292,7 +298,7 @@ export function saveDunning(steps: DunningStep[]): Promise<DunningStep[]> {
     const data = getData()
     if (steps.some((s) => !s.template.trim())) throw new ServiceError('Todo passo precisa de uma mensagem.')
     const ids = newIds()
-    const clean = steps.map((s) => ({ ...s, id: s.id || ids.next('dun') })).sort((a, b) => a.dayOffset - b.dayOffset)
+    const clean = steps.map((s) => ({ ...s, channel: toChannel(s.channel), id: s.id || ids.next('dun') })).sort((a, b) => a.dayOffset - b.dayOffset)
     commit({ settings: { ...data.settings, dunning: clean }, seq: ids.seq() })
     return clean
   })
@@ -317,8 +323,20 @@ export function exportCsv(filter: ChargeFilter = {}): Promise<string> {
   })
 }
 
-/** Texto pronto de WhatsApp para a cobrança (muda o tom se estiver atrasada) */
-export function buildWhatsAppMessage(chargeId: string): Promise<string> {
+/** Link do portal do cliente já na fatura: <origem>/portal/<token>?fatura=<id> */
+export function payLinkFor(c: Pick<Charge, 'id'>, client: Pick<Client, 'portalToken'>): string {
+  const origin = (globalThis as { location?: { origin?: string } }).location?.origin ?? 'https://app.cerradolocacoes.com.br'
+  return `${origin}/portal/${client.portalToken}?fatura=${c.id}`
+}
+
+export interface ChargeEmail {
+  subject: string
+  body: string
+  payLink: string
+}
+
+/** E-mail curto e educado para a cobrança (muda o tom se estiver atrasada), com o link de pagamento do portal */
+export function buildChargeMessage(chargeId: string): Promise<ChargeEmail> {
   return call(() => {
     const data = getData()
     const L = lookup(data)
@@ -327,17 +345,35 @@ export function buildWhatsAppMessage(chargeId: string): Promise<string> {
     const client = L.client(c.clientId)
     const first = (client.contacts[0]?.name ?? client.name).split(' ')[0]
     const co = data.settings.company.name
-    const pix = pixFor(c, co)
-    const pay = c.method === 'pix' ? `Pix copia e cola:\n${pix.copiaECola}` : `Linha digitável do boleto:\n${pix.boletoLine}`
+    const payLink = payLinkFor(c, client)
+    const how = c.method === 'pix' ? 'Pague por Pix' : 'Pague por boleto'
     const today = todayFn()
+    const sign = `Atenciosamente,\n${co}`
     if (c.status === 'atrasada' || (c.status === 'aberta' && c.dueAt < today)) {
-      return `Olá, ${first}! Aqui é da ${co}. Não encontramos o pagamento da cobrança ${c.code}, de ${formatMoney(c.value)}, que venceu em ${formatDate(c.dueAt)} (${c.description}). Se já pagou, é só enviar o comprovante por aqui. Se precisar de ajuda para regularizar, estamos à disposição.\n\n${pay}`
+      return {
+        subject: `Cobrança ${c.code} vencida em ${formatDate(c.dueAt)}`,
+        body: `Olá, ${first},\n\nNão encontramos o pagamento da cobrança ${c.code}, de ${formatMoney(c.value)}, que venceu em ${formatDate(c.dueAt)} (${c.description}). Se já pagou, desconsidere este e-mail. Se precisar de ajuda para regularizar, é só responder.\n\n${how}: ${payLink}\n\n${sign}`,
+        payLink,
+      }
     }
     if (c.kind === 'avaria') {
-      return `Olá, ${first}! Aqui é da ${co}. Encontramos uma avaria em equipamento da locação, registrada com foto: ${c.description}. O valor de reparo é ${formatMoney(c.value)}, com vencimento em ${formatDate(c.dueAt)}. As fotos estão no portal do cliente.\n\n${pay}`
+      return {
+        subject: `Avaria registrada na locação: cobrança ${c.code}`,
+        body: `Olá, ${first},\n\nEncontramos uma avaria em equipamento da locação, registrada com foto: ${c.description}. O valor do reparo é ${formatMoney(c.value)}, com vencimento em ${formatDate(c.dueAt)}. As fotos estão no portal.\n\n${how}: ${payLink}\n\n${sign}`,
+        payLink,
+      }
     }
-    return `Olá, ${first}! Aqui é da ${co}. Segue a cobrança ${c.code}: ${c.description}. Valor ${formatMoney(c.value)}, vencimento em ${formatDate(c.dueAt)}.\n\n${pay}`
+    return {
+      subject: `Cobrança ${c.code}: ${formatMoney(c.value)}, vence em ${formatDate(c.dueAt)}`,
+      body: `Olá, ${first},\n\nSegue a cobrança ${c.code}: ${c.description}. Valor ${formatMoney(c.value)}, vencimento em ${formatDate(c.dueAt)}.\n\n${how}: ${payLink}\n\n${sign}`,
+      payLink,
+    }
   })
+}
+
+/** @deprecated Use buildChargeMessage. Devolve só o texto do e-mail; existe para as telas antigas continuarem funcionando. */
+export function buildWhatsAppMessage(chargeId: string): Promise<string> {
+  return buildChargeMessage(chargeId).then((m) => m.body)
 }
 
 /* ───────────────────────── Pix e boleto fictícios (formato plausível) ───────────────────────── */

@@ -5,6 +5,7 @@
 import { dayStr } from '@/domain/dates'
 import type { DbData } from '@/domain/types'
 import { buildActivity } from './seed/activity'
+import { buildAutomationHistory } from './seed/automations'
 import { buildClients, buildSettings, buildTeams, buildUnits, TYPES } from './seed/catalog'
 import { buildRentals } from './seed/rentals'
 import { createRng } from './seed/util'
@@ -22,6 +23,7 @@ export function buildSeed(todayDate: Date = new Date()): DbData {
   const { rentals, meta, unitFinal, tags } = buildRentals({ rng, today, types, units: baseUnits, clients })
   const units = baseUnits.map((u) => ({ ...u, ...unitFinal.get(u.id) }))
   const act = buildActivity({ rng, today, types, units, clients, teams, rentals, meta, tags })
+  const auto = buildAutomationHistory({ today, rentals, services: act.services, charges: act.charges, units, types, clients, teams })
   return {
     settings,
     clients,
@@ -34,6 +36,8 @@ export function buildSeed(todayDate: Date = new Date()): DbData {
     charges: act.charges,
     notifications: act.notifications,
     suggestions: [],
+    automations: auto.automations,
+    automationLog: auto.automationLog,
     seq: act.seq + 1000,
   }
 }

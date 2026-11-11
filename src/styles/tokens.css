@@ -519,13 +519,14 @@
   }
   /* crédito do mapa discreto, no canto, com as cores do tema */
   .ds-mapreal .maplibregl-ctrl-attrib {
-    background: color-mix(in oklab, var(--raised) 82%, transparent);
-    color: var(--fg-3);
+    /* !important: o CSS do MapLibre entra fora das camadas do Tailwind e venceria estas regras */
+    background: color-mix(in oklab, var(--raised) 82%, transparent) !important;
+    color: var(--fg-3) !important;
     font: 500 11px/1.4 var(--font-sans);
     border-radius: 8px;
   }
   .ds-mapreal .maplibregl-ctrl-attrib a {
-    color: var(--fg-2);
+    color: var(--fg-2) !important;
   }
   .ds-mapreal .maplibregl-ctrl-attrib-button {
     border-radius: 999px;

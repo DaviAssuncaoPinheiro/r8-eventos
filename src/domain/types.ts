@@ -31,13 +31,18 @@ export interface Company {
   legalName: string
   cnpj: string
   phone: string
+  /** @deprecated O WhatsApp saiu do produto: o contato é o `phone`. Fica sempre vazio; só existe para as telas antigas continuarem compilando até serem atualizadas. */
+  whatsapp: string
   email: string
   address: string
   city: string
 }
 
 /** 'email' = envio de e-mails de cobrança e avisos ao cliente */
-export type IntegrationKey = 'email' | 'pix' | 'boleto' | 'nfse' | 'contaAzul'
+export type IntegrationKey = 'email' | 'pix' | 'boleto' | 'nfse' | 'contaAzul' | LegacyIntegrationKey
+
+/** @deprecated Integração retirada do produto; só para as telas antigas compilarem. Nunca existe em `settings.integrations`. */
+export type LegacyIntegrationKey = 'whatsapp'
 
 export interface Integration {
   connected: boolean
@@ -49,7 +54,8 @@ export interface Integration {
 export interface DunningStep {
   id: string
   dayOffset: number
-  channel: Channel
+  /** 'whatsapp' só é aceito por compatibilidade com as telas antigas (vira 'email' ao salvar a régua) */
+  channel: Channel | LegacyChannel
   enabled: boolean
   template: string
 }
@@ -63,6 +69,7 @@ export interface Settings {
   segmentId: SegmentId
   aiEnabled: boolean
   users: User[]
+  /** a chave legada nunca existe em tempo de execução (ver LegacyIntegrationKey); leia sempre com `?.` */
   integrations: Record<IntegrationKey, Integration>
   dunning: DunningStep[]
   currentUserId: string
@@ -281,6 +288,9 @@ export type PayMethod = 'pix' | 'boleto'
 /** Canal de envio ao cliente: e-mail ou mensagem no portal do cliente */
 export type Channel = 'email' | 'portal'
 
+/** @deprecated Canal retirado do produto; só para as telas antigas compilarem (tratado como 'email'). */
+export type LegacyChannel = 'whatsapp'
+
 export interface Charge {
   id: string
   /** 'COB-5021' */
@@ -327,7 +337,10 @@ export interface CopilotSuggestion {
   /** valor em jogo, quando houver */
   value?: number
   detail: string
+  /** texto do e-mail (igual a `draft.body`; campo mantido para as telas atuais) */
   draftMessage?: string
+  /** rascunho do e-mail ao cliente */
+  draft?: { subject: string; body: string }
   /** ids que a ação usa: { damageIds }, { rentalId }, { chargeIds }, { moves }, { serviceId, clientId } */
   payload: Record<string, unknown>
   status: SuggestionStatus

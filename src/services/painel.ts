@@ -4,6 +4,7 @@
 */
 import { getData } from '@/data/db'
 import { addDays, addMonths, dayOf, diffDays, monthKey, monthLabel, today as todayFn } from '@/domain/dates'
+import { computeRecoveredMoney } from '@/domain/recovery'
 import type { DbData, ISODate, Service, Team } from '@/domain/types'
 import { call } from './config'
 import { mapById } from './common'
@@ -45,6 +46,10 @@ export interface MoneyPanel {
   occupancy: { inField: number; cleaning: number; maintenance: number; idle: number; total: number; pct: number }
   teamsNow: TeamNow[]
   actions: RecommendedAction[]
+  /** dinheiro que o sistema recuperou no mês atual (ver getRecoveredMoney) */
+  recovered: { month: string; total: number }
+  /** execuções das automações hoje */
+  automations: { runsToday: number }
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100
@@ -170,6 +175,8 @@ export function computeMoneyPanel(data: DbData, today: ISODate = todayFn()): Mon
     occupancy: calcOccupancy(data),
     teamsNow: calcTeamsNow(data, today),
     actions: buildActions(data, { uncollectedDamages, unbilledExtras, overdue, idle }, today),
+    recovered: { month: monthKey(today), total: computeRecoveredMoney(data, monthKey(today), today).total },
+    automations: { runsToday: data.automationLog.filter((r) => dayOf(r.at) === today).length },
   }
 }
 
