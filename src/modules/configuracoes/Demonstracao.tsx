@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { RotateCcw, WifiOff } from 'lucide-react'
-import { Badge, Button, Dialog, Switch, notify } from '@/ui'
-import { getFailureRate, resetDemo, setFailureRate, useMutation } from '@/services'
+import { Badge, Button, Switch, notify } from '@/ui'
+import { getFailureRate, setFailureRate } from '@/services'
+import { ResetDialog } from './ResetDialog'
 
 export default function Demonstracao() {
   const [fail, setFail] = React.useState(() => getFailureRate() > 0)
   const [confirm, setConfirm] = React.useState(false)
-  const reset = useMutation(resetDemo)
 
   /* a falha simulada só vale enquanto esta aba está aberta */
   React.useEffect(() => () => setFailureRate(0), [])
@@ -15,16 +15,6 @@ export default function Demonstracao() {
     setFail(v)
     setFailureRate(v ? 0.35 : 0)
     notify.info(v ? 'Falhas simuladas ligadas' : 'Falhas simuladas desligadas')
-  }
-
-  const doReset = async () => {
-    try {
-      await reset.run()
-      setConfirm(false)
-      notify.success('Dados de demonstração restaurados')
-    } catch {
-      notify.error('Não foi possível restaurar. Tente de novo.')
-    }
   }
 
   return (
@@ -54,17 +44,7 @@ export default function Demonstracao() {
         </div>
       </section>
 
-      <Dialog
-        open={confirm}
-        onOpenChange={setConfirm}
-        size="sm"
-        destructive
-        title="Restaurar os dados de demonstração?"
-        description="Locações, cobranças, avisos e configurações voltam ao estado inicial."
-        confirmLabel="Restaurar dados"
-        confirmLoading={reset.loading}
-        onConfirm={() => void doReset()}
-      />
+      <ResetDialog open={confirm} onOpenChange={setConfirm} />
     </div>
   )
 }

@@ -145,9 +145,7 @@ export default function Servico() {
           </Block>
 
           <Block aria-label="Unidades">
-            <h2 className="flex items-center gap-2 text-title-sub">
-              Unidades <Badge tone="accent">{s.unitCodes.length}</Badge>
-            </h2>
+            <h2 className="text-title-sub">Unidades</h2>
             <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
               {s.unitCodes.map((c) => (
                 <li key={c} className="tnum inline-flex h-9 items-center rounded-pill bg-sunken px-3.5 text-body font-semibold">

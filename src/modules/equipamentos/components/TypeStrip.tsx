@@ -51,7 +51,7 @@ export function TypeStrip({ rows, loading, selected, onSelect }: { rows?: StockR
                   on ? 'ring-2 ring-accent ring-inset' : 'ring-1 ring-transparent ring-inset',
                 )}
               >
-                <TypeThumb src={r.type.photo} alt={r.type.name} className="aspect-[4/3] w-full rounded-[16px]" />
+                <TypeThumb src={r.type.photo} alt={r.type.name} typeId={r.type.id} tag={r.type.short} className="aspect-[4/3] w-full rounded-[16px]" />
                 <span className="block px-3 pt-3 pb-2">
                   <span className="block truncate text-title-card">{r.type.name}</span>
                   <OccupancyBar row={r} className="mt-3" />

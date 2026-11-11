@@ -18,6 +18,9 @@ const abs = (src: string) => {
   }
 }
 
+/** O acervo repete a foto do tipo: cada posição mostra um recorte diferente. */
+const CROPS = ['center', '15% 60%', '85% 40%', '50% 15%', '30% 85%', '70% 70%']
+
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 /**
@@ -50,7 +53,7 @@ export function buildReportHtml(company: CompanyBrand, report: MonthlyClientRepo
 
   const services = report.cleanings
     .map((c) => {
-      const photos = c.photos.slice(0, 6).map((p) => `<figure><img src="${esc(abs(p.src))}" alt="${esc(p.label)}" /><figcaption>${esc(p.label)}</figcaption></figure>`).join('')
+      const photos = c.photos.slice(0, 6).map((p, i) => `<figure><img style="object-position:${CROPS[i % CROPS.length]}" src="${esc(abs(p.src))}" alt="${esc(p.label)}" /><figcaption>${esc(p.label)}</figcaption></figure>`).join('')
       const sign = c.signature
         ? `<div class="sign">${c.signature.dataUrl ? `<img src="${esc(c.signature.dataUrl)}" alt="Assinatura" />` : ''}<div><b>${esc(c.signature.name)}</b><span>${esc(c.signature.role)}</span></div></div>`
         : ''

@@ -10,7 +10,7 @@ import { TrilhaEtapas } from './components/TrilhaEtapas'
 import { Dossie } from './components/Dossie'
 import { ContratoPapel } from './components/ContratoPapel'
 import { printContract, printDossier } from './documentos'
-import { NEXT_STAGE, durationLabel } from './util'
+import { NEXT_STAGE, cleanTitle, durationLabel } from './util'
 
 const SVC_STATUS = { agendado: 'agendado', a_caminho: 'a-caminho', em_andamento: 'em-andamento', concluido: 'concluido', atrasado: 'atrasado' } as const
 
@@ -121,7 +121,7 @@ function Conteudo({ detail }: { detail: RentalDetail }) {
     <>
       <PageHeader
         back="/locacoes"
-        title={rental.title}
+        title={cleanTitle(rental.title)}
         meta={<Badge tone={st.tone}>{st.label}</Badge>}
         actions={
           <>
@@ -177,7 +177,7 @@ function Conteudo({ detail }: { detail: RentalDetail }) {
         />
       </div>
 
-      <Dialog open={cancelOpen} onOpenChange={setCancelOpen} destructive title="Cancelar esta locação?" description={`${rental.code} · ${rental.title}`} confirmLabel="Cancelar locação" cancelLabel="Manter locação" onConfirm={() => void doCancel()} confirmLoading={cancel.loading} />
+      <Dialog open={cancelOpen} onOpenChange={setCancelOpen} destructive title="Cancelar esta locação?" description={`${rental.code} · ${cleanTitle(rental.title)}`} confirmLabel="Cancelar locação" cancelLabel="Manter locação" onConfirm={() => void doCancel()} confirmLoading={cancel.loading} />
       {signOpen ? <AssinarDialog detail={detail} onClose={() => setSignOpen(false)} /> : null}
     </>
   )

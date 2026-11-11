@@ -16,7 +16,7 @@ function ClientCard({ c }: { c: ClientView }) {
   return (
     <Link
       to={`/clientes/${c.id}`}
-      className="group flex min-w-0 flex-col gap-5 rounded-card bg-raised p-5 transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="group flex min-w-0 flex-col gap-4 rounded-card bg-raised p-5 transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <div className="flex min-w-0 items-center gap-3.5">
         <Avatar name={c.name} seed={c.id} />
@@ -25,18 +25,16 @@ function ClientCard({ c }: { c: ClientView }) {
           <Badge tone="neutral">{c.kind}</Badge>
         </div>
       </div>
-      <dl className="m-0 grid grid-cols-2 gap-4">
-        <div className="min-w-0">
-          <dt className="text-caption text-fg-3">Locações ativas</dt>
-          <dd className="tnum m-0 mt-0.5 text-title-sub">{c.activeRentals}</dd>
-        </div>
-        <div className="min-w-0">
-          <dt className="text-caption text-fg-3">A receber</dt>
-          <dd className={cn('m-0 mt-0.5 text-title-sub', c.overdue > 0 ? 'text-danger-ink' : 'text-fg')}>
+      <div className="flex min-h-8 items-center justify-between gap-3">
+        {c.receivable > 0 ? (
+          <span className={cn('text-title-sub', c.overdue > 0 ? 'text-danger-ink' : 'text-fg')}>
             <Money value={c.receivable} className={c.overdue > 0 ? 'text-danger-ink' : undefined} />
-          </dd>
-        </div>
-      </dl>
+          </span>
+        ) : (
+          <span className="text-body font-semibold text-ok-ink">Em dia</span>
+        )}
+        {c.activeRentals > 0 ? <Badge tone="info">{c.activeRentals === 1 ? '1 ativa' : `${c.activeRentals} ativas`}</Badge> : null}
+      </div>
     </Link>
   )
 }

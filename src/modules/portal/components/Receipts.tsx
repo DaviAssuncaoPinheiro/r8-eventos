@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { ChevronDown, FileDown, ImageOff, ShieldCheck } from 'lucide-react'
-import { Badge, Button, EmptyState, PhotoThumb, PhotoViewer, Segmented, cn, type PhotoItem } from '@/ui'
+import { Badge, Button, EmptyState, PhotoViewer, Segmented, cn, type PhotoItem } from '@/ui'
 import { SERVICE_ICON } from '@/app/status'
 import { formatDate, formatTime } from '@/lib/format'
 import { dayOf, monthKey, monthLabel } from '@/domain/dates'
 import type { ServiceReceipt } from '@/services'
 
 const PAGE = 6
+/** O acervo repete a foto do tipo: cada posição mostra um recorte diferente. */
+const CROPS = ['center', '15% 60%', '85% 40%', '50% 15%', '30% 85%', '70% 70%']
 
 /** Meses que têm comprovante, do mais novo ao mais antigo (no máximo 6) */
 export function receiptMonths(receipts: ServiceReceipt[]): string[] {
@@ -25,16 +27,13 @@ function Receipt({ r, onPhoto }: { r: ServiceReceipt; onPhoto: (photos: PhotoIte
         <Icon size={20} strokeWidth={2} />
       </span>
       <article className="rounded-card bg-raised p-4 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-          <div className="min-w-0">
-            <h3 className="text-title-card">{r.typeLabel}</h3>
-            <p className="mt-0.5 truncate text-body text-fg-2">{r.rentalTitle}</p>
-          </div>
-          <div className="text-right">
-            <p className="tnum text-body font-semibold">{formatDate(r.at)}</p>
-            <p className="tnum text-caption text-fg-2">{formatTime(r.at)}</p>
-          </div>
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="min-w-0 truncate text-title-card">{r.typeLabel}</h3>
+          <p className="tnum shrink-0 text-body font-semibold">
+            {formatDate(r.at)}, {formatTime(r.at)}
+          </p>
         </div>
+        <p className="mt-0.5 truncate text-body text-fg-2">{r.rentalTitle}</p>
 
         {r.unitCodes.length ? (
           <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -47,10 +46,25 @@ function Receipt({ r, onPhoto }: { r: ServiceReceipt; onPhoto: (photos: PhotoIte
         ) : null}
 
         {items.length ? (
-          <ul className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {items.map((p, i) => (
               <li key={p.id}>
-                <PhotoThumb src={p.src} alt={p.alt} size={96} onClick={() => onPhoto(items, i)} />
+                <button
+                  type="button"
+                  aria-label={`Abrir foto: ${p.alt}`}
+                  onClick={() => onPhoto(items, i)}
+                  className="group relative block aspect-[4/3] w-full overflow-hidden rounded-control bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  <img
+                    src={p.src}
+                    alt=""
+                    loading="lazy"
+                    draggable={false}
+                    style={{ objectPosition: CROPS[i % CROPS.length] }}
+                    className="size-full object-cover transition-transform duration-200 ease-[var(--ease-ui)] group-hover:scale-[1.03]"
+                  />
+                  <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-pill bg-inverse/80 px-2.5 py-1 text-caption font-semibold text-on-inverse">{r.photos[i].label}</span>
+                </button>
               </li>
             ))}
           </ul>
@@ -64,7 +78,7 @@ function Receipt({ r, onPhoto }: { r: ServiceReceipt; onPhoto: (photos: PhotoIte
         {r.signature ? (
           <div className="mt-4 flex items-center gap-3 rounded-control bg-sunken p-3">
             {r.signature.dataUrl ? (
-              <span className="grid h-14 w-28 shrink-0 place-items-center rounded-tip bg-white p-1">
+              <span className="grid h-20 w-36 shrink-0 place-items-center rounded-tip bg-white p-1.5">
                 <img src={r.signature.dataUrl} alt={`Assinatura de ${r.signature.name}`} className="max-h-full max-w-full object-contain" />
               </span>
             ) : (
@@ -150,7 +164,7 @@ export function ReceiptsSection({
 
       {months.length > 1 ? (
         <div className="-mx-4 mt-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-          <Segmented<string> label="Mês" value={month} onChange={onMonth} options={months.map((m) => ({ value: m, label: monthLabel(m) }))} />
+          <Segmented<string> className="h-11" label="Mês" value={month} onChange={onMonth} options={months.map((m) => ({ value: m, label: monthLabel(m) }))} />
         </div>
       ) : null}
 

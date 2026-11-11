@@ -1,8 +1,8 @@
 /* Módulo "Avarias e cobranças": cartões de avaria com foto, cobrança em um clique e extras por faturar. */
 import * as React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Check, Plus, ReceiptText, TriangleAlert } from 'lucide-react'
-import { Banner, Button, Dialog, EmptyState, MoneyCard, PhotoViewer, Segmented, Skeleton, Tooltip, cn, notify } from '@/ui'
+import { Check, Info, Plus, ReceiptText, TriangleAlert } from 'lucide-react'
+import { Banner, Button, Dialog, EmptyState, Money, MoneyCard, PhotoViewer, Segmented, Skeleton, Tooltip, cn, notify, useCountUp } from '@/ui'
 import { PageHeader } from '@/app/PageHeader'
 import { DAMAGE_STATUS, SERVICE_ICON } from '@/app/status'
 import { today, monthKey } from '@/domain/dates'
@@ -68,12 +68,42 @@ function ExtraCard({ g, busy, onBill }: { g: ExtraGroup; busy: boolean; onBill: 
   )
 }
 
+function SideNumber({ title, value, formula, tone }: { title: string; value: number; formula: string; tone?: 'ok' }) {
+  const shown = useCountUp(value)
+  return (
+    <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex items-center gap-1.5">
+        <h3 className="text-body-lg font-medium">{title}</h3>
+        <Tooltip content={formula}>
+          <button type="button" aria-label={`Como é calculado: ${title}`} className="ds-hit inline-flex size-6 items-center justify-center rounded-pill text-fg-3 transition-colors duration-150 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+            <Info size={16} strokeWidth={2} aria-hidden />
+          </button>
+        </Tooltip>
+      </div>
+      <div className={cn('text-kpi', tone === 'ok' && value > 0 && 'text-ok-ink')}>
+        <Money value={shown} variant="kpi" toneNegative={false} />
+      </div>
+    </div>
+  )
+}
+
+/** Os dois números secundários num cartão só. */
+function SideNumbers({ awaiting, paid, className }: { awaiting: number; paid: number; className?: string }) {
+  return (
+    <section aria-label="Cobranças de avarias" className={cn('flex min-w-0 flex-col justify-center gap-6 rounded-card bg-raised p-5 sm:p-6', className)}>
+      <SideNumber title="Aguardando pagamento" value={awaiting} formula="Avarias cobradas, com a cobrança ainda sem pagamento." />
+      <div className="h-px bg-hairline" aria-hidden />
+      <SideNumber title="Pagas no mês" value={paid} formula="Cobranças de avaria pagas neste mês." tone="ok" />
+    </section>
+  )
+}
+
 function CardsSkeleton({ n = 6 }: { n?: number }) {
   return (
-    <ul role="status" aria-busy="true" aria-label="Carregando" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
+    <ul role="status" aria-busy="true" aria-label="Carregando" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
       {Array.from({ length: n }).map((_, i) => (
         <li key={i} className="overflow-hidden rounded-card bg-raised">
-          <Skeleton shape="block" className="aspect-[4/3] h-auto rounded-none" />
+          <Skeleton shape="block" className="aspect-[16/9] h-auto rounded-none" />
           <div className="flex flex-col gap-3 p-5">
             <Skeleton className="h-8 w-1/2" />
             <Skeleton className="w-3/4" />
@@ -241,8 +271,8 @@ export default function Avarias() {
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
             {damages.initialLoading ? (
               <>
-                {[0, 1, 2].map((i) => (
-                  <div key={i} role="status" aria-busy="true" aria-label="Carregando indicador" className={cn('flex h-[196px] flex-col justify-between rounded-card bg-raised p-6', i === 0 ? 'sm:col-span-2 @min-[1180px]/frame:col-span-6' : '@min-[1180px]/frame:col-span-3')}>
+                {[0, 1].map((i) => (
+                  <div key={i} role="status" aria-busy="true" aria-label="Carregando indicador" className={cn('flex h-[196px] flex-col justify-between rounded-card bg-raised p-6', i === 0 ? 'sm:col-span-2 @min-[1180px]/frame:col-span-8' : 'sm:col-span-2 @min-[1180px]/frame:col-span-4')}>
                     <Skeleton className="h-4 w-1/3" />
                     <Skeleton className="h-10 w-2/3" />
                   </div>
@@ -257,7 +287,7 @@ export default function Avarias() {
                   value={unchargedTotal}
                   tag={{ label: uncharged.length === 1 ? '1 avaria' : `${uncharged.length} avarias` }}
                   formula="Avarias registradas em campo que ainda não viraram cobrança."
-                  className="sm:col-span-2 @min-[1180px]/frame:col-span-6"
+                  className="sm:col-span-2 @min-[1180px]/frame:col-span-8"
                 >
                   <button
                     type="button"
@@ -268,8 +298,7 @@ export default function Avarias() {
                     Cobrar todas
                   </button>
                 </MoneyCard>
-                <MoneyCard title="Aguardando pagamento" value={awaiting} formula="Avarias cobradas, com a cobrança ainda sem pagamento." className="@min-[1180px]/frame:col-span-3" />
-                <MoneyCard title="Pagas no mês" value={paidTotal} formula="Cobranças de avaria pagas neste mês." className="@min-[1180px]/frame:col-span-3" />
+                <SideNumbers awaiting={awaiting} paid={paidTotal} className="sm:col-span-2 @min-[1180px]/frame:col-span-4" />
               </>
             )}
           </div>
@@ -304,7 +333,7 @@ export default function Avarias() {
                 />
               </div>
             ) : (
-              <ul aria-label="Avarias" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
+              <ul aria-label="Avarias" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
                 {visible.map((d) => (
                   <DamageCard
                     key={d.id}
@@ -342,7 +371,7 @@ export default function Avarias() {
                 <EmptyState icon={Check} title="Nenhum extra para faturar" />
               </div>
             ) : (
-              <ul aria-label="Extras por locação" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
+              <ul aria-label="Extras por locação" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
                 {groups.map((g) => (
                   <ExtraCard key={g.rentalId} g={g} busy={busy === g.rentalId} onBill={() => void bill(g)} />
                 ))}

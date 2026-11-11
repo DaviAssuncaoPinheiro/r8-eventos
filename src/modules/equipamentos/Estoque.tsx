@@ -79,7 +79,7 @@ export default function Estoque() {
       width: 150,
       render: (u) => (
         <span className="flex items-center gap-3">
-          <TypeThumb src={u.type.photo} alt="" className="size-8 rounded-tip" />
+          <TypeThumb src={u.type.photo} alt="" typeId={u.type.id} className="size-8 rounded-tip" />
           <span className="tnum font-semibold">{u.code}</span>
         </span>
       ),

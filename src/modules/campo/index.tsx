@@ -3,10 +3,10 @@ import { ArrowLeft } from 'lucide-react'
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { useBrandSync } from '@/app/AppLayout'
-import { resetDemo } from '@/services'
 import { TooltipProvider } from '@/ui'
 import { DemoStrip } from '@/ui/DemoStrip'
-import { AppToaster, notify } from '@/ui/Toast'
+import { AppToaster } from '@/ui/Toast'
+import { ResetDialog } from '../configuracoes/ResetDialog'
 import { FrameContext } from './components/Sheet'
 import Avarias from './Avarias'
 import Hoje from './Hoje'
@@ -16,7 +16,7 @@ import Registro from './Registro'
 import Servico from './Servico'
 import Servicos from './Servicos'
 import { syncQueue } from './sync'
-import { useCampo } from './store'
+import { resetCampo, useCampo } from './store'
 
 const MQ = '(min-width: 640px)'
 
@@ -44,15 +44,7 @@ export default function Campo() {
     if (!offline && queued > 0) void syncQueue()
   }, [offline, queued])
 
-  const onReset = async () => {
-    try {
-      await resetDemo()
-      useCampo.setState({ queue: [], drafts: {}, myDamages: {}, offline: false })
-      notify.success('Dados de demonstração restaurados')
-    } catch {
-      notify.error('Não foi possível restaurar. Tente de novo.')
-    }
-  }
+  const [confirmReset, setConfirmReset] = React.useState(false)
 
   const routes = (
     <Routes>
@@ -70,7 +62,8 @@ export default function Campo() {
   return (
     <TooltipProvider>
       <div className="ds-root min-h-dvh">
-        <DemoStrip fixed onReset={onReset} />
+        <DemoStrip fixed onReset={() => setConfirmReset(true)} />
+        <ResetDialog open={confirmReset} onOpenChange={setConfirmReset} onDone={resetCampo} />
         <FrameContext.Provider value={frame}>
           {wide ? (
             <div className="grid min-h-dvh place-items-center bg-app px-6 pt-[calc(var(--demo-strip-h,0px)+24px)] pb-6">

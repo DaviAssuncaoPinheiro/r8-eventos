@@ -18,7 +18,7 @@ export function UnitCard({ unit }: { unit: UnitView }) {
         'hover:-translate-y-0.5 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
       )}
     >
-      <TypeThumb src={unit.type.photo} alt={unit.type.name} className="size-14 rounded-control" />
+      <TypeThumb src={unit.type.photo} alt={unit.type.name} typeId={unit.type.id} className="size-14 rounded-control" />
       <span className="min-w-0 flex-1">
         <span className="tnum block truncate text-title-card">{unit.code}</span>
         <StatusDot tone={st.tone} className="mt-0.5 text-caption">

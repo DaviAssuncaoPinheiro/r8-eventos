@@ -68,8 +68,8 @@ export function buildMap(services: ServiceView[], teams: Team[], aspect: number)
       const n = used.get(s.bairroId) ?? 0
       used.set(s.bairroId, n + 1)
       const ang = n * 2.4
-      const x = Math.round(b.x + (n ? Math.cos(ang) * 46 : 0))
-      const y = Math.round(b.y + (n ? Math.sin(ang) * 46 : 0))
+      const x = Math.round(b.x + (n ? Math.cos(ang) * 54 : 0))
+      const y = Math.round(b.y + (n ? Math.sin(ang) * 54 : 0))
       path.push({ x, y })
       pts.push({ x, y })
       if (s.status === 'concluido' || s.status === 'em_andamento' || s.status === 'a_caminho') lastDone = path.length - 1
@@ -102,8 +102,8 @@ export function buildMap(services: ServiceView[], teams: Team[], aspect: number)
   // enquadra a base e as paradas, com folga, na proporção do espaço disponível
   const xs = pts.map((p) => p.x)
   const ys = pts.map((p) => p.y)
-  let w = Math.max(760, Math.max(...xs) - Math.min(...xs) + 220)
-  let h = Math.max(460, Math.max(...ys) - Math.min(...ys) + 220)
+  let w = Math.max(440, Math.max(...xs) - Math.min(...xs) + 130)
+  let h = Math.max(280, Math.max(...ys) - Math.min(...ys) + 130)
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2
   const cy = (Math.max(...ys) + Math.min(...ys)) / 2
   if (w / h < aspect) w = h * aspect

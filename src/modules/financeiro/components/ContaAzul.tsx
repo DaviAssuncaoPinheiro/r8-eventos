@@ -6,6 +6,7 @@ import { formatDateTime } from '@/lib/format'
 import { useSettings } from '@/services'
 
 const KEY = 'r8.contaazul.sync'
+const isToday = (iso: string) => iso.slice(0, 10) === new Date().toISOString().slice(0, 10)
 const readSync = () => {
   try {
     return localStorage.getItem(KEY) ?? undefined
@@ -38,8 +39,6 @@ export function ContaAzul({ paidThisMonth }: { paidThisMonth: number }) {
     }, 1500)
   }
 
-  const shown = last ?? conta.connectedAt
-
   return (
     <section aria-label="Conta Azul" className="flex min-w-0 flex-col rounded-card bg-raised p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
@@ -54,7 +53,7 @@ export function ContaAzul({ paidThisMonth }: { paidThisMonth: number }) {
           {conta.connected ? (
             <>
               <p className="truncate text-body font-semibold">{conta.account ?? 'Conta da empresa'}</p>
-              <p className="text-caption text-fg-3">{shown ? `Última sincronização ${formatDateTime(shown)}` : 'Ainda não sincronizado'}</p>
+              {last ? <p className="text-caption text-fg-3">{`Sincronizado ${isToday(last) ? 'hoje às' : 'em'} ${isToday(last) ? formatDateTime(last).slice(-5) : formatDateTime(last)}`}</p> : null}
             </>
           ) : (
             <p className="text-body font-semibold">Sem conexão</p>

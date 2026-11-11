@@ -107,17 +107,11 @@ export function PhotoPicker({ photos, onChange, label, moment, max = 12 }: { pho
           </li>
         ) : null}
       </ul>
-      <Button
-        variant="secondary"
-        size="field"
-        icon={ImagePlus}
-        block
-        className="mt-3"
-        disabled={full}
-        onClick={() => onChange([...photos, newPhoto(nextExample(photos.map((p) => p.src)), label, moment)])}
-      >
-        Usar foto de exemplo
-      </Button>
+      {!full ? (
+        <Button variant="secondary" size="field" icon={ImagePlus} block className="mt-3" onClick={() => onChange([...photos, newPhoto(nextExample(photos.map((p) => p.src)), label, moment)])}>
+          Usar foto de exemplo
+        </Button>
+      ) : null}
       <PhotoViewer photos={photos.map((p, i) => ({ id: p.id, src: p.src, alt: `${p.label}, foto ${i + 1}` }))} index={index} open={open} onIndexChange={setIndex} onOpenChange={setOpen} returnFocusRef={back} />
     </div>
   )

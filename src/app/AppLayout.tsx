@@ -15,6 +15,7 @@ import { getMoneyPanel, listNotifications, markAllRead, resetDemo, useQuery, use
 import { Copiloto, CopilotoButton } from '@/modules/copiloto'
 import { CommandPalette } from './CommandPalette'
 import { NAV_ITEMS } from './nav'
+import { Tour } from './Tour'
 
 const topBtn =
   'ds-touch ds-touch-sq relative inline-flex size-11 shrink-0 items-center justify-center rounded-pill bg-raised text-fg-2 transition-[background-color,color] duration-150 ease-[var(--ease-ui)] hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
@@ -109,8 +110,7 @@ export default function AppLayout() {
                   <>
                     <SideNavItem icon={Smartphone} label="App de campo" render={(p) => <NavLink to="/campo" {...p} />} />
                     <SideNavItem icon={Settings} label="Configurações" active={isActive('/configuracoes')} render={(p) => <NavLink to="/configuracoes" {...p} />} />
-                    {/* EXTENSÃO: o tour guiado troca este onClick por abrir o tour */}
-                    <SideNavItem icon={CircleHelp} label="Ajuda" onClick={() => window.dispatchEvent(new CustomEvent('app:tour'))} />
+                                        <SideNavItem icon={CircleHelp} label="Ajuda" onClick={() => window.dispatchEvent(new CustomEvent('app:tour'))} />
                   </>
                 }
               >
@@ -193,7 +193,7 @@ export default function AppLayout() {
         </div>
         <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
         <Copiloto />
-        {/* EXTENSÃO: <Tour /> é montado aqui */}
+        <Tour />
         <AppToaster />
       </div>
     </TooltipProvider>

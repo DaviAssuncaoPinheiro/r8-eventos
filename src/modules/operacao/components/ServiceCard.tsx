@@ -48,17 +48,17 @@ export const ServiceCard = React.memo(function ServiceCard({ service: s, teams, 
         e.dataTransfer.effectAllowed = 'move'
         e.dataTransfer.setData('text/plain', s.id)
         // a imagem do arrasto é tirada logo depois deste evento: a sombra já precisa estar no cartão
-        e.currentTarget.classList.add('shadow-drag')
+        e.currentTarget.classList.add('shadow-drag', 'bg-raised')
         requestAnimationFrame(() => onDragStart?.(s.id))
       }}
       onDragEnd={(e) => {
-        e.currentTarget.classList.remove('shadow-drag')
+        e.currentTarget.classList.remove('shadow-drag', 'bg-raised')
         onDragEnd?.()
       }}
       className={cn(
-        'group/svc relative rounded-control bg-sunken transition-[background-color,opacity,box-shadow] duration-150 ease-[var(--ease-ui)] hover:bg-hover',
+        'group/svc relative rounded-control transition-[background-color,opacity,box-shadow] duration-150 ease-[var(--ease-ui)] hover:bg-hover',
         movable && 'cursor-grab active:cursor-grabbing',
-        dragging && 'opacity-40 shadow-drag',
+        dragging && 'bg-raised opacity-40 shadow-drag',
         className,
       )}
     >
@@ -75,7 +75,7 @@ export const ServiceCard = React.memo(function ServiceCard({ service: s, teams, 
           {s.extra ? <Badge tone="warn">Extra</Badge> : null}
         </span>
         <span className="mt-1.5 flex items-center gap-2">
-          <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-tip bg-raised text-fg-2">
+          <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-tip bg-sunken text-fg-2">
             {done ? <Check size={16} strokeWidth={2.5} className="text-ok-ink" /> : <Icon size={16} strokeWidth={2} />}
           </span>
           <span className="min-w-0 truncate text-body font-semibold">{serviceTitle(s)}</span>

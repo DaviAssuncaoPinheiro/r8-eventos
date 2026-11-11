@@ -35,3 +35,15 @@ export const NEXT_STAGE: Partial<Record<RentalStatus, RentalStatus>> = {
 export function esc(s: string | undefined | null): string {
   return (s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string)
 }
+
+/** Tira palavra repetida em sequência ("Residencial Residencial das Palmas" vira "Residencial das Palmas") */
+export function cleanTitle(t: string): string {
+  return t.replace(/\b([\p{L}\d]+)(\s+)\1\b/giu, '$1')
+}
+
+/** Tipo que dá a cara da locação: o mais característico entre os itens (estrutura antes de banheiro). */
+const PRIORITY = ['trailer', 'tnd10', 'tnd5', 'bal', 'ala', 'fec', 'pia', 'pcd', 'bq']
+export function mainTypeId(items: { typeId: string }[]): string | undefined {
+  const ids = items.map((i) => i.typeId)
+  return PRIORITY.find((p) => ids.includes(p)) ?? ids[0]
+}

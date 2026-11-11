@@ -193,7 +193,7 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
   )
 
   return (
-    <CampoScreen title={`${s.typeLabel}, ${s.clientName}`} onBack={step > 0 ? () => go(step - 1) : back} actionBar={bar} nav={false}>
+    <CampoScreen title={s.typeLabel} onBack={step > 0 ? () => go(step - 1) : back} actionBar={bar} nav={false}>
       <Stepper variant="field" steps={STEPS} current={step} title={TITLES[step]} />
 
       <div className="mt-5">
@@ -225,7 +225,7 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
                       >
                         {on ? <Check size={20} strokeWidth={3} /> : null}
                       </span>
-                      <span className={on ? 'text-fg-2 line-through decoration-fg-3' : 'text-fg'}>{label}</span>
+                      <span className="text-fg">{label}</span>
                     </button>
                   </li>
                 )

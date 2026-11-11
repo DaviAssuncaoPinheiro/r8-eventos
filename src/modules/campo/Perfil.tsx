@@ -31,7 +31,7 @@ export default function Perfil() {
                   {team.initials}
                 </span>
                 <div className="min-w-0">
-                  <h1 className="truncate text-title-field">{team.name}</h1>
+                  <h2 className="truncate text-title-field">{team.name}</h2>
                   <p className="truncate text-body-lg text-fg-2">{team.members.join(', ')}</p>
                 </div>
               </div>

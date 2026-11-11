@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowUpRight, Download, FileWarning, PackageOpen, Plus, ReceiptText, Route, Send, Sparkles, Truck, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, Download, FileWarning, Info, PackageOpen, Plus, ReceiptText, Route, Send, Sparkles, Truck, type LucideIcon } from 'lucide-react'
 import { ArcGauge, Banner, Button, Money, MapaDF, MoneyCard, PillBars, Segmented, Skeleton, Tooltip, cn, notify, type MapPin, type MapRoute } from '@/ui'
 import { PageHeader } from '@/app/PageHeader'
 import { SERVICE_STATUS } from '@/app/status'
@@ -39,6 +39,17 @@ const ACAO_ROTA: Record<RecommendedAction['kind'], string> = {
   cobrar_atrasados: '/financeiro?status=atrasada',
   alugar_parados: '/equipamentos?status=disponivel',
   confirmar_orcamentos: '/locacoes?status=orcamento',
+}
+
+/** Botão (i) discreto com o "como é calculado" de um indicador. */
+function InfoTip({ label, text }: { label: string; text: string }) {
+  return (
+    <Tooltip content={text}>
+      <button type="button" aria-label={`Como é calculado: ${label}`} className="ds-hit inline-flex size-6 shrink-0 items-center justify-center rounded-pill text-fg-3 transition-colors duration-150 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+        <Info size={16} strokeWidth={2} aria-hidden />
+      </button>
+    </Tooltip>
+  )
 }
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
@@ -96,7 +107,7 @@ function buildMap(panel: MoneyPanel, services: ServiceView[]) {
 function fitBox(pins: MapPin[], ratio: number): [number, number, number, number] {
   const xs = [BASE.x, ...pins.map((p) => p.x)]
   const ys = [BASE.y, ...pins.map((p) => p.y)]
-  const pad = 90
+  const pad = 140
   const minX = Math.min(...xs) - pad
   const maxX = Math.max(...xs) + pad
   const minY = Math.min(...ys) - pad
@@ -106,7 +117,7 @@ function fitBox(pins: MapPin[], ratio: number): [number, number, number, number]
   const cx = (minX + maxX) / 2
   const cy = (minY + maxY) / 2
   w = Math.min(w, 940)
-  return [Math.max(20, cx - w / 2), Math.max(20, cy - h / 2), w, h]
+  return [cx - w / 2, cy - h / 2, w, h]
 }
 
 function csvEscape(v: string | number) {
@@ -366,7 +377,7 @@ export default function Painel() {
     )
   }
 
-  const { rentedToday, idle, uncollectedDamages, unbilledExtras, receivable, overdue, occupancy } = panel
+  const { rentedToday, idle, uncollectedDamages, unbilledExtras, receivable, occupancy } = panel
   const deltaTag =
     rentedToday.deltaPct === 0
       ? { label: '0%' }
@@ -414,7 +425,10 @@ export default function Painel() {
       <div className="mt-4 grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
         <section className="min-w-0 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-4">
           <div className="flex items-start justify-between gap-3">
-            <h2 className="text-title-sub">Receita</h2>
+            <h2 className="flex items-center gap-1.5 text-title-sub">
+              Receita
+              <InfoTip label="Receita" text="Soma do que foi pago em cada mês, pela data do pagamento. O mês corrente conta até hoje; a variação compara o último mês fechado com o anterior." />
+            </h2>
             <Segmented<Periodo>
               label="Período"
               size="sm"
@@ -440,7 +454,10 @@ export default function Painel() {
         </section>
 
         <section className="flex min-w-0 flex-col rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-3">
-          <h2 className="text-title-sub">A receber</h2>
+          <h2 className="flex items-center gap-1.5 text-title-sub">
+            A receber
+            <InfoTip label="A receber" text={`${plural(receivable.count, 'fatura aberta', 'faturas abertas')}, em dia ou atrasadas, que ainda não foram pagas. Atrasados é a parte delas já vencida.`} />
+          </h2>
           <p className="mt-2 text-kpi">
             <Money value={receivable.value} variant="kpi" />
           </p>
@@ -463,13 +480,17 @@ export default function Painel() {
             )}
           </div>
 
-          <div className="mt-5 flex items-baseline justify-between gap-3">
-            <span className="flex items-center gap-2 text-body font-medium text-fg-2">
-              <span aria-hidden className="size-2.5 rounded-pill bg-danger" />
-              Atrasados
-            </span>
-            <span className="text-title-sub text-danger-ink">{formatMoney(overdue.value)}</span>
-          </div>
+          <ul className="mt-5 flex flex-col gap-3">
+            {aging.filter((f) => f.value > 0).map((f) => (
+              <li key={f.label} className="flex items-center justify-between gap-3 text-body">
+                <span className="flex items-center gap-2 font-medium text-fg-2">
+                  <span aria-hidden className={cn('size-2.5 rounded-pill', f.cls)} />
+                  {f.label}
+                </span>
+                <span className={cn('tnum font-semibold', f.cls === 'bg-danger' ? 'text-danger-ink' : 'text-fg')}>{formatMoney(f.value)}</span>
+              </li>
+            ))}
+          </ul>
 
           <div className="mt-auto pt-6">
             <Button variant="primary" size="lg" block icon={Send} onClick={() => navigate('/financeiro?status=atrasada')}>
@@ -532,7 +553,10 @@ export default function Painel() {
         </section>
 
         <section className={cn('min-w-0 rounded-card bg-raised p-5 sm:p-6', aiEnabled ? '@min-[1180px]/frame:col-span-4' : '@min-[1180px]/frame:col-span-5')}>
-          <h2 className="text-title-sub">Ocupação do estoque</h2>
+          <h2 className="flex items-center gap-1.5 text-title-sub">
+            Ocupação do estoque
+            <InfoTip label="Ocupação do estoque" text={`${occupancy.inField} de ${occupancy.total} ${l.unitPlural} em campo hoje. Limpeza, manutenção e parados ficam fora da conta.`} />
+          </h2>
           <ArcGauge
             className="mt-5"
             center={`${Math.round(occupancy.pct)}%`}

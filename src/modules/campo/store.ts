@@ -1,5 +1,6 @@
 /* Estado local do app de campo: equipe ativa, modo sem sinal, fila de envio e rascunhos do registro. */
 import { create } from 'zustand'
+import { useDb } from '@/data/db'
 import type { NewDamageInput, ReportInput } from '@/services'
 
 export interface DraftPhoto {
@@ -35,6 +36,8 @@ export type QueueItem =
   | { id: string; kind: 'complete'; label: string; teamId: string; serviceId: string; report: ReportInput; damageLocalIds: string[] }
 
 interface Persisted {
+  /** contador de ids da base quando gravou: se a base voltou ao início depois, este estado é de antes e não vale mais */
+  dbSeq?: number
   teamId: string | null
   offline: boolean
   queue: QueueItem[]
@@ -61,7 +64,8 @@ const MAX_PERSISTED_PHOTO = 90_000
 function load(): Partial<Persisted> {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as Partial<Persisted>) : {}
+    const p = raw ? (JSON.parse(raw) as Partial<Persisted>) : {}
+    return typeof p.dbSeq === 'number' && useDb.getState().seq < p.dbSeq ? {} : p
   } catch {
     return {}
   }
@@ -122,7 +126,7 @@ export const useCampo = create<CampoState>((set) => ({
 
 const snapshot = (): Persisted => {
   const s = useCampo.getState()
-  return { teamId: s.teamId, offline: s.offline, queue: s.queue, drafts: s.drafts, myDamages: s.myDamages }
+  return { dbSeq: useDb.getState().seq, teamId: s.teamId, offline: s.offline, queue: s.queue, drafts: s.drafts, myDamages: s.myDamages }
 }
 
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -137,3 +141,13 @@ if (typeof window !== 'undefined') {
     if (document.visibilityState === 'hidden') save(snapshot())
   })
 }
+
+/** Volta o campo ao início: equipe padrão, com sinal, sem fila, rascunhos nem avarias da sessão. */
+export function resetCampo() {
+  useCampo.setState({ teamId: null, offline: false, queue: [], drafts: {}, myDamages: {}, syncing: false })
+}
+
+/* "Restaurar dados" em qualquer lugar (faixa do escritório, aba Demonstração) troca a base inteira de uma vez */
+useDb.subscribe((s, p) => {
+  if (s.clients !== p.clients && s.units !== p.units && s.teams !== p.teams && s.types !== p.types) resetCampo()
+})

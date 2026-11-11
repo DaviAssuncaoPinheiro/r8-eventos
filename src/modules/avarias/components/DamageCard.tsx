@@ -5,7 +5,7 @@ import { CHARGE_STATUS, DAMAGE_STATUS } from '@/app/status'
 import { formatMoney } from '@/lib/format'
 import type { DamageView } from '@/services'
 
-/** Cartão de avaria: foto 4:3, valor em destaque, código da unidade, tipo, cliente e situação. */
+/** Cartão de avaria: foto 16:9, valor em destaque, código da unidade, tipo, cliente e situação. */
 export function DamageCard({
   damage: d,
   busy,
@@ -36,7 +36,7 @@ export function DamageCard({
   ]
   return (
     <li className="flex min-w-0 flex-col overflow-hidden rounded-card bg-raised">
-      <div className="relative aspect-[4/3] bg-sunken">
+      <div className="relative aspect-[16/9] bg-sunken">
         <button
           type="button"
           onClick={onOpenPhoto}
@@ -47,9 +47,9 @@ export function DamageCard({
         </button>
         <span className="tnum pointer-events-none absolute top-3 left-3 inline-flex h-7 items-center rounded-pill bg-raised px-3 text-caption font-bold text-fg">{d.unitCode}</span>
       </div>
-      <div className="flex flex-1 flex-col gap-3 p-5">
+      <div className="flex flex-1 flex-col gap-2.5 p-4">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-kpi">{formatMoney(d.value)}</p>
+          <p className="tnum text-[22px] leading-7 font-semibold tracking-tight">{formatMoney(d.value)}</p>
           <Menu
             align="end"
             items={items}

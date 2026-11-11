@@ -44,27 +44,25 @@ const topBtn =
 function usePending() {
   const q = useQuery(listSuggestions, [])
   const pending = React.useMemo(() => (q.data ?? []).filter((s) => s.status === 'pendente'), [q.data])
-  return { ...q, pending }
+  // as mais valiosas primeiro; o botão e a gaveta mostram só as primeiras
+  const ranked = React.useMemo(() => [...pending].sort((a, b) => (b.value ?? 0) - (a.value ?? 0)), [pending])
+  return { ...q, pending: ranked }
 }
+
+const VISIBLE = 6
 
 /** Botão redondo do topo. Só aparece com o Pacote IA ligado; o ponto mostra quantas propostas esperam. */
 export function CopilotoButton() {
   const { aiEnabled } = useSettings()
   const { pending } = usePending()
   if (!aiEnabled) return null
-  const label = pending.length ? `Copiloto, ${pending.length} ${pending.length === 1 ? 'proposta' : 'propostas'}` : 'Copiloto'
+  const shown = Math.min(pending.length, VISIBLE)
+  const label = shown ? `Copiloto, ${shown} ${shown === 1 ? 'proposta' : 'propostas'}` : 'Copiloto'
   return (
     <Tooltip content="Copiloto">
       <button type="button" aria-label={label} onClick={openCopiloto} className={topBtn}>
         <Sparkles size={20} strokeWidth={2} aria-hidden />
-        {pending.length ? (
-          <span
-            aria-hidden
-            className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-pill bg-accent px-1 text-[12px] leading-none font-semibold text-on-accent ring-2 ring-raised"
-          >
-            {pending.length}
-          </span>
-        ) : null}
+        {shown ? <span aria-hidden className="absolute top-1.5 right-1.5 size-2.5 rounded-pill bg-accent ring-2 ring-raised" /> : null}
       </button>
     </Tooltip>
   )
@@ -192,6 +190,8 @@ function Body() {
   const { pending, initialLoading, error, refetch } = usePending()
   const panel = useQuery(getMoneyPanel, [])
   const [confirmed, setConfirmed] = React.useState<Confirmed[]>([])
+  const [all, setAll] = React.useState(false)
+  const list = all ? pending : pending.slice(0, VISIBLE)
   const teams = React.useMemo(() => (panel.data?.teamsNow ?? []).map((t) => ({ id: t.team.id, name: t.team.name })), [panel.data])
 
   const services = useQuery(() => listServices({ date: today() }), [])
@@ -237,9 +237,16 @@ function Body() {
               <span className="text-body-lg font-semibold">{c.text}</span>
             </li>
           ))}
-          {pending.map((s) => (
+          {list.map((s) => (
             <SuggestionCard key={s.id} s={s} teams={teams} fromTeam={fromTeamOf(s)} onDone={onDone} />
           ))}
+          {!all && pending.length > VISIBLE ? (
+            <li className="flex justify-center">
+              <Button variant="ghost" onClick={() => setAll(true)}>
+                Ver mais ({pending.length - VISIBLE})
+              </Button>
+            </li>
+          ) : null}
           {!pending.length && !confirmed.length ? (
             <li className="rounded-card bg-sunken">
               <EmptyState icon={Sparkles} title="Nada pendente agora" />

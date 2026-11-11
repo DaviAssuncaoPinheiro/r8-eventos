@@ -6,6 +6,7 @@ import { RENTAL_FLOW, RENTAL_STATUS } from '@/app/status'
 import { Banner, Button, Card, EmptyState, Input, Money, Segmented, Select, Skeleton, StatusDot, Table, type TableColumn } from '@/ui'
 import { listRentals, listTypes, useQuery, type RentalListItem, type RentalStatus } from '@/services'
 import { formatDate } from '@/lib/format'
+import { cleanTitle } from './util'
 import { FunilTrilha } from './components/FunilTrilha'
 import { CartaoLocacao } from './components/CartaoLocacao'
 
@@ -52,7 +53,7 @@ export default function Lista() {
 
   const columns: TableColumn<RentalListItem>[] = [
     { key: 'code', header: 'Código', width: 110, render: (r) => <span className="tnum font-semibold">{r.code}</span>, mobile: 'secondary' },
-    { key: 'title', header: 'Locação', minWidth: 240, render: (r) => <span className="font-semibold">{r.title}</span>, secondary: (r) => r.clientName, mobile: 'title' },
+    { key: 'title', header: 'Locação', minWidth: 240, render: (r) => <span className="font-semibold">{cleanTitle(r.title)}</span>, secondary: (r) => r.clientName, mobile: 'title' },
     { key: 'period', header: 'Período', width: 250, render: (r) => <span className="tnum whitespace-nowrap">{formatDate(r.start)} a {formatDate(r.end)}</span> },
     { key: 'status', header: 'Situação', width: 150, render: (r) => <StatusDot tone={RENTAL_STATUS[r.status].tone}>{RENTAL_STATUS[r.status].label}</StatusDot>, mobile: 'status' },
     { key: 'total', header: 'Valor', align: 'right', width: 140, render: (r) => <Money value={r.total} variant="cell" className="font-semibold" />, mobile: 'value' },
@@ -175,12 +176,12 @@ function Quadro({ rentals, all, status, types, loading, empty, onOpen, onNew }: 
   }
   const stages = status && status !== 'cancelada' ? [status] : RENTAL_FLOW
   return (
-    <div className="overflow-x-auto pb-2" tabIndex={-1}>
-      <div className={stages.length === 1 ? 'grid grid-cols-1' : 'grid min-w-max grid-flow-col auto-cols-[minmax(272px,1fr)] gap-3 @min-[1180px]/frame:min-w-0'}>
+    <div className="snap-x overflow-x-auto pb-2" tabIndex={-1}>
+      <div className={stages.length === 1 ? 'grid grid-cols-1' : 'grid min-w-max grid-flow-col auto-cols-[min(300px,86vw)] gap-3 sm:auto-cols-[minmax(272px,1fr)] @min-[1180px]/frame:min-w-0'}>
         {stages.map((s) => {
           const list = rentals.filter((r) => r.status === s)
           return (
-            <section key={s} aria-label={RENTAL_STATUS[s].label} className="min-w-0 rounded-card bg-sunken p-2">
+            <section key={s} aria-label={RENTAL_STATUS[s].label} className="min-w-0 snap-start rounded-card bg-sunken p-2">
               <header className="flex items-center justify-between px-2 pt-1 pb-3">
                 <StatusDot tone={RENTAL_STATUS[s].tone} className="font-semibold">
                   {RENTAL_STATUS[s].label}

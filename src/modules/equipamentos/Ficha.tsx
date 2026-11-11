@@ -58,7 +58,7 @@ export default function Ficha() {
         })
       }
     }
-    for (const c of readChanges(unit.id)) {
+    for (const c of readChanges(unit)) {
       out.push({ id: `chg-${c.at}`, at: c.at, icon: HISTORY_ICON.situacao, tone: 'warn', title: `Situação: ${MENU_LABEL[c.from]} para ${MENU_LABEL[c.to]}` })
     }
     return out.sort((a, b) => b.at.localeCompare(a.at))
@@ -108,6 +108,7 @@ export default function Ficha() {
     const from = unit.status
     try {
       await mut.run(unit.id, to)
+      await q.refetch()
       addChange({ unitId: unit.id, at: new Date().toISOString(), from, to })
       setLogTick((n) => n + 1)
       notify.success(`${unit.code} agora está em ${MENU_LABEL[to].toLowerCase()}`)
@@ -117,7 +118,9 @@ export default function Ficha() {
   }
   const menuItems: MenuEntry[] = SETTABLE.map((s) => ({ label: MENU_LABEL[s], disabled: s === unit.status, onSelect: () => void change(s) }))
   const inField = unit.status === 'em_campo'
-  const fields = seg.equipmentFields.filter((f) => unit.fields[f.key] !== undefined && unit.fields[f.key] !== '')
+  // campos de banheiro (tanque, fabricante, lote) não fazem sentido em estrutura como tenda e alambrado
+  const sanitary = unit.type.cleanable
+  const fields = seg.equipmentFields.filter((f) => unit.fields[f.key] !== undefined && unit.fields[f.key] !== '' && (seg.id !== 'eventos' || sanitary || !['capacidadeL', 'fabricante', 'lote'].includes(f.key)))
 
   return (
     <>
@@ -130,7 +133,7 @@ export default function Ficha() {
       <div className="grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
         {/* foto e QR */}
         <Card padding="none" className="p-2 @min-[1180px]/frame:col-span-5">
-          <TypeThumb src={unit.type.photo} alt={unit.type.name} className="aspect-[16/10] w-full rounded-[16px]" />
+          <TypeThumb src={unit.type.photo} alt={unit.type.name} typeId={unit.type.id} tag={unit.type.short} className="aspect-[16/10] w-full rounded-[16px]" />
           <div className="p-4 sm:p-5">
             <h2 className="mb-4 text-title-sub">{unit.type.name}</h2>
             <QrTile

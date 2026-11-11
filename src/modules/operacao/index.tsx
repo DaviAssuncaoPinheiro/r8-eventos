@@ -192,7 +192,7 @@ export default function Operacao() {
       {sug && sugFrom && sugTo ? (
         <Banner
           tone="warn"
-          title={`${sugFrom.name} está atrasada.`}
+          title={`${sugFrom.name} atrasada.`}
           className="mb-3"
           action={
             <div className="flex items-center gap-2">
@@ -216,7 +216,7 @@ export default function Operacao() {
             </div>
           }
         >
-          Passar {sug.clientName} para a {sugTo.name} economiza {sug.savedMinutes} min.
+          {sug.clientName} para a {sugTo.name}: {sug.savedMinutes} min a menos.
         </Banner>
       ) : null}
 

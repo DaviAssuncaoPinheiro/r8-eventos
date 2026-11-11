@@ -1,13 +1,13 @@
 import { formatDate, formatDateTime, formatMoney, formatCNPJ, formatPhone } from '@/lib/format'
 import { RENTAL_STATUS } from '@/app/status'
 import type { Company, Contract, RentalDetail, ServicePhoto } from '@/services'
-import { PRINT_CSS, printHtml } from './print'
-import { esc, periodTag } from './util'
+import { printCss, printHtml } from './print'
+import { cleanTitle, esc } from './util'
 
 const abs = (src: string) => (/^(data:|https?:)/.test(src) ? src : new URL(src, window.location.origin).href)
 
 function head(company: Company, title: string): string {
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(title)}</title><style>${PRINT_CSS}</style></head><body>
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(title)}</title><style>${printCss()}</style></head><body>
   <div class="brand"><b>${esc(company.name)}</b><span>${esc(company.legalName)} · CNPJ ${esc(formatCNPJ(company.cnpj))}<br>${esc(company.phone)} · ${esc(company.email)}</span></div>`
 }
 
@@ -49,24 +49,24 @@ export function buildDossierHtml(d: RentalDetail, company: Company): string {
     .join('')
   return (
     head(company, `Dossiê ${r.code}`) +
-    `<h1>Dossiê de prova · ${esc(r.code)}</h1><p><span class="tag">${esc(st)}</span> &nbsp; ${esc(r.title)}</p>
-    <h2>Dados da locação</h2>
-    <div class="grid">
-      <div class="kv"><small>Cliente</small><b>${esc(d.client.name)}</b></div>
-      <div class="kv"><small>Período</small><b>${esc(formatDate(r.start))} a ${esc(formatDate(r.end))} (${esc(periodTag(r.start, r.end))})</b></div>
-      <div class="kv"><small>Endereço</small><b>${esc(r.address)}</b></div>
-      <div class="kv"><small>Contato no local</small><b>${esc(r.contact.name)}, ${esc(r.contact.role)} · ${esc(formatPhone(r.contact.phone))}</b></div>
-      <div class="kv"><small>Equipamentos</small><b>${items}</b></div>
-      <div class="kv"><small>Valor total</small><b>${esc(formatMoney(d.financial.total))}</b></div>
-    </div>
+    `<div class="hero"><small>Dossiê de prova · ${esc(r.code)} · ${esc(st)}</small><h1>${esc(cleanTitle(r.title))}</h1><p>${esc(d.client.name)} · ${esc(formatDate(r.start))} a ${esc(formatDate(r.end))}</p></div>
     <div class="counters">
       <div class="counter"><b>${d.dossier.length}</b><small>Registros</small></div>
       <div class="counter"><b>${counts.photos}</b><small>Fotos</small></div>
       <div class="counter"><b>${counts.signatures}</b><small>Assinaturas</small></div>
       <div class="counter"><b>${counts.checklists}</b><small>Checklists</small></div>
     </div>
+    <h2>Dados da locação</h2>
+    <div class="grid">
+      <div class="kv"><small>Cliente</small><b>${esc(d.client.name)}</b></div>
+      <div class="kv"><small>Período</small><b>${esc(formatDate(r.start))} a ${esc(formatDate(r.end))}</b></div>
+      <div class="kv"><small>Endereço</small><b>${esc(r.address)}</b></div>
+      <div class="kv"><small>Contato no local</small><b>${esc(r.contact.name)}, ${esc(r.contact.role)} · ${esc(formatPhone(r.contact.phone))}</b></div>
+      <div class="kv"><small>Equipamentos</small><b>${items}</b></div>
+      <div class="kv"><small>Valor total</small><b>${esc(formatMoney(d.financial.total))}</b></div>
+    </div>
     <h2>Registros em ordem cronológica</h2>
-    ${events || '<p>Nenhum registro até o momento.</p>'}` +
+    <div class="timeline">${events || '<p>Nenhum registro até o momento.</p>'}</div>` +
     foot(company)
   )
 }

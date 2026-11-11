@@ -9,7 +9,7 @@ import { checkAvailability, createRental, listClients, listTypes, quoteRental, u
 import { formatDate, formatPhone } from '@/lib/format'
 import { ClientePicker } from './components/ClientePicker'
 import { CartaoTipo } from './components/CartaoTipo'
-import { capital, periodTag } from './util'
+import { capital, cleanTitle, periodTag } from './util'
 
 interface Form {
   clientId: string
@@ -254,7 +254,7 @@ export default function Nova() {
               </div>
             </section>
             <section aria-label="Resumo" className="rounded-card bg-raised p-5 sm:p-6">
-              <h2 className="text-title-sub">{form.title}</h2>
+              <h2 className="text-title-sub">{cleanTitle(form.title)}</h2>
               <p className="mt-1 text-body text-fg-2">
                 {client?.name} · {form.address}, {BAIRROS.find((b) => b.id === form.bairroId)?.name}
               </p>

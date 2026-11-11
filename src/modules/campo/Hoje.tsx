@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { AlertTriangle, CircleCheck, MapPin, Navigation, Play, QrCode } from 'lucide-react'
+import { AlertTriangle, MapPin, Navigation, Play, QrCode } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { today } from '@/domain/dates'
 import { formatDate } from '@/lib/format'
 import { startService, useMutation } from '@/services'
-import { Badge } from '@/ui'
+import { useCountUp } from '@/ui'
 import { FieldActionGrid, FieldActionTile } from '@/ui/FieldAction'
 import { notify } from '@/ui/Toast'
+import { CheckMark } from './components/CheckMark'
 import { CampoScreen, LoadFailed } from './components/Screen'
 import { ListSkeleton, ServiceList } from './components/ServiceList'
 import { fmtDuration, fmtTime, greeting, mapsUrl, useCampoDay, useServiceTitle } from './lib'
@@ -33,6 +34,7 @@ export default function Hoje() {
   const d = new Date()
   const first = team?.members[0]?.split(' ')[0]
   const closed = !!services.length && !open.length
+  const doneCount = Math.round(useCountUp(done.length))
   const later = open.filter((s) => s.id !== next?.id)
   const stateTag = next && (next.status === 'atrasado' ? { label: 'Atrasado', tone: 'danger' as const } : next.status === 'a_caminho' ? { label: 'A caminho', tone: 'info' as const } : next.status === 'em_andamento' ? { label: 'Em andamento', tone: 'accent' as const } : null)
 
@@ -91,12 +93,13 @@ export default function Hoje() {
             </section>
           ) : closed ? (
             <section aria-label="Dia fechado" className="ds-hero mt-4 rounded-card p-5">
-              <span className="grid size-14 place-items-center rounded-pill bg-on-accent/15">
-                <CircleCheck size={32} strokeWidth={2} aria-hidden />
-              </span>
-              <h2 className="mt-3 text-[26px] leading-8 font-semibold tracking-[-0.02em]">Dia fechado</h2>
-              <p className="mt-1 text-body-lg text-on-accent-2">
-                <strong className="tnum text-[32px] leading-10 font-semibold text-on-accent">{done.length}</strong> {done.length === 1 ? 'serviço feito' : 'serviços feitos'}
+              <div className="flex items-center gap-4">
+                <CheckMark size={88} label="Dia fechado" className="shrink-0 text-on-accent" />
+                <h2 className="text-[26px] leading-8 font-semibold tracking-[-0.02em]">Dia fechado</h2>
+              </div>
+              <p className="mt-4 flex items-baseline gap-3">
+                <strong className="tnum text-[64px] leading-[64px] font-semibold tracking-[-0.03em] text-on-accent">{doneCount}</strong>
+                <span className="text-body-lg font-semibold text-on-accent-2">{done.length === 1 ? 'serviço' : 'serviços'}</span>
               </p>
             </section>
           ) : (
@@ -135,9 +138,7 @@ export default function Hoje() {
           ) : null}
           {closed ? (
             <>
-              <h2 className="mt-6 mb-2 flex items-center gap-2 px-1 text-title-sub">
-                Feitos hoje <Badge tone="ok">{done.length}</Badge>
-              </h2>
+              <h2 className="mt-6 mb-2 px-1 text-title-sub">Feitos hoje</h2>
               <ServiceList services={done} label="Serviços feitos" />
             </>
           ) : null}

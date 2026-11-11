@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { DoorClosed, Eraser, MessageSquareMore, PackageX, QrCode, Send, Sparkles, TriangleAlert, type LucideIcon } from 'lucide-react'
-import { Banner, Button, Drawer, EmptyState, Field, PhotoThumb, PhotoViewer, Skeleton, StatusDot, Textarea, cn, notify, type PhotoItem } from '@/ui'
+import { Banner, Button, Drawer, EmptyState, Field, PhotoViewer, Skeleton, StatusDot, Textarea, cn, notify, type PhotoItem } from '@/ui'
 import { UNIT_STATUS } from '@/app/status'
 import { formatDate, formatTime } from '@/lib/format'
 import { getUnitPage, reportProblem, useLabels, useMutation, useQuery, type ProblemKind } from '@/services'
 import { PublicShell } from './components/PublicShell'
 
+const CROPS = ['center', '15% 60%', '85% 40%', '50% 15%']
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export default function Unidade() {
@@ -90,10 +91,18 @@ export default function Unidade() {
                   <span className="ml-3 text-title-sub text-fg-2">{formatTime(data.lastCleaning.at)}</span>
                 </p>
                 {photos.length ? (
-                  <ul className="mt-4 flex flex-wrap gap-2">
+                  <ul className="mt-4 grid grid-cols-2 gap-2">
                     {photos.map((p, i) => (
                       <li key={p.id}>
-                        <PhotoThumb src={p.src} alt={p.alt} size={96} onClick={() => setViewer(i)} />
+                        <button
+                          type="button"
+                          aria-label={`Abrir foto: ${p.alt}`}
+                          onClick={() => setViewer(i)}
+                          className="relative block aspect-[4/3] w-full overflow-hidden rounded-control bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        >
+                          <img src={p.src} alt="" loading="lazy" draggable={false} style={{ objectPosition: CROPS[i % CROPS.length] }} className="size-full object-cover" />
+                          <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-pill bg-inverse/80 px-2.5 py-1 text-caption font-semibold text-on-inverse">{data.lastCleaning?.photos[i]?.label}</span>
+                        </button>
                       </li>
                     ))}
                   </ul>
