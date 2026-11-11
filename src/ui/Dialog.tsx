@@ -21,57 +21,13 @@ export function useMediaQuery(query: string): boolean {
 }
 
 /*
-  Keyframes das sobreposições. Radix só espera a saída se houver animação (não transição),
-  por isso ficam aqui, injetados uma vez. Tokens de duração e curva vêm de tokens.css.
-  Entrada: 250ms (diálogo, gaveta) ou 200ms (menu); saída com 70% da duração.
-  prefers-reduced-motion é zerado pela regra global de src/index.css.
+  Keyframes e classes de entrada/saída das sobreposições (ds-scrim, ds-dialog, ds-drawer-side,
+  ds-vaul, ds-menu) ficam em src/styles/tokens.css. Radix só espera a saída se houver animação
+  (não transição), por isso são keyframes.
 */
-const OVERLAY_CSS = `
-@keyframes ds-fade-in { from { opacity: 0 } }
-@keyframes ds-fade-out { to { opacity: 0 } }
-@keyframes ds-dialog-in { from { opacity: 0; transform: scale(0.98) } }
-@keyframes ds-dialog-out { to { opacity: 0; transform: scale(0.98) } }
-@keyframes ds-sheet-in { from { transform: translateY(100%) } }
-@keyframes ds-sheet-out { to { transform: translateY(100%) } }
-@keyframes ds-side-in { from { transform: translateX(calc(100% + 12px)) } }
-@keyframes ds-side-out { to { transform: translateX(calc(100% + 12px)) } }
-@keyframes ds-menu-in { from { opacity: 0; transform: translateY(var(--ds-menu-y, 4px)) } }
-@keyframes ds-menu-out { to { opacity: 0 } }
 
-.ds-scrim[data-state='open'] { animation: ds-fade-in var(--dur-slow) var(--ease-ui) }
-.ds-scrim[data-state='closed'] { animation: ds-fade-out 175ms var(--ease-ui) forwards }
-
-.ds-dialog[data-state='open'] { animation: ds-sheet-in var(--dur-slow) var(--ease-ui) }
-.ds-dialog[data-state='closed'] { animation: ds-sheet-out 175ms var(--ease-ui) forwards }
-@media (min-width: 640px) {
-  .ds-dialog[data-state='open'] { animation: ds-dialog-in var(--dur-slow) var(--ease-ui) }
-  .ds-dialog[data-state='closed'] { animation: ds-dialog-out 175ms var(--ease-ui) forwards }
-}
-
-.ds-drawer-side[data-state='open'] { animation: ds-side-in var(--dur-slow) var(--ease-ui) }
-.ds-drawer-side[data-state='closed'] { animation: ds-side-out 175ms var(--ease-ui) forwards }
-
-.ds-vaul[data-vaul-drawer], .ds-vaul-scrim[data-vaul-overlay] {
-  transition-duration: var(--dur-slow) !important;
-  transition-timing-function: var(--ease-ui) !important;
-}
-
-.ds-menu[data-state='open'] { animation: ds-menu-in var(--dur-base) var(--ease-ui) }
-.ds-menu[data-state='closed'] { animation: ds-menu-out 140ms var(--ease-ui) forwards }
-.ds-menu[data-side='top'] { --ds-menu-y: 4px }
-.ds-menu[data-side='bottom'] { --ds-menu-y: -4px }
-`
-
-let injected = false
-export function ensureOverlayStyles() {
-  if (injected || typeof document === 'undefined') return
-  injected = true
-  const el = document.createElement('style')
-  el.setAttribute('data-ds-overlay', '')
-  el.textContent = OVERLAY_CSS
-  document.head.appendChild(el)
-}
-ensureOverlayStyles()
+/** @deprecated Os estilos das sobreposições vêm de tokens.css; não faz nada. Mantido só para não quebrar importações. */
+export function ensureOverlayStyles() {}
 
 /* ───────── Diálogo ───────── */
 

@@ -2,9 +2,6 @@ import * as React from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from './cn'
-import { ensureOverlayStyles } from './Dialog'
-
-ensureOverlayStyles()
 
 export type MenuEntry =
   | {

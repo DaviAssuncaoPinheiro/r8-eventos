@@ -241,7 +241,7 @@ const CATEGORIAS = [
   { key: 'bq', label: 'Banheiro', value: 21480 },
   { key: 'tnd', label: 'Tenda', value: 12960 },
   { key: 'trl', label: 'Trailer', value: 9240 },
-  { key: 'ala', label: 'Alambrado', value: 4632.9 },
+  { key: 'ala', label: 'Grade', value: 4632.9 },
   { key: 'par', label: 'Parado', value: 3980, idle: true },
 ]
 

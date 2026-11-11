@@ -81,7 +81,7 @@ function Swatch({ t }: { t: Tok }) {
     <li className="flex min-w-0 items-center gap-3 py-2">
       <span
         aria-hidden
-        className="grid size-11 shrink-0 place-items-center rounded-control text-caption font-bold shadow-[inset_0_0_0_1px_var(--hairline)]"
+        className="grid size-11 shrink-0 place-items-center rounded-control text-caption font-bold shadow-[inset_0_0_0_1px_var(--edge)]"
         style={{ background: `var(${t.v})`, color: t.text ? `var(${t.text})` : undefined }}
       >
         {t.text ? 'Aa' : null}

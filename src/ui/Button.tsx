@@ -30,7 +30,7 @@ const variants: Record<ButtonVariant, string> = {
     'disabled:bg-sunken disabled:text-fg-disabled',
 }
 
-/* altura, padding horizontal, gap, texto, tamanho do ícone */
+/* altura, padding horizontal, gap, texto, tamanho do ícone. Em toque (pointer: coarse), sm e md crescem para 44 (ds-touch). */
 const sizes: Record<ButtonSize, { cls: string; icon: number; square: string }> = {
   sm: { cls: 'h-8 px-3 gap-1.5 text-body', icon: 16, square: 'w-8 px-0' },
   md: { cls: 'h-10 px-4 gap-2 text-body', icon: 18, square: 'w-10 px-0' },
@@ -63,7 +63,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       data-force={forceState}
       aria-busy={loading || undefined}
       disabled={disabled}
-      className={cn(base, variants[variant], s.cls, iconOnly && s.square, block && 'w-full', size === 'sm' && 'ds-touch', loading && 'pointer-events-none', className)}
+      className={cn(base, variants[variant], s.cls, iconOnly && s.square, block && 'w-full', (size === 'sm' || size === 'md') && 'ds-touch', iconOnly && (size === 'sm' || size === 'md') && 'ds-touch-sq', loading && 'pointer-events-none', className)}
       {...rest}
     >
       {lead}

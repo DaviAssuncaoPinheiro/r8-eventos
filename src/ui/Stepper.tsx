@@ -91,7 +91,7 @@ export function Stepper({ steps, current, onStepClick, variant = 'office', title
                   type="button"
                   onClick={() => onStepClick(i)}
                   aria-label={`Voltar ao passo ${i + 1}, ${s.label}${status}`}
-                  className="-mx-1 flex items-center gap-2 rounded-control px-1 py-1 transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  className="ds-hit -mx-1 flex items-center gap-2 rounded-control px-1 py-1 transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   {label}
                 </button>

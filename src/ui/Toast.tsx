@@ -118,6 +118,7 @@ export function AppToaster({ id }: { id?: string }) {
       gap={8}
       visibleToasts={3}
       toastOptions={{ unstyled: true }}
+      containerAriaLabel="Notificações"
       style={{ zIndex: 80, '--width': '360px' } as React.CSSProperties}
     />
   )

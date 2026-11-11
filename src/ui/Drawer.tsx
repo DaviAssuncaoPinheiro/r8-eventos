@@ -4,9 +4,7 @@ import { Drawer as Vaul } from 'vaul'
 import { X } from 'lucide-react'
 import { Button } from './Button'
 import { cn } from './cn'
-import { ensureOverlayStyles, useMediaQuery } from './Dialog'
-
-ensureOverlayStyles()
+import { useMediaQuery } from './Dialog'
 
 export type DrawerSide = 'right' | 'bottom'
 
@@ -43,7 +41,7 @@ export function Drawer({ open, defaultOpen, onOpenChange, trigger, side, width =
 
   if (mode === 'bottom') {
     return (
-      <Vaul.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
+      <Vaul.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} autoFocus>
         {trigger ? <Vaul.Trigger asChild>{trigger}</Vaul.Trigger> : null}
         <Vaul.Portal>
           <Vaul.Overlay className="ds-vaul-scrim ds-root fixed inset-0 z-[60] bg-scrim" />

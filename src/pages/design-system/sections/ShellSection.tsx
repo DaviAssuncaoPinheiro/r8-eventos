@@ -21,7 +21,7 @@ import {
   ChartColumn,
   Sparkles,
 } from 'lucide-react'
-import { Button, Segmented, StatusDot, Tooltip, type StatusTone } from '@/ui'
+import { Button, Segmented, StatusDot, Tooltip, useMediaQuery, type StatusTone } from '@/ui'
 import { SideNav, SideNavGroup, SideNavItem, SideNavScope } from '@/ui/SideNav'
 import { TopBar } from '@/ui/TopBar'
 import { BottomNav, BottomNavItem } from '@/ui/BottomNav'
@@ -165,9 +165,10 @@ function OfficeMiniature() {
       </div>
       <ScaledFrame width={width} height={600}>
         <OfficeFrame
+          embedded
           rail={
             <div className="flex flex-col gap-4">
-              <h3 className="text-title-card">Atividade recente</h3>
+              <h5 className="text-title-card">Atividade recente</h5>
               <ul className="flex flex-col gap-3">
                 {[
                   ['Avaria registrada na BQ-0142', '11/11/2026 às 10:12, Marcos Vieira'],
@@ -211,7 +212,7 @@ function OfficeMiniature() {
         >
           <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
             <div>
-              <h2 className="text-title-page">Serviços de hoje</h2>
+              <h4 className="text-title-page">Serviços de hoje</h4>
               <p className="mt-1 text-body text-fg-2">11/11/2026, 5 serviços na agenda</p>
             </div>
             <Button variant="primary" icon={Plus}>
@@ -236,9 +237,10 @@ function PhoneFrame() {
     { id: 'perfil', label: 'Perfil', icon: UserRound },
   ] as const
   return (
-    <div className="max-w-full overflow-x-auto p-2">
-      <div className="h-[720px] w-[390px] shrink-0 overflow-hidden rounded-[32px] ring-[6px] ring-edge">
+    <div className="w-[406px] max-w-full shrink-0 p-2">
+      <div className="h-[720px] w-full max-w-[390px] overflow-hidden rounded-[32px] ring-[6px] ring-edge">
         <FieldFrame
+          embedded
           title="R8 Eventos"
           pending={3}
           actionBar={
@@ -256,7 +258,7 @@ function PhoneFrame() {
             </BottomNav>
           }
         >
-          <h2 className="text-title-field">Hoje</h2>
+          <h4 className="text-title-field">Hoje</h4>
           <p className="mt-1 mb-4 text-body-lg text-fg-2">5 serviços, 1 em andamento</p>
           <ul className="rounded-card bg-raised">
             {SERVICES.map((s) => (
@@ -285,6 +287,8 @@ export default function ShellSection() {
   const [openActive, setOpenActive] = React.useState<NavId>('locacoes')
   const [closedActive, setClosedActive] = React.useState<NavId>('operacao')
   const [resets, setResets] = React.useState(0)
+  /* tooltip à direita aberto à força só onde cabe; no celular ele sairia da tela */
+  const wide = useMediaQuery('(min-width: 640px)')
 
   return (
     <DsSection
@@ -320,7 +324,7 @@ export default function ShellSection() {
           <div className="mt-6 flex flex-wrap gap-x-10 gap-y-6">
             <StateCell label="Desabilitado, com tooltip (sem permissão)" className="min-w-[232px] sm:min-w-[480px]">
               <div className="w-[232px]">
-                <SideNavItem icon={ChartColumn} label="Relatórios" disabled disabledReason="Sem permissão. Peça acesso ao administrador." forceTooltip />
+                <SideNavItem icon={ChartColumn} label="Relatórios" disabled disabledReason="Sem permissão. Peça acesso ao administrador." forceTooltip={wide} />
               </div>
             </StateCell>
             <StateCell label="Recolhida, tooltip à direita" className="min-w-[200px] sm:min-w-[320px]">

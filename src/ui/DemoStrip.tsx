@@ -59,7 +59,7 @@ export function DemoStrip({ onReset, fixed = false, compact, className }: DemoSt
         <button
           type="button"
           onClick={onReset}
-          className="shrink-0 rounded-tip px-1 text-caption font-semibold text-on-inverse underline underline-offset-2 hover:text-on-inverse-2 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-on-inverse"
+          className="ds-hit shrink-0 rounded-tip px-1 text-caption font-semibold text-on-inverse underline underline-offset-2 hover:text-on-inverse-2 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-on-inverse"
         >
           Restaurar dados
         </button>

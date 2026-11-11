@@ -215,7 +215,7 @@ Borda OU sombra, nunca as duas. Linhas internas: 1 px `border-hairline`. Campo: 
 | `--dur-slow` | 250 ms | Gaveta, diálogo, toast |
 | `--ease-ui` | `cubic-bezier(0.16, 1, 0.3, 1)` (exponencial de saída) | Tudo |
 
-Entrada de flutuante: opacidade 0 → 1 e translateY 4 px → 0 (menu, tooltip 2 px) ou escala 0,98 → 1 (diálogo); gaveta desliza 100% → 0. Saída com 70% da duração. Sem sequência de entrada de página, sem parallax, sem animação em loop exceto esqueleto (1,4 s) e spinner de botão (0,8 s). `prefers-reduced-motion: reduce` zera transições e animações (regra global em `src/index.css`).
+Entrada de flutuante: opacidade 0 → 1 e translateY 4 px → 0 (menu, tooltip 2 px) ou escala 0,98 → 1 (diálogo); gaveta desliza 100% → 0. Saída com 70% da duração. Sem sequência de entrada de página, sem parallax, sem animação em loop exceto esqueleto (1,4 s) e spinner de botão (0,8 s). `prefers-reduced-motion: reduce` zera transições e animações (regra global em `src/index.css`). Os keyframes de entrada e saída das sobreposições (`ds-scrim`, `ds-dialog`, `ds-drawer-side`, `ds-vaul`, `ds-menu`) ficam em `src/styles/tokens.css`, fora de `@layer`, para vencer utilitários no mesmo elemento; nenhum componente injeta `<style>`.
 
 ### 3.10 Ícones
 
@@ -231,6 +231,8 @@ lucide-react, `strokeWidth={2}` em todos os tamanhos, cor herdada (`currentColor
 | Escritório | 1280 | `xl:` | Lateral aberta (248), trilho direito fixo (336) |
 | Escritório largo | 1440 | `wide:` | Conteúdo até 1280 de largura útil, centralizado |
 
+**Alvo de toque.** Em `pointer: coarse` todo controle tem alvo de pelo menos 44 × 44: `ds-touch` (altura mínima 44: botão sm e md, campo md, linha de caixa, rádio e switch), `ds-touch-sq` (largura mínima 44: botão só ícone sm e md) e `ds-hit` (área de toque invisível de 44 × 44 centrada, sem mudar o desenho: trilho do switch, opção de segmentado, número de passo clicável, botão texto da faixa de demonstração). O desenho no desktop não muda.
+
 ---
 
 ## 4. Grid e casca
@@ -239,7 +241,7 @@ lucide-react, `strokeWidth={2}` em todos os tamanhos, cor herdada (`currentColor
 
 - Fundo `bg-app`. Padding externo 12 px, gap 12 px entre painéis (`--shell-gap`).
 - **Lateral** `bg-panel`, `rounded-panel`, altura 100dvh − 24, fixa. Largura 248 px aberta (≥ 1280), 72 px recolhida (1024 a 1279, ou por escolha do usuário; a escolha fica em localStorage). Conteúdo: marca da locadora (logo 32 px + nome 16/650) em 64 px de altura; grupos de navegação com rótulo `text-caption` 600 `fg-3` (12 px acima, 4 abaixo); itens de 40 px; rodapé com Configurações e usuário.
-- **Topo** `bg-panel`, `rounded-panel`, altura 64 px, padding horizontal 24 px, fixo no topo da coluna principal: busca (cmdk, 40 px, largura 360 px, atalho Ctrl K) à esquerda; à direita, ações só ícone 40 px (avisos, ajuda) e usuário (avatar 32 px + nome 14/600 + papel 12 fg-3).
+- **Topo** `bg-panel`, `rounded-panel`, altura 64 px, padding horizontal 24 px, fixo no topo da coluna principal: título da tela `text-title-sub` truncado à esquerda; busca (cmdk, 40 px, largura até 360 px, atalho Ctrl K) ao centro (de 1024 a 1279 vira botão só ícone 40); à direita, ações só ícone 40 px (avisos, ajuda) e usuário (avatar 32 px + nome 14/600 + papel 12 fg-3).
 - **Painel principal** `bg-panel`, `rounded-panel`, padding 32 px (24 px em 1024 a 1279), largura útil máxima 1280 px. Cabeçalho da página: título `text-title-page` + linha de apoio `text-body fg-2` (4 px abaixo) à esquerda, ações à direita (primário no fim); 24 px até o conteúdo.
 - **Grade do conteúdo**: 12 colunas, gap 16 px (cartões) ou 24 px (seções). Padrões: indicadores em `StatStrip` (1 cartão) ou bloco destaque (4 col) + StatStrip (8 col); tabela em 12 col; lista + detalhe em 7/5.
 - **Trilho direito** (contexto: dossiê do cliente, atividade, Copiloto): `bg-panel`, `rounded-panel`, 336 px, padding 20 px, fixo a partir de 1280. Entre 1024 e 1279 vira gaveta pela direita (botão só ícone no topo). Abaixo de 1024 vira tela cheia.
@@ -254,6 +256,8 @@ lucide-react, `strokeWidth={2}` em todos os tamanhos, cor herdada (`currentColor
 - Título da tela `text-title-field` (24/30) no topo do conteúdo, 16 px abaixo do cabeçalho.
 - Alvos: ≥ 44 × 44 em tudo, ≥ 48 px de altura nos botões principais (o `field` tem 56). Distância mínima entre alvos 8 px.
 - Corpo 16 px; texto principal sempre `fg` (≥ 14:1 no claro, para sol).
+
+Contêineres: `OfficeFrame` e `FieldFrame` em `src/ui/AppFrame.tsx`. No app, passe `viewport`; num quadro de exemplo dentro de outra página (documentação), passe `embedded`: o conteúdo do escritório vira `div` em vez de `main` e o título do campo vira `p` em vez de `h1`, para não duplicar o marco principal nem quebrar a hierarquia de títulos da página que os contém.
 
 ### 4.3 Densidade de tabela
 
@@ -278,7 +282,7 @@ Anatomia: [ícone 16/18/20/24] + rótulo + [ícone à direita]. `rounded-control
 | Tamanho | Altura | Padding x | Texto | Ícone |
 |---|---|---|---|---|
 | `sm` | 32 (44 em `pointer: coarse`) | 12 | 14 | 16 |
-| `md` (padrão) | 40 | 16 | 14 | 18 |
+| `md` (padrão) | 40 (44 em `pointer: coarse`) | 16 | 14 | 18 |
 | `lg` | 48 | 20 | 16 | 20 |
 | `field` | 56 | 24 | 16 / 700 | 24 |
 
@@ -291,7 +295,7 @@ Anatomia: [ícone 16/18/20/24] + rótulo + [ícone à direita]. `rounded-control
 | Desabilitado | `bg-sunken` `fg-disabled` | `bg-raised` `fg-disabled` anel `hairline` | `fg-disabled` | `bg-sunken` `fg-disabled` |
 | Carregando | spinner 0,8 s no lugar do ícone, rótulo no gerúndio ("Gerando"), `aria-busy`, sem clique | idem | idem | idem |
 
-Só ícone (`iconOnly`): quadrado do tamanho da altura, `aria-label` obrigatório, tooltip com o mesmo texto. Largura total (`block`). Um primário por área de ação; ordem: secundário à esquerda, primário à direita. Rótulo é verbo + objeto ("Gerar cobrança").
+Só ícone (`iconOnly`): quadrado do tamanho da altura (sm e md viram 44 × 44 em toque), `aria-label` obrigatório, tooltip com o mesmo texto. Largura total (`block`). Um primário por área de ação; ordem: secundário à esquerda, primário à direita. Rótulo é verbo + objeto ("Gerar cobrança").
 
 ### 5.2 Field, Input, Textarea, Select
 
@@ -348,7 +352,7 @@ Trilho `bg-sunken`, `rounded-control`, padding 4, gap 2, altura 40 (`md`) ou 32 
 |---|---|---|
 | `default` | `bg-raised` | Padrão |
 | `sunken` | `bg-sunken` | Área dentro do painel: vazio, filtro, rascunho |
-| `highlight` | `bg-accent` com degradê 160° de `--accent` a `--accent-hover`; texto `on-accent`, secundário `on-accent-2` | Um por tela, só para o número que ancora a página |
+| `highlight` | `bg-accent` com degradê 160° de `--accent` a `--accent-hover`; texto `on-accent`, secundário `on-accent-2`; anel de foco `on-accent` (o cartão redefine `--ring`, porque `accent-ink` some sobre o acento) | Um por tela, só para o número que ancora a página |
 
 CardHeader: título 16/650 + descrição 12 `fg-3` (no destaque, `on-accent-2`), ação à direita (botão sm ou só ícone), 16 px até o conteúdo, altura mínima 32. Proibido cartão dentro de cartão, borda lateral colorida e grade de cartões iguais como estrutura de página.
 
@@ -367,13 +371,13 @@ Radix. `bg-inverse` `text-on-inverse`, 12/16, padding 8 × 10, `rounded-tip`, la
 
 ### 5.10 Money
 
-`formatMoney` + `.tnum` + `white-space: nowrap`. Variantes: `inline` (texto corrido), `cell` (bloco alinhado à direita), `kpi` (prefixo e centavos menores, `aria-label` com o valor completo). Negativo: sinal "-" e `danger-ink`. `sign`: "+" em positivos (variação, extra). Total de coluna: 600 ou 700, linha superior 1 px `strong`.
+`formatMoney` + `.tnum` + `white-space: nowrap`. Variantes: `inline` (texto corrido), `cell` (bloco alinhado à direita), `kpi` (prefixo e centavos menores a 80% de opacidade, 100% dentro do Card `highlight` para manter 4,5:1; o valor completo vai num texto `sr-only` e as partes visuais ficam `aria-hidden`). Negativo: sinal "-" e `danger-ink`. `sign`: "+" em positivos (variação, extra). Total de coluna: 600 ou 700, linha superior 1 px `strong`.
 
 ---
 
-## 6. Componentes a implementar (stubs na página)
+## 6. Componentes de padrão (`src/ui`, demonstrados na página)
 
-Mesmo rigor dos de cima. Use só tokens e primitivos de `src/ui`. Arquivo de demonstração já registrado no índice: `src/pages/design-system/sections/DataSection.tsx`, `OverlaySection.tsx`, `ShellSection.tsx`.
+Mesmo rigor dos de cima. Use só tokens e primitivos de `src/ui`. Demonstração: `src/pages/design-system/sections/DataSection.tsx`, `OverlaySection.tsx`, `ShellSection.tsx`.
 
 ### 6.1 Tabela (`DataSection`)
 
@@ -399,7 +403,7 @@ Item de lista da agenda e do app de campo. Altura mínima 72 px, padding 12 × 1
 - Tooltip: `TooltipBody`, linha vertical de referência 1 px `strong` tracejada 3/3.
 - Rosca/progresso: só para uma proporção (ex.: ocupação da frota), espessura 12, trilho `sunken`, número no centro `text-kpi`.
 - Vazio: área do gráfico `bg-sunken` `rounded-control` com texto 14 `fg-3` centralizado ("Sem locações neste período"). Carregando: esqueleto bloco da altura do gráfico.
-- Acessibilidade: `role="img"` + `aria-label` com resumo ("Faturamento de outubro: R$ 48.312,90, 12,4% acima de setembro"); tabela equivalente acessível por botão "Ver dados".
+- Acessibilidade: `role="img"` + `aria-label` com resumo ("Faturamento de outubro: R$ 48.312,90, 12,4% acima de setembro"); tabela equivalente acessível por botão "Ver dados". A camada de teclado do recharts fica desligada (`accessibilityLayer={false}`, rosca com `rootTabIndex={-1}`): nada focável dentro de `role="img"`; pelo teclado, o caminho é "Ver dados".
 
 ### 6.4 Linha do tempo do dossiê (`DataSection`)
 
@@ -411,7 +415,7 @@ Miniatura 64 × 64 (lista) ou 96 × 96 (grade do campo), `rounded-tip`, `object-
 
 ### 6.6 QR (`DataSection`)
 
-`qrcode.react` em SVG, módulos `--fg` sobre `#ffffff` sempre (mesmo no escuro, o QR fica num quadrado branco com padding 12 e `rounded-card`), nível de correção M, tamanho 160 (tela) / 3 cm (impressão). Abaixo: código 14/600 `.tnum` ("BQ-0142") e nome do equipamento 12 `fg-3`. Ações: "Imprimir etiqueta" (secundário) e "Copiar link" (só ícone).
+`qrcode.react` em SVG, módulos pretos fixos (`text-black`) sobre quadrado branco fixo (`bg-white`) nos dois temas, com padding 12 e `rounded-card` (decisão: leitores de QR e impressão precisam do contraste máximo; `--fg` claro no escuro inverteria o código), nível de correção M, tamanho 160 (tela) / 3 cm (impressão). Abaixo: código 14/600 `.tnum` ("BQ-0142") e nome do equipamento 12 `fg-3`. Ações: "Imprimir etiqueta" (secundário) e "Copiar link" (só ícone).
 
 ### 6.7 Diálogo (`OverlaySection`, Radix Dialog)
 
@@ -420,7 +424,7 @@ Só quando a tarefa exige interrupção ou foco protegido (confirmar exclusão, 
 ### 6.8 Gaveta (`OverlaySection`, vaul / Radix Dialog)
 
 - Lateral direita (escritório): largura 480 (detalhe) ou 640 (formulário longo), altura 100dvh − 24, a 12 px da borda, `bg-overlay` `shadow-overlay` `rounded-panel`. Cabeçalho 64 px (título `text-title-sub`, fechar 40), corpo com rolagem e padding 24, rodapé fixo com ações (como o diálogo). Entrada 250 ms deslizando da direita. Fundo `scrim`.
-- Inferior (celular, vaul): largura total, raio 18 só em cima, puxador 36 × 4 `strong` centralizado a 8 px do topo, altura máx. 90dvh, ação principal `field` no rodapé com área segura. Arrastar para baixo fecha.
+- Inferior (celular, vaul): largura total, raio 18 só em cima, puxador 36 × 4 `strong` centralizado a 8 px do topo, altura máx. 90dvh, ação principal `field` no rodapé com área segura. Arrastar para baixo fecha; Esc fecha; ao abrir, o foco entra na gaveta e fica preso nela (vaul com `autoFocus`) e volta ao gatilho ao fechar.
 
 ### 6.9 Menu (`OverlaySection`, Radix Popover/DropdownMenu)
 
@@ -432,7 +436,7 @@ Topo central no escritório, inferior acima da navegação no celular. `bg-inver
 
 ### 6.11 Faixa de aviso (`OverlaySection`)
 
-Faixa em linha no topo do conteúdo (não flutua). `rounded-card`, padding 12 × 16, fundo `-soft` do tom, ícone 18 `-ink` (Info, TriangleAlert, CircleAlert, CircleCheck), título 14/600 `-ink` + texto 14 `fg` na mesma linha ou abaixo, ação à direita (botão secundário sm) e fechar só ícone 32 quando dispensável. Sem borda lateral. Tons: info, warn, danger, ok. Exemplo: "3 mensalidades vencem hoje, R$ 7.420,00 no total. Ver cobranças".
+Faixa em linha no topo do conteúdo (não flutua). `rounded-card`, padding 12 × 16, fundo `-soft` do tom, ícone 18 `-ink` (Info, TriangleAlert, CircleAlert, CircleCheck), título 14/600 `-ink` + texto 14 `fg` na mesma linha ou abaixo, ação à direita (botão secundário sm; em largura estreita desce para baixo do texto) e fechar só ícone 32 (44 em toque) quando dispensável. Sem borda lateral. Tons: info, warn, danger, ok. Exemplo: "3 mensalidades vencem hoje, R$ 7.420,00 no total. Ver cobranças".
 
 ### 6.12 Estado vazio (`OverlaySection`)
 
@@ -453,11 +457,11 @@ Altura 40, `rounded-control`, padding x 12, ícone 18 + rótulo 14/500 `fg-2`, g
 
 ### 6.16 Topo (`ShellSection`)
 
-Ver 4.1. Busca: Input md com ícone Search 16, placeholder "Buscar cliente, locação ou equipamento", atalho "Ctrl K" em Badge neutral à direita. Avisos: botão só ícone Bell 20 com ponto 8 `danger` (borda 2 `panel`) no canto superior direito quando há não lidos. Usuário: botão que abre menu (Perfil, Configurações, Sair).
+Ver 4.1. Ordem: título à esquerda, busca ao centro, avisos e usuário à direita. Busca: Input md com ícone Search 16, placeholder "Buscar cliente, locação, equipamento" (cabe inteiro nos 360 px com o atalho), atalho "Ctrl K" em Badge neutral à direita. Avisos: botão só ícone Bell 20 com ponto 8 `danger` (borda 2 `panel`) no canto superior direito quando há não lidos. Usuário: botão que abre menu (Perfil, Configurações, Sair).
 
 ### 6.17 Navegação inferior do celular (`ShellSection`)
 
-Ver 4.2. Itens do app de campo: Hoje, Serviços, Avarias, Perfil. Foco: contorno 2 `ring` afastado −2 no item. Badge numérico 12/600 sobre o ícone (pílula 18, `danger` com texto branco) quando houver pendência.
+Ver 4.2. Itens do app de campo: Hoje, Serviços, Avarias, Perfil. Foco: contorno 2 `ring` afastado −2 no item. Badge numérico 12/600 sobre o ícone (pílula 18, `bg-danger-solid` com texto branco, 5,5:1; `danger` com branco não passa) quando houver pendência.
 
 ### 6.18 Botões grandes do app de campo (`ShellSection`)
 
@@ -467,7 +471,7 @@ Ver 4.2. Itens do app de campo: Hoje, Serviços, Avarias, Perfil. Foco: contorno
 
 ### 6.19 Faixa "Ambiente de demonstração" (`ShellSection`)
 
-Fixa no topo de tudo (z 95), altura 32, largura total, `bg-inverse` `text-on-inverse`, texto 12/600 centralizado: "Ambiente de demonstração. Dados fictícios." + botão texto "Reiniciar dados" 12/600 sublinhado. Empurra a casca 32 px para baixo (não sobrepõe). No celular: 28 px, só "Demonstração · dados fictícios".
+Fixa no topo de tudo (z 95), altura 32, largura total, `bg-inverse` `text-on-inverse`, texto 12/600 centralizado: "Ambiente de demonstração. Dados fictícios." + botão texto "Restaurar dados" 12/600 sublinhado ("restaurar" diz que os dados voltam ao estado de exemplo; "reiniciar" soava como reiniciar o app). Empurra a casca 32 px para baixo (não sobrepõe), publicando a altura em `--demo-strip-h`. No celular: 28 px, só "Demonstração, dados fictícios", sem o botão.
 
 ---
 
@@ -606,6 +610,6 @@ Colunas: branco sobre accent, hover e active; `on-accent-2` sobre accent; `accen
 ## Perguntas em aberto
 
 1. **Neutros tingidos pela marca?** Mantive neutros frios fixos para combinar com qualquer marca. Se o cliente quiser neutros puxados para a cor dele, dá para derivar em `applyBrand` (croma ≤ 0,01).
-2. **Contraste do botão preenchido com o fundo no escuro.** Com Grafite no escuro, accent sobre painel dá 2,37:1. O botão é identificado pelo rótulo (WCAG 1.4.11 não exige), mas pode parecer apagado. Alternativa conservadora: contorno 1 px `edge` no primário quando accent/painel < 3:1.
+2. **Contraste do botão preenchido com o fundo no escuro.** Com Grafite no escuro, accent sobre painel dá 2,37:1. O botão é identificado pelo rótulo (WCAG 1.4.11 não exige), mas pode parecer apagado. O mesmo vale para o trilho do switch ligado (2,37:1 sobre o painel): o estado é lido pela posição do botão branco, que dá 7,7:1 com o trilho e 18:1 com o painel, então passa. Alternativa conservadora, não aplicada: contorno 1 px `edge` no primário e no switch ligado quando accent/painel < 3:1.
 3. **Laranja R8 escurece para `#c65200`.** O laranja original `#ee6a1c` dá 3,2:1 com branco; a derivação escurece até 4,56:1. Se o cliente exigir o tom exato, a alternativa é texto escuro sobre o laranja (mudaria `--on-accent`), o que não está implementado.
 4. **Corpo do escritório em 14 px** (o piso era 13). Densidade de tabela aceita 13 px se o cliente pedir mais linhas por tela.

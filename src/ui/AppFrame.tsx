@@ -31,6 +31,11 @@ export interface OfficeFrameProps {
   onNavOpenChange?: (open: boolean) => void
   /** Usa a janela: altura 100dvh menos `--demo-strip-h`. Sem isso, preenche o pai. */
   viewport?: boolean
+  /**
+   * Quadro de exemplo dentro de outra página (documentação): o conteúdo vira `div` em vez de `main`,
+   * para não duplicar o marco principal da página que o contém.
+   */
+  embedded?: boolean
   className?: string
 }
 
@@ -45,8 +50,10 @@ export function OfficeFrame({
   navOpen = false,
   onNavOpenChange,
   viewport,
+  embedded,
   className,
 }: OfficeFrameProps) {
+  const Main = embedded ? 'div' : 'main'
   const onRailKey = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape' && railOpen) onRailOpenChange?.(false)
   }
@@ -79,9 +86,9 @@ export function OfficeFrame({
 
         <div className="flex min-w-0 flex-1 flex-col gap-[var(--shell-gap)] @max-[1023px]/frame:gap-0">
           {topbar}
-          <main className="min-h-0 flex-1 overflow-y-auto rounded-panel bg-panel p-8 @max-[1279px]/frame:p-6 @max-[1023px]/frame:rounded-none @max-[1023px]/frame:p-4">
+          <Main className="min-h-0 flex-1 overflow-y-auto rounded-panel bg-panel p-8 @max-[1279px]/frame:p-6 @max-[1023px]/frame:rounded-none @max-[1023px]/frame:p-4">
             <div className="mx-auto w-full max-w-[var(--content-max)]">{children}</div>
-          </main>
+          </Main>
         </div>
 
         {rail ? (
@@ -148,10 +155,13 @@ export interface FieldFrameProps {
   /** Conteúdo rolável. Margem lateral 16 já aplicada. */
   children: React.ReactNode
   viewport?: boolean
+  /** Quadro de exemplo dentro de outra página: o título vira `p` em vez de `h1`. */
+  embedded?: boolean
   className?: string
 }
 
-export function FieldFrame({ title, onBack, pending = 0, action, actionBar, nav, children, viewport, className }: FieldFrameProps) {
+export function FieldFrame({ title, onBack, pending = 0, action, actionBar, nav, children, viewport, embedded, className }: FieldFrameProps) {
+  const Title = embedded ? 'p' : 'h1'
   const [scrolled, setScrolled] = React.useState(false)
   return (
     <div
@@ -178,7 +188,7 @@ export function FieldFrame({ title, onBack, pending = 0, action, actionBar, nav,
             <ArrowLeft size={24} strokeWidth={2} aria-hidden />
           </button>
         ) : null}
-        <h1 className={cn('min-w-0 flex-1 truncate text-title-sub', onBack ? '' : 'pl-2')}>{title}</h1>
+        <Title className={cn('min-w-0 flex-1 truncate text-title-sub', onBack ? '' : 'pl-2')}>{title}</Title>
         <SyncIndicator pending={pending} />
         {action}
       </header>

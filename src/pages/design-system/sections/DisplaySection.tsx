@@ -87,7 +87,7 @@ export function CardSection() {
       <Specimen title="Indicador" note="Rótulo 14/600 fg-2, número kpi 28px ou kpi-lg 38px, variação 12/600 com seta. O botão (i) abre a fórmula em tooltip. Sem dados: texto, não zero.">
         <div className="grid grid-cols-1 gap-4 pt-12 md:grid-cols-3">
           <Card>
-            <Stat label="Equipamento parado" value="37 unidades" delta={-0.06} deltaInverted deltaLabel="na semana" formula="Unidades no pátio há mais de 7 dias sem locação." formulaOpen />
+            <Stat label="Equipamento parado" value="37 unidades" delta={-0.06} deltaInverted deltaLabel="na semana" formula="Unidades no pátio há mais de 7 dias sem locação." />
           </Card>
           <Card>
             <Stat label="Mensalidades atrasadas" money value={-12480} delta={0.21} deltaInverted deltaLabel="na semana" />
@@ -159,7 +159,8 @@ export function MoneySection() {
 export function TooltipSection() {
   return (
     <DsSection id="tooltip" title="Tooltip" intro="Fundo bg-inverse, 12/16, até 260px, atraso 300ms. Para explicar, nunca para conteúdo essencial. Em toque, abre no toque do botão (i).">
-      <div className="flex flex-wrap items-start gap-10 pt-16 pb-4 sm:pl-24">
+      {/* no celular um exemplo por linha, para os dois tooltips abertos não se sobreporem */}
+      <div className="flex flex-col items-start gap-16 pt-16 pb-4 sm:flex-row sm:flex-wrap sm:gap-10 sm:pl-24">
         <Tooltip content="Unidades no pátio há mais de 7 dias sem locação." open side="top">
           <Button size="sm">Tooltip simples</Button>
         </Tooltip>
@@ -188,7 +189,7 @@ export function TooltipSection() {
 export function SkeletonSection() {
   return (
     <DsSection id="carregando" title="Carregando" intro="Esqueleto com o tamanho do conteúdo final, nunca spinner no meio do conteúdo. Spinner só dentro de botão.">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2" aria-busy="true" aria-label="Carregando exemplo">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2" role="status" aria-busy="true" aria-label="Carregando exemplo">
         <Card>
           <Skeleton className="h-4 w-32" />
           <Skeleton className="mt-3 h-8 w-48" />

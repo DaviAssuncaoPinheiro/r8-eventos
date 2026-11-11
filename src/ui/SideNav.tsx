@@ -61,7 +61,7 @@ export interface SideNavItemProps {
 }
 
 const itemBase =
-  'relative flex h-10 w-full shrink-0 cursor-pointer items-center overflow-hidden rounded-control text-left text-body font-medium text-fg-2 no-underline select-none ' +
+  'ds-touch relative flex h-10 w-full shrink-0 cursor-pointer items-center overflow-hidden rounded-control text-left text-body font-medium text-fg-2 no-underline select-none ' +
   'transition-[background-color,color,padding] duration-150 ease-[var(--ease-ui)] ' +
   'hover:bg-hover hover:text-fg data-[force=hover]:bg-hover data-[force=hover]:text-fg ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ' +

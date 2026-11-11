@@ -7,7 +7,8 @@ const variants: Record<CardVariant, string> = {
   default: 'bg-raised text-fg',
   sunken: 'bg-sunken text-fg',
   /* um por tela: preenchido com a marca, leve degradê de 160° só no fundo */
-  highlight: 'text-on-accent bg-accent bg-[linear-gradient(160deg,var(--accent)_0%,var(--accent-hover)_100%)]',
+  /* o anel de foco vira on-accent aqui dentro: a tinta do acento some sobre o próprio acento */
+  highlight: 'text-on-accent bg-accent bg-[linear-gradient(160deg,var(--accent)_0%,var(--accent-hover)_100%)] [--ring:var(--on-accent)]',
 }
 
 export interface CardProps extends React.HTMLAttributes<HTMLElement> {

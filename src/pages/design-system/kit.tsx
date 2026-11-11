@@ -30,7 +30,7 @@ export function DsSection({ id, title, intro, children }: { id: string; title: s
       <h2 id={`${id}-t`} className="text-title-section">
         {title}
       </h2>
-      {intro ? <p className="mt-1.5 max-w-[68ch] text-body text-fg-2">{intro}</p> : null}
+      {intro ? <p className="mt-1.5 max-w-[60ch] text-body text-fg-2">{intro}</p> : null}
       <div className="mt-6 flex flex-col gap-8">{children}</div>
     </section>
   )
@@ -41,7 +41,7 @@ export function Specimen({ title, note, children, className }: { title: string; 
   return (
     <div className={cn('min-w-0', className)}>
       <h3 className="text-title-card">{title}</h3>
-      {note ? <p className="mt-0.5 max-w-[68ch] text-caption text-fg-3">{note}</p> : null}
+      {note ? <p className="mt-0.5 max-w-[60ch] text-caption text-fg-3">{note}</p> : null}
       <div className="mt-3">{children}</div>
     </div>
   )

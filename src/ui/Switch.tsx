@@ -23,7 +23,7 @@ export function Switch({ label, description, forceState, className, id, disabled
         disabled={disabled}
         data-force={forceState}
         className={cn(
-          'relative mt-px inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-pill bg-strong p-0.5 transition-colors duration-150 ease-[var(--ease-ui)]',
+          'ds-hit relative mt-px inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-pill bg-strong p-0.5 transition-colors duration-150 ease-[var(--ease-ui)]',
           'hover:bg-fg-3 data-[force=hover]:bg-fg-3 data-[state=checked]:bg-accent data-[state=checked]:hover:bg-accent-hover',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[force=focus]:outline-2 data-[force=focus]:outline-offset-2 data-[force=focus]:outline-ring',
           'disabled:cursor-not-allowed disabled:bg-sunken disabled:shadow-[inset_0_0_0_1px_var(--edge)] disabled:data-[state=checked]:bg-fg-disabled disabled:data-[state=checked]:shadow-none',

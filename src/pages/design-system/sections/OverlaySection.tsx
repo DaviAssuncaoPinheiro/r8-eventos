@@ -62,9 +62,9 @@ const REVIEW_ROWS = [
 
 function ReviewTable() {
   return (
-    <div className="rounded-control bg-sunken">
+    <div className="border-y border-hairline">
       {REVIEW_ROWS.map((r) => (
-        <div key={r.d} className="flex h-12 items-center justify-between gap-4 border-b border-hairline px-4 last:border-b-0">
+        <div key={r.d} className="flex h-12 items-center justify-between gap-4 border-b border-hairline last:border-b-0">
           <span className="min-w-0 truncate text-body">{r.d}</span>
           <Money variant="cell" value={r.v} />
         </div>
@@ -137,7 +137,7 @@ function StepperDemo() {
   return (
     <Card>
       <Stepper steps={STEPS} current={current} onStepClick={setCurrent} />
-      <div className="mt-5 rounded-control bg-sunken p-4">
+      <div className="mt-5 border-t border-hairline pt-5">
         <p className="text-body font-semibold">{STEPS[current].label}</p>
         <p className="mt-1 text-body text-fg-2">Passo {current + 1} de {STEPS.length}. Clique num passo concluído para voltar a ele.</p>
       </div>
@@ -337,7 +337,7 @@ export default function OverlaySection() {
             <Button onClick={() => notify.info('3 mensalidades vencem hoje', { toasterId: TOASTER, description: 'R$ 7.420,00 no total' })}>Mostrar informação</Button>
             <Button onClick={() => notify.success('Avaria excluída', { toasterId: TOASTER, action: { label: 'Desfazer', onClick: () => {} } })}>Mostrar com ação</Button>
           </div>
-          <div className="flex flex-wrap items-start gap-4 rounded-card bg-sunken p-4">
+          <div className="flex flex-wrap items-start gap-4">
             <ToastCard tone="success" message="Cobrança gerada para a Construtora Planalto" />
             <ToastCard tone="error" message="Não foi possível enviar a cobrança" description="Confira o e-mail do cliente e tente de novo." />
             <ToastCard tone="success" message="Avaria excluída" action={{ label: 'Desfazer', onClick: () => {} }} />

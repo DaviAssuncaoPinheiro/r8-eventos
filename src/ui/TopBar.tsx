@@ -33,7 +33,7 @@ export interface TopBarProps {
 }
 
 const iconBtn =
-  'relative inline-flex size-10 shrink-0 items-center justify-center rounded-control text-fg-2 ' +
+  'ds-touch ds-touch-sq relative inline-flex size-10 shrink-0 items-center justify-center rounded-control text-fg-2 ' +
   'transition-[background-color,color] duration-150 ease-[var(--ease-ui)] hover:bg-hover hover:text-fg active:bg-sunken ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
@@ -44,7 +44,7 @@ export function TopBar({
   onBellClick,
   user,
   onUserAction,
-  placeholder = 'Buscar cliente, locação ou equipamento',
+  placeholder = 'Buscar cliente, locação, equipamento',
   onSearchClick,
   onMenuClick,
   compact = false,

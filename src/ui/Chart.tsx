@@ -152,9 +152,9 @@ export function BarSeriesChart({ data, currentKey, valueFormat, axisFormat = for
   return (
     <div>
       {legend ? <ChartLegend items={legend} /> : null}
-      <div style={{ height }}>
+      <div aria-hidden style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }} barCategoryGap={8}>
+          <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }} barCategoryGap={8} accessibilityLayer={false}>
             {hasIdle ? (
               <defs>
                 <pattern id={pid} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(135)">
@@ -222,9 +222,9 @@ export function TrendChart({ data, series, variant = 'line', valueFormat, axisFo
   return (
     <div>
       {series.length > 1 ? <ChartLegend items={series.map((s) => ({ key: s.key, label: s.label, color: s.color }))} active={isolated} onToggle={toggle} /> : null}
-      <div style={{ height }}>
+      <div aria-hidden style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
-          <Chart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+          <Chart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }} accessibilityLayer={false}>
             <CartesianGrid vertical={false} stroke="var(--viz-grid)" strokeWidth={1} />
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} tickMargin={8} minTickGap={16} />
             <YAxis axisLine={false} tickLine={false} tick={axisTick} tickFormatter={axisFormat} ticks={ticks} width={44} domain={[0, ticks[ticks.length - 1]]} />
@@ -296,8 +296,8 @@ export function RatioDonut({ value, label, restLabel = 'Restante', details, size
   ]
   return (
     <div className="flex flex-wrap items-center gap-x-8 gap-y-4" style={{ minHeight: height }}>
-      <div className="relative shrink-0" style={{ width: size, height: size }}>
-        <PieChart width={size} height={size}>
+      <div aria-hidden className="relative shrink-0" style={{ width: size, height: size }}>
+        <PieChart width={size} height={size} accessibilityLayer={false}>
           <RTooltip
             {...tipProps}
             content={(p: TooltipContentProps) => {
@@ -306,7 +306,7 @@ export function RatioDonut({ value, label, restLabel = 'Restante', details, size
               return <TipBox title={d.name} rows={[{ label: 'Proporção', value: formatPercent(d.value), color: d.name === label ? 'var(--accent)' : 'var(--idle)' }]} />
             }}
           />
-          <Pie data={data} dataKey="value" startAngle={90} endAngle={-270} innerRadius={size / 2 - 12} outerRadius={size / 2} stroke="none" isAnimationActive={!reduced} animationDuration={250}>
+          <Pie data={data} dataKey="value" rootTabIndex={-1} startAngle={90} endAngle={-270} innerRadius={size / 2 - 12} outerRadius={size / 2} stroke="none" isAnimationActive={!reduced} animationDuration={250}>
             {data.map((d) => (
               <Cell key={d.name} fill={d.fill} />
             ))}
@@ -403,7 +403,8 @@ export function ChartCard({ title, summary, period, ariaLabel, state = 'ready', 
       ) : null}
       {ready && !showData ? (
         <ChartHeight.Provider value={height}>
-          <div role="img" aria-label={ariaLabel}>
+          {/* group (não img): a legenda clicável fica dentro; o desenho é aria-hidden e o resumo vem do aria-label */}
+          <div role="group" aria-label={ariaLabel}>
             {children}
           </div>
         </ChartHeight.Provider>

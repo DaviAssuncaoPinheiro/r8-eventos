@@ -47,7 +47,7 @@ export interface TimelineProps {
 export function Timeline({ groups, loading, onPhotoOpen, className }: TimelineProps) {
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Carregando registros" className={cn('flex flex-col gap-4', className)}>
+      <div role="status" aria-busy="true" aria-label="Carregando registros" className={cn('flex flex-col gap-4', className)}>
         {[0, 1, 2].map((i) => (
           <div key={i} aria-hidden className="flex gap-3">
             <Skeleton shape="circle" className="size-7" />

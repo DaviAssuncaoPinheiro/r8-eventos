@@ -29,18 +29,21 @@ export function Banner({ tone = 'info', title, children, action, onClose, classN
   return (
     <div role={tone === 'danger' ? 'alert' : 'status'} className={cn('flex items-start gap-3 rounded-card px-4 py-3', t.box, className)}>
       <Icon size={18} strokeWidth={2} aria-hidden className={cn('mt-px shrink-0', t.ink)} />
-      <div className="min-w-0 flex-1 text-body">
-        <span className={cn('font-semibold', t.ink)}>{title}</span>
-        {children ? <span className="text-fg"> {children}</span> : null}
+      {/* texto e ação dividem a linha; em tela estreita a ação desce para baixo do texto */}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2">
+        <p className="min-w-0 flex-[1_1_240px] text-body">
+          <span className={cn('font-semibold', t.ink)}>{title}</span>
+          {children ? <span className="text-fg"> {children}</span> : null}
+        </p>
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
       {onClose ? (
         <button
           type="button"
           onClick={onClose}
           aria-label="Fechar aviso"
           className={cn(
-            'ds-touch -my-1 -mr-1 flex size-8 shrink-0 items-center justify-center rounded-control transition-colors duration-150',
+            'ds-touch ds-touch-sq -my-1 -mr-1 flex size-8 shrink-0 items-center justify-center rounded-control transition-colors duration-150',
             'hover:bg-raised/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
             t.ink,
           )}
