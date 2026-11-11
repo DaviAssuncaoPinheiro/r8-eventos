@@ -51,9 +51,6 @@ export default function Empresa() {
         <Field label="Telefone">
           <Input type="tel" value={draft.phone} onChange={set('phone')} onBlur={() => setDraft((d) => ({ ...d, phone: formatPhone(d.phone) }))} autoComplete="tel" />
         </Field>
-        <Field label="WhatsApp">
-          <Input type="tel" value={draft.whatsapp} onChange={set('whatsapp')} onBlur={() => setDraft((d) => ({ ...d, whatsapp: formatPhone(d.whatsapp) }))} />
-        </Field>
         <Field label="Endereço" className="sm:col-span-2">
           <Input value={draft.address} onChange={set('address')} autoComplete="street-address" />
         </Field>

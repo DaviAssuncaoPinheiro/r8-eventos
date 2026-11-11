@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MessageCircle, Phone } from 'lucide-react'
+import { Mail, Phone } from 'lucide-react'
 import { AppToaster, TooltipProvider, cn } from '@/ui'
 import { applyBrand } from '@/lib/brand'
 import { formatPhone } from '@/lib/format'
@@ -9,7 +9,6 @@ export interface CompanyBrand {
   logoDataUrl?: string
   brandHex: string
   phone: string
-  whatsapp: string
   email: string
 }
 
@@ -20,12 +19,6 @@ export const initialsOf = (name: string) =>
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase())
     .join('')
-
-/** Número de WhatsApp em link wa.me (com 55 na frente quando falta) */
-export function waLink(raw: string) {
-  const d = raw.replace(/\D/g, '')
-  return `https://wa.me/${d.startsWith('55') && d.length > 11 ? d : `55${d}`}`
-}
 
 /** Logo da locadora, ou as iniciais em quadrado na cor da marca */
 export function BrandMark({ company, size = 40, className }: { company: Pick<CompanyBrand, 'name' | 'logoDataUrl'>; size?: number; className?: string }) {
@@ -77,21 +70,21 @@ export function PublicShell({
             {company ? (
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <a
-                  href={waLink(company.whatsapp)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ds-touch inline-flex h-11 items-center gap-2 rounded-pill bg-raised px-5 text-body font-semibold text-fg no-underline transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                >
-                  <MessageCircle size={18} strokeWidth={2} aria-hidden />
-                  WhatsApp {formatPhone(company.whatsapp)}
-                </a>
-                <a
                   href={`tel:+55${company.phone.replace(/\D/g, '')}`}
                   className="ds-touch inline-flex h-11 items-center gap-2 rounded-pill bg-raised px-5 text-body font-semibold text-fg no-underline transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   <Phone size={18} strokeWidth={2} aria-hidden />
                   {formatPhone(company.phone)}
                 </a>
+                {company.email ? (
+                  <a
+                    href={`mailto:${company.email}`}
+                    className="ds-touch inline-flex h-11 items-center gap-2 rounded-pill bg-raised px-5 text-body font-semibold text-fg no-underline transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <Mail size={18} strokeWidth={2} aria-hidden />
+                    {company.email}
+                  </a>
+                ) : null}
               </div>
             ) : null}
             <p className="text-caption text-fg-3">Ambiente de demonstração</p>

@@ -1,4 +1,4 @@
-/* Estado local do app de campo: equipe ativa, modo sem sinal, fila de envio e rascunhos do registro. */
+/* Estado local do app da equipe de rua: equipe ativa, modo sem sinal, fila de envio e rascunhos do registro. */
 import { create } from 'zustand'
 import { useDb } from '@/data/db'
 import type { NewDamageInput, ReportInput } from '@/services'

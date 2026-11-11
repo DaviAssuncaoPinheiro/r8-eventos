@@ -1,7 +1,7 @@
 /* Financeiro: cobranças, extras, envio, baixa, régua de cobrança, Pix e exportação. */
 import { commit, getData, newIds } from '@/data/db'
 import { addDays, demoNowISO, diffDays, monthKey, today as todayFn } from '@/domain/dates'
-import type { Channel, Charge, ChargeKind, ChargeStatus, Client, Damage, DunningStep, ISODate, LegacyChannel, PayMethod, Rental, Service, DbData } from '@/domain/types'
+import type { Channel, Charge, ChargeKind, ChargeStatus, Client, Damage, DunningStep, ISODate, PayMethod, Rental, Service, DbData } from '@/domain/types'
 import { call, ServiceError } from './config'
 import { formatMoney, lookup, mkNotification, normalize } from './common'
 import { nextCode } from './rules'
@@ -184,14 +184,13 @@ export function billExtras(rentalId: string): Promise<Charge> {
   })
 }
 
-/** Canal aceito por compatibilidade: o canal antigo é tratado como e-mail */
-const toChannel = (c: Channel | LegacyChannel): Channel => (c === 'portal' ? 'portal' : 'email')
+/** Só existem e-mail e portal; qualquer valor antigo guardado no navegador vira e-mail */
+const toChannel = (c: string): Channel => (c === 'portal' ? 'portal' : 'email')
 
 /**
  * Envia a cobrança ao cliente (e-mail ou aviso no portal): rascunho vira `aberta` e ganha `sentAt`.
- * `via: 'whatsapp'` ainda é aceito em tempo de execução e tratado como `'email'` (@deprecated, telas antigas).
  */
-export function sendCharge(id: string, opts: { via: Channel | LegacyChannel; method: PayMethod }): Promise<Charge> {
+export function sendCharge(id: string, opts: { via: Channel; method: PayMethod }): Promise<Charge> {
   return call(() => {
     const data = getData()
     const c = data.charges.find((x) => x.id === id)
@@ -226,8 +225,8 @@ export function markPaid(id: string): Promise<Charge> {
   })
 }
 
-/** Registra um lembrete enviado (e-mail por padrão; o canal antigo é tratado como e-mail) */
-export function sendReminder(id: string, channel: Channel | LegacyChannel = 'email'): Promise<Charge> {
+/** Registra um lembrete enviado (e-mail por padrão) */
+export function sendReminder(id: string, channel: Channel = 'email'): Promise<Charge> {
   return call(() => {
     const data = getData()
     const c = data.charges.find((x) => x.id === id)
@@ -369,11 +368,6 @@ export function buildChargeMessage(chargeId: string): Promise<ChargeEmail> {
       payLink,
     }
   })
-}
-
-/** @deprecated Use buildChargeMessage. Devolve só o texto do e-mail; existe para as telas antigas continuarem funcionando. */
-export function buildWhatsAppMessage(chargeId: string): Promise<string> {
-  return buildChargeMessage(chargeId).then((m) => m.body)
 }
 
 /* ───────────────────────── Pix e boleto fictícios (formato plausível) ───────────────────────── */

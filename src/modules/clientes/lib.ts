@@ -31,12 +31,11 @@ export const cnpjOk = (v: string) => digits(v).length === 14
 export const phoneOk = (v: string) => [10, 11].includes(digits(v).length)
 export const emailOk = (v: string) => !v.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
 
-/** Número internacional para os links de WhatsApp e ligação */
+/** Número internacional para o link de ligação */
 export function intlPhone(phone: string): string {
   const d = digits(phone)
   return d.startsWith('55') && d.length > 11 ? d : `55${d}`
 }
-export const waLink = (phone: string) => `https://wa.me/${intlPhone(phone)}`
 export const telLink = (phone: string) => `tel:+${intlPhone(phone)}`
 
 export function initialsOf(name: string): string {

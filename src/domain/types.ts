@@ -31,18 +31,13 @@ export interface Company {
   legalName: string
   cnpj: string
   phone: string
-  /** @deprecated O WhatsApp saiu do produto: o contato é o `phone`. Fica sempre vazio; só existe para as telas antigas continuarem compilando até serem atualizadas. */
-  whatsapp: string
   email: string
   address: string
   city: string
 }
 
 /** 'email' = envio de e-mails de cobrança e avisos ao cliente */
-export type IntegrationKey = 'email' | 'pix' | 'boleto' | 'nfse' | 'contaAzul' | LegacyIntegrationKey
-
-/** @deprecated Integração retirada do produto; só para as telas antigas compilarem. Nunca existe em `settings.integrations`. */
-export type LegacyIntegrationKey = 'whatsapp'
+export type IntegrationKey = 'email' | 'pix' | 'boleto' | 'nfse' | 'contaAzul'
 
 export interface Integration {
   connected: boolean
@@ -54,8 +49,7 @@ export interface Integration {
 export interface DunningStep {
   id: string
   dayOffset: number
-  /** 'whatsapp' só é aceito por compatibilidade com as telas antigas (vira 'email' ao salvar a régua) */
-  channel: Channel | LegacyChannel
+  channel: Channel
   enabled: boolean
   template: string
 }
@@ -69,7 +63,6 @@ export interface Settings {
   segmentId: SegmentId
   aiEnabled: boolean
   users: User[]
-  /** a chave legada nunca existe em tempo de execução (ver LegacyIntegrationKey); leia sempre com `?.` */
   integrations: Record<IntegrationKey, Integration>
   dunning: DunningStep[]
   currentUserId: string
@@ -287,9 +280,6 @@ export type ChargeStatus = 'rascunho' | 'aberta' | 'paga' | 'atrasada' | 'cancel
 export type PayMethod = 'pix' | 'boleto'
 /** Canal de envio ao cliente: e-mail ou mensagem no portal do cliente */
 export type Channel = 'email' | 'portal'
-
-/** @deprecated Canal retirado do produto; só para as telas antigas compilarem (tratado como 'email'). */
-export type LegacyChannel = 'whatsapp'
 
 export interface Charge {
   id: string

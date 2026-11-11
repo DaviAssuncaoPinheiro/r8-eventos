@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useLabels, type ServiceDetail } from '@/services'
-import { Button, useCountUp } from '@/ui'
+import { Button } from '@/ui'
+import { RollingNumber, Stagger } from '@/ui/Motion'
 import { FieldActionBar } from '@/ui/FieldAction'
 import { useCampoDay } from '../lib'
 import { CheckMark } from './CheckMark'
@@ -40,21 +41,21 @@ export function Done({ service, summary }: { service: ServiceDetail; summary: Su
         <CheckMark size={128} label="Serviço concluído" className="text-ok" />
         <h2 className="mt-6 text-title-field">Serviço concluído</h2>
       </div>
-      <dl className="mt-8 grid grid-cols-3 gap-3">
+      <Stagger as="div" delay={0.5} className="mt-8 grid grid-cols-3 gap-3">
         {nums.map((x) => (
           <Big key={x.label} n={x.n} label={x.label} />
         ))}
-      </dl>
+      </Stagger>
     </CampoScreen>
   )
 }
 
 function Big({ n, label }: { n: number; label: string }) {
-  const v = Math.round(useCountUp(n))
   return (
-    <div className="flex min-h-36 flex-col-reverse justify-between rounded-card bg-raised p-4">
+    <dl className="m-0 flex min-h-36 flex-col-reverse justify-between rounded-card bg-raised p-4">
       <dt className="text-body font-semibold text-fg-2">{label}</dt>
-      <dd className="tnum text-[56px] leading-[56px] font-semibold tracking-[-0.03em] text-fg">{v}</dd>
-    </div>
+      <dd className="tnum text-[56px] leading-[56px] font-semibold tracking-[-0.03em] text-fg"><RollingNumber value={n} />
+      </dd>
+    </dl>
   )
 }

@@ -86,7 +86,6 @@ export function buildSettings(rng: Rng, today: ISODate): Settings {
       legalName: 'Cerrado Locações de Equipamentos Ltda',
       cnpj: cnpj(rng),
       phone: '(61) 3399-4410',
-      whatsapp: '',
       email: 'contato@cerradolocacoes.com.br',
       address: 'SIA Trecho 3, lote 140',
       city: 'Brasília · DF',

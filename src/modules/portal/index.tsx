@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { Boxes, CalendarClock, Link2Off, Plus } from 'lucide-react'
-import { Badge, Banner, Button, EmptyState, Skeleton, StatusDot, cn, notify, useCountUp } from '@/ui'
-import { Money } from '@/ui'
+import { Badge, Banner, Button, EmptyState, Skeleton, StatusDot, cn, notify } from '@/ui'
+import { RollingMoney, RollingNumber, Stagger, Tilt } from '@/ui/Motion'
 import { RENTAL_STATUS } from '@/app/status'
 import { formatDate } from '@/lib/format'
 import { MONTHS_LONG, monthKey, today } from '@/domain/dates'
@@ -21,29 +21,28 @@ function Hero({ data, cleaningsLabel }: { data: PortalData; cleaningsLabel: stri
   const units = new Set(data.activeRentals.flatMap((r) => r.units.map((u) => u.id))).size
   const cleanings = data.monthlyReport.cleanings.length
   const open = data.invoices.filter((i) => i.status === 'aberta' || i.status === 'atrasada').reduce((a, i) => a + i.value, 0)
-  const nUnits = Math.round(useCountUp(units))
-  const nCleanings = Math.round(useCountUp(cleanings))
-  const nOpen = useCountUp(open)
   return (
+    <Tilt>
     <section aria-label="Resumo" className="ds-hero ds-hero-card rounded-card p-5 sm:p-7">
       <h1 className="text-title-section sm:text-title-field">Olá, {data.client.name}</h1>
       <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">
         <div>
-          <dd className="tnum text-kpi sm:text-kpi-lg">{nUnits}</dd>
+          <dd className="tnum text-kpi sm:text-kpi-lg"><RollingNumber value={units} /></dd>
           <dt className="mt-1 text-body text-on-accent-2">Equipamentos no local</dt>
         </div>
         <div>
-          <dd className="tnum text-kpi sm:text-kpi-lg">{nCleanings}</dd>
+          <dd className="tnum text-kpi sm:text-kpi-lg"><RollingNumber value={cleanings} /></dd>
           <dt className="mt-1 text-body text-on-accent-2">{cap(cleaningsLabel)} no mês</dt>
         </div>
         <div className="col-span-2 sm:col-span-1">
           <dd className="text-kpi sm:text-kpi-lg">
-            <Money value={nOpen} variant="kpi" />
+            <RollingMoney value={open} kpi />
           </dd>
           <dt className="mt-1 text-body text-on-accent-2">Fatura em aberto</dt>
         </div>
       </dl>
     </section>
+    </Tilt>
   )
 }
 
@@ -131,6 +130,8 @@ export default function Portal() {
   const data = q.data
   const [pickedMonth, setMonth] = React.useState<string | undefined>()
   const [reporting, setReporting] = React.useState(false)
+  const [params] = useSearchParams()
+  const focusInvoice = params.get('fatura') ?? undefined
 
   const months = React.useMemo(() => (data ? receiptMonths(data.receipts) : []), [data])
   const month = pickedMonth && months.includes(pickedMonth) ? pickedMonth : (months[0] ?? monthKey(today()))
@@ -170,7 +171,7 @@ export default function Portal() {
       ) : !data ? (
         <LoadingState />
       ) : (
-        <div className="flex flex-col gap-10">
+        <Stagger className="flex flex-col gap-10">
           <Hero data={data} cleaningsLabel={l.cleaningPlural} />
 
           <section aria-labelledby="equipamentos">
@@ -192,8 +193,8 @@ export default function Portal() {
 
           <ReceiptsSection receipts={data.receipts} month={month} onMonth={setMonth} monthName={monthName} onReport={report} reporting={reporting} />
 
-          <InvoicesSection token={token} invoices={data.invoices} />
-        </div>
+          <InvoicesSection token={token} invoices={data.invoices} focusId={focusInvoice} />
+        </Stagger>
       )}
     </PublicShell>
   )

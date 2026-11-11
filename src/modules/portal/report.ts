@@ -138,7 +138,7 @@ export function buildReportHtml(company: CompanyBrand, report: MonthlyClientRepo
   <h2>Faturas</h2>
   ${invoices}
   <div class="totals"><span>Faturado ${esc(formatMoney(t.invoiced))}</span><span>Pago ${esc(formatMoney(t.paid))}</span><span>Em aberto ${esc(formatMoney(t.open))}</span></div>
-  <footer><span>${esc(company.name)}${company.whatsapp ? ' · WhatsApp ' + esc(formatPhone(company.whatsapp)) : ''}${company.email ? ' · ' + esc(company.email) : ''}</span><span>Ambiente de demonstração</span></footer>
+  <footer><span>${esc(company.name)}${company.phone ? ' · ' + esc(formatPhone(company.phone)) : ''}${company.email ? ' · ' + esc(company.email) : ''}</span><span>Ambiente de demonstração</span></footer>
 </body></html>`
 }
 

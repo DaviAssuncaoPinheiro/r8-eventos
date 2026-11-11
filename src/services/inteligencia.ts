@@ -1,5 +1,5 @@
 /*
-  Inteligência: previsão de caixa, lucro por equipamento, preço sugerido, risco de calote, previsão de demanda,
+  Inteligência: previsão de caixa, lucro por equipamento, preço sugerido, previsão de demanda,
   dinheiro recuperado e a calculadora de perdas da venda. TUDO sai dos dados (somas reais); as premissas estão
   nas constantes e nos comentários de cada regra.
   As funções `calc*` são puras (recebem o estado) e servem para teste.
@@ -402,93 +402,6 @@ export function getAssetProfitability(): Promise<AssetProfitability> {
   return call(() => calcAssetProfitability(getData()))
 }
 
-/* ═════════════════════════ Risco de calote ═════════════════════════ */
-
-export type RiskTier = 'baixo' | 'medio' | 'alto'
-
-export interface ClientRisk {
-  client: { id: string; name: string; kind: string }
-  /** 0 a 100 (quanto maior, pior) */
-  score: number
-  tier: RiskTier
-  /** média de dias de atraso das cobranças que atrasaram (pagas com atraso ou vencidas em aberto) */
-  avgDaysLate: number
-  /** cobranças com mais de 3 dias de atraso (pagas ou ainda em aberto) */
-  lateCount: number
-  /** total em aberto (a vencer e vencido) */
-  openValue: number
-  overdueValue: number
-  suggestion: string
-}
-
-export interface ClientRiskReport {
-  clients: ClientRisk[]
-  summary: { exposureHigh: number; clientsHigh: number }
-}
-
-/** Janela das cobranças consideradas (dias desde a emissão) */
-export const RISK_WINDOW_DAYS = 180
-
-/*
-  Score (0 a 100) por cliente, somando quatro partes:
-    idade da pior cobrança vencida em aberto  até 45 pontos (45 dias ou mais)
-    média de dias de atraso                   até 20 pontos (10 dias ou mais)
-    proporção de cobranças com atraso > 3 dias até 20 pontos
-    valor vencido em aberto                   até 15 pontos (R$ 3.000 ou mais)
-  Faixas: alto >= 60, médio de 30 a 59, baixo < 30.
-*/
-export function riskTier(score: number): RiskTier {
-  return score >= 60 ? 'alto' : score >= 30 ? 'medio' : 'baixo'
-}
-
-export function calcClientRisk(data: DbData, today: ISODate = todayFn()): ClientRiskReport {
-  const from = addDays(today, -RISK_WINDOW_DAYS)
-  const rows: ClientRisk[] = []
-  for (const c of data.clients) {
-    const list = data.charges.filter((x) => x.clientId === c.id && x.status !== 'rascunho' && x.status !== 'cancelada' && x.issuedAt >= from)
-    if (!list.length) continue
-    const late: number[] = []
-    let maxOverdue = 0
-    let openValue = 0
-    let overdueValue = 0
-    let counted = 0
-    for (const x of list) {
-      const isOpen = x.status === 'aberta' || x.status === 'atrasada'
-      if (isOpen) openValue += x.value
-      if (isOpen && x.dueAt < today) {
-        const d = diffDays(x.dueAt, today)
-        late.push(d)
-        overdueValue += x.value
-        maxOverdue = Math.max(maxOverdue, d)
-        counted++
-      } else if (x.status === 'paga' && x.paidAt) {
-        counted++
-        const d = Math.max(0, diffDays(x.dueAt, x.paidAt))
-        if (d > 0) late.push(d)
-      }
-    }
-    const avgDaysLate = late.length ? r1(late.reduce((a, b) => a + b, 0) / late.length) : 0
-    const lateCount = late.filter((d) => d > 3).length
-    const score = Math.round(Math.min(1, maxOverdue / 45) * 45 + Math.min(1, avgDaysLate / 10) * 20 + (counted ? (lateCount / counted) * 20 : 0) + Math.min(1, overdueValue / 3000) * 15)
-    const tier = riskTier(score)
-    const suggestion =
-      tier === 'alto'
-        ? `Exigir pagamento antecipado nas próximas locações${overdueValue > 0 ? ` e cobrar os ${formatMoney(r2(overdueValue))} vencidos` : ''}.`
-        : tier === 'medio'
-          ? 'Enviar lembrete 3 dias antes do vencimento e acompanhar de perto.'
-          : 'Manter as condições atuais.'
-    rows.push({ client: { id: c.id, name: c.name, kind: c.kind }, score, tier, avgDaysLate, lateCount, openValue: r2(openValue), overdueValue: r2(overdueValue), suggestion })
-  }
-  rows.sort((a, b) => b.score - a.score || b.overdueValue - a.overdueValue || a.client.name.localeCompare(b.client.name))
-  const high = rows.filter((r) => r.tier === 'alto')
-  return { clients: rows, summary: { exposureHigh: r2(high.reduce((a, r) => a + r.openValue, 0)), clientsHigh: high.length } }
-}
-
-/** Risco por cliente com cobrança nos últimos 6 meses (mais arriscados primeiro) e o resumo da exposição alta */
-export function getClientRisk(): Promise<ClientRiskReport> {
-  return call(() => calcClientRisk(getData()))
-}
-
 /* ═════════════════════════ Previsão de caixa ═════════════════════════ */
 
 export interface CashWeek {
@@ -497,8 +410,6 @@ export interface CashWeek {
   label: string
   /** cobranças em aberto que vencem na semana (as já vencidas entram na primeira) */
   expected: number
-  /** parte do esperado (cobranças e mensalidades futuras) de clientes de risco alto */
-  atRisk: number
   /** mensalidades futuras das locações em campo e confirmadas, ainda não emitidas (emissão 2 dias antes do ciclo, vence em 15) */
   recurring: number
 }
@@ -507,7 +418,6 @@ export interface CashTotal {
   days: number
   expected: number
   recurring: number
-  atRisk: number
   /** expected + recurring */
   total: number
 }
@@ -543,7 +453,6 @@ function cashEvents(data: DbData, today: ISODate): CashEvent[] {
 
 export function calcCashForecast(data: DbData, weeks: number, today: ISODate = todayFn()): CashForecast {
   const events = cashEvents(data, today)
-  const high = new Set(calcClientRisk(data, today).clients.filter((c) => c.tier === 'alto').map((c) => c.client.id))
   const sum = (es: CashEvent[], k?: CashEvent['kind']) => r2(es.filter((e) => !k || e.kind === k).reduce((a, e) => a + e.value, 0))
   const rows: CashWeek[] = Array.from({ length: weeks }, (_, i) => {
     const start = addDays(today, i * 7)
@@ -553,7 +462,6 @@ export function calcCashForecast(data: DbData, weeks: number, today: ISODate = t
       weekStart: start,
       label: `${start.slice(8, 10)}/${start.slice(5, 7)}`,
       expected: sum(es, 'expected'),
-      atRisk: sum(es.filter((e) => high.has(e.clientId))),
       recurring: sum(es, 'recurring'),
     }
   })
@@ -561,12 +469,12 @@ export function calcCashForecast(data: DbData, weeks: number, today: ISODate = t
     const es = events.filter((e) => e.day <= addDays(today, days - 1))
     const expected = sum(es, 'expected')
     const recurring = sum(es, 'recurring')
-    return { days, expected, recurring, atRisk: sum(es.filter((e) => high.has(e.clientId))), total: r2(expected + recurring) }
+    return { days, expected, recurring, total: r2(expected + recurring) }
   }
   return { weeks: rows, totals: { d30: tot(30), d60: tot(60), d90: tot(90) } }
 }
 
-/** Caixa previsto por semana (esperado, em risco, mensalidades futuras) e totais de 30, 60 e 90 dias */
+/** Caixa previsto por semana (esperado e mensalidades futuras) e totais de 30, 60 e 90 dias */
 export function getCashForecast(weeks = 12): Promise<CashForecast> {
   return call(() => calcCashForecast(getData(), weeks))
 }
@@ -585,19 +493,17 @@ export interface IntelligenceSummary {
   recoveredMonth: number
   /** ganho mensal possível se todos os preços sugeridos forem aplicados */
   priceGainMonthly: number
-  /** total em aberto de clientes de risco alto */
-  riskExposure: number
-  clientsHigh: number
+  /** tipo com a maior falta de estoque no pico dos próximos 30 dias (null se o estoque dá conta) */
+  stockout: { typeId: string; typeName: string; missingUnits: number; peakDay: ISODate } | null
 }
 
 export function calcIntelligenceSummary(data: DbData, today: ISODate = todayFn()): IntelligenceSummary {
-  const risk = calcClientRisk(data, today).summary
+  const worst = calcDemandForecast(data, 30, today).types.filter((t) => t.missingUnits > 0).sort((a, b) => b.missingUnits - a.missingUnits || b.stockoutDays - a.stockoutDays)[0]
   return {
     cashForecast30: calcCashForecast(data, 1, today).totals.d30.total,
     recoveredMonth: computeRecoveredMoney(data, monthKey(today), today).total,
     priceGainMonthly: r2(calcPriceSuggestions(data, today).reduce((a, s) => a + s.monthlyGain, 0)),
-    riskExposure: risk.exposureHigh,
-    clientsHigh: risk.clientsHigh,
+    stockout: worst ? { typeId: worst.type.id, typeName: worst.type.name, missingUnits: worst.missingUnits, peakDay: worst.peakDay } : null,
   }
 }
 

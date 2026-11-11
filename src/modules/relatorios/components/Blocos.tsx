@@ -13,7 +13,8 @@ import {
   type RevenueByEquipmentRow,
   type TeamPerformanceRow,
 } from '@/services'
-import { Badge, Banner, Button, ChartCard, Money, TrendChart, cn, useCountUp } from '@/ui'
+import { Badge, Banner, Button, ChartCard, TrendChart, cn } from '@/ui'
+import { RollingMoney, RollingNumber } from '@/ui/Motion'
 import { formatDate, formatMoney, formatPercent } from '@/lib/format'
 import { HBars } from '@/modules/clientes/components/HBars'
 import { dayLabel } from '../lib'
@@ -38,11 +39,9 @@ const pct1 = (n: number) => formatPercent(n / 100)
 /* ───────────────────────── 1. ocupação ───────────────────────── */
 
 function BigPct({ value }: { value: number }) {
-  const n = useCountUp(value)
   return (
     <p className="tnum text-kpi-lg">
-      <span className="sr-only">{pct1(value)}</span>
-      <span aria-hidden>{pct1(Math.round(n * 10) / 10)}</span>
+      <RollingNumber value={Math.round(value * 10) / 10} suffix="%" decimals={1} />
     </p>
   )
 }
@@ -123,7 +122,7 @@ export function ReceitaClientes({ range, onData }: { range: DateRange; onData?: 
       {d ? (
         <>
           <p className="text-kpi">
-            <Money value={d.total} variant="kpi" />
+            <RollingMoney value={d.total} kpi />
           </p>
           <HBars
             className="mt-4"

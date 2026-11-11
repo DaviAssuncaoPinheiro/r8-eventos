@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Check, CheckCheck, Trash2 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { getService, listTypes, startService, useQuery, useSegment, type ServiceDetail } from '@/services'
@@ -8,11 +9,12 @@ import { FieldActionBar } from '@/ui/FieldAction'
 import { SignaturePad } from '@/ui/SignaturePad'
 import { Stepper } from '@/ui/Stepper'
 import { notify } from '@/ui/Toast'
+import { celebrate, reduced } from '@/ui/Motion'
 import { AddDamageButton, DamageFields, parseValue } from './components/DamageForm'
 import { PhotoPicker } from './components/Photos'
 import { CampoScreen, LoadFailed } from './components/Screen'
 import { Done, type Summary } from './components/Done'
-import { newId, suggestDamageValue, useBack } from './lib'
+import { newId, suggestDamageValue, useBack, useCampoDay } from './lib'
 import { submitCompletion, type LocalDamage } from './sync'
 import { useCampo, type Draft, type DraftDamage, type DraftPhoto } from './store'
 
@@ -80,6 +82,13 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
   const d = stored ?? base()
   const patch = (p: Partial<Draft>) => patchDraft(s.id, base, p)
   const [saving, setSaving] = React.useState(false)
+  const { open: openToday } = useCampoDay()
+  const lastOfDay = openToday.length === 1 && openToday[0].id === s.id
+  const prevStep = React.useRef(d.step)
+  const dir = d.step >= prevStep.current ? 1 : -1
+  React.useEffect(() => {
+    prevStep.current = d.step
+  }, [d.step])
 
   /* abrir o registro é começar o serviço */
   const started = React.useRef(false)
@@ -138,7 +147,8 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
 
   const go = (n: number) => patch({ step: n })
 
-  const conclude = async () => {
+  const conclude = async (origin: HTMLElement) => {
+    const box = origin.getBoundingClientRect()
     let damages = d.damages
     if (d.hasDamage && formValid) damages = addDamage()
     if (d.hasDamage === false) damages = []
@@ -161,6 +171,7 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
         `${s.typeLabel}, ${s.clientName}`,
       )
       clearDraft(s.id)
+      if (lastOfDay) celebrate({ x: box.left + box.width / 2, y: box.top + box.height / 2 })
       onDone({ items: checkedCount, photos: d.photos.length, damages: damages.length, queued: res === 'fila' })
     } catch (e) {
       notify.error(e instanceof Error && e.message ? e.message : 'Não foi possível concluir. Tente de novo.')
@@ -179,8 +190,8 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
         icon={last ? CheckCheck : undefined}
         disabled={!canNext}
         loading={saving}
-        onClick={() => {
-          if (last) void conclude()
+        onClick={(e) => {
+          if (last) void conclude(e.currentTarget)
           else {
             if (step === 2 && d.hasDamage && formValid) addDamage()
             go(step + 1)
@@ -196,7 +207,16 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
     <CampoScreen title={s.typeLabel} onBack={step > 0 ? () => go(step - 1) : back} actionBar={bar} nav={false}>
       <Stepper variant="field" steps={STEPS} current={step} title={TITLES[step]} />
 
-      <div className="mt-5">
+      <div className="mt-5 overflow-x-clip">
+        <AnimatePresence mode="wait" initial={false} custom={dir}>
+        <motion.div
+          key={step}
+          custom={dir}
+          initial={reduced() ? false : { x: dir * 48, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={reduced() ? undefined : { x: dir * -48, opacity: 0, transition: { duration: 0.12 } }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        >
         {step === 0 ? (
           <div>
             <div className="mb-3 flex items-center justify-between gap-3">
@@ -335,6 +355,8 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
             <SignatureBlock signature={d.signature} onChange={(v) => patch({ signature: v })} />
           </div>
         ) : null}
+        </motion.div>
+        </AnimatePresence>
       </div>
     </CampoScreen>
   )

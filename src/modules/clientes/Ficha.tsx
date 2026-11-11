@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { Check, ClipboardList, Copy, ExternalLink, Info, Link2, MessageCircle, PenLine, Phone, Plus, ReceiptText, ShieldCheck, Users } from 'lucide-react'
+import { Check, ClipboardList, Copy, ExternalLink, Info, Link2, Mail, PenLine, Phone, Plus, ReceiptText, ShieldCheck, Users } from 'lucide-react'
 import { getClient, getPortalLink, useQuery, type ChargeView, type ClientDetail, type RentalListItem, type ServiceReceipt } from '@/services'
-import { Badge, Banner, Button, Card, EmptyState, Money, PhotoGrid, Segmented, Skeleton, StatusDot, Tooltip, cn, notify, useCountUp } from '@/ui'
+import { Badge, Banner, Button, Card, EmptyState, Money, PhotoGrid, Segmented, Skeleton, StatusDot, Tooltip, cn, notify } from '@/ui'
+import { RollingMoney, RollingNumber, Stagger } from '@/ui/Motion'
 import { PageHeader } from '@/app/PageHeader'
 import { CHARGE_STATUS, RENTAL_STATUS, SERVICE_ICON, TONE_SOFT } from '@/app/status'
 import { formatDate, formatDateTime, formatPhone } from '@/lib/format'
 import { Avatar } from './components/Avatar'
 import { ClientDrawer } from './components/ClientDrawer'
 import { LinkButton } from './components/LinkButton'
-import { telLink, waLink } from './lib'
+import { telLink } from './lib'
 
 type Aba = 'locacoes' | 'pagamentos' | 'comprovantes' | 'contatos'
 const ABAS: Aba[] = ['locacoes', 'pagamentos', 'comprovantes', 'contatos']
@@ -18,7 +19,6 @@ const ABAS: Aba[] = ['locacoes', 'pagamentos', 'comprovantes', 'contatos']
 /* ───────────────────────── números ───────────────────────── */
 
 function Num({ label, formula, value, money, danger }: { label: string; formula: string; value: number; money?: boolean; danger?: boolean }) {
-  const n = useCountUp(value)
   return (
     <div className="flex min-w-0 flex-col gap-1">
       <div className="flex min-h-6 items-center gap-1">
@@ -34,7 +34,7 @@ function Num({ label, formula, value, money, danger }: { label: string; formula:
         </Tooltip>
       </div>
       <div className={cn('text-kpi', danger ? 'text-danger-ink' : 'text-fg')}>
-        {money ? <Money value={Math.round(n * 100) / 100} variant="kpi" className={danger ? 'text-danger-ink' : undefined} /> : <span className="tnum">{Math.round(n)}</span>}
+        {money ? <RollingMoney value={value} kpi /> : <RollingNumber value={value} className="tnum" />}
       </div>
     </div>
   )
@@ -54,7 +54,7 @@ function Numbers({ d }: { d: ClientDetail }) {
         <Num money danger={c.overdue > 0} label="Atrasado" value={c.overdue} formula="Cobranças vencidas e ainda não pagas." />
       </div>
       <div className="min-w-0 border-t border-l border-hairline px-4 py-4 lg:border-t-0 lg:px-6 lg:py-5">
-        <Num label="Locações ativas" value={c.activeRentals} formula="Locações com equipamentos em campo agora." />
+        <Num label="Locações ativas" value={c.activeRentals} formula="Locações com equipamentos no cliente agora." />
       </div>
     </div>
   )
@@ -286,7 +286,7 @@ function Contatos({ d, editar }: { d: ClientDetail; editar: () => void }) {
       </Card>
     )
   return (
-    <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 @min-[700px]/frame:grid-cols-2 @min-[1100px]/frame:grid-cols-3">
+    <Stagger role="list" aria-label="Contatos" className="m-0 grid list-none grid-cols-1 gap-4 p-0 @min-[700px]/frame:grid-cols-2 @min-[1100px]/frame:grid-cols-3">
       {d.contacts.map((c, i) => (
         <li key={`${c.name}-${i}`} className="flex min-w-0 flex-col gap-4 rounded-card bg-raised p-5">
           <div className="flex min-w-0 items-center gap-3.5">
@@ -298,16 +298,18 @@ function Contatos({ d, editar }: { d: ClientDetail; editar: () => void }) {
           </div>
           <p className="tnum text-body-lg font-semibold">{formatPhone(c.phone)}</p>
           <div className="flex flex-wrap gap-2">
-            <LinkButton href={waLink(c.phone)} target="_blank" rel="noopener noreferrer" icon={MessageCircle} aria-label={`WhatsApp para ${c.name}`}>
-              WhatsApp
-            </LinkButton>
             <LinkButton href={telLink(c.phone)} icon={Phone} aria-label={`Ligar para ${c.name}`}>
               Ligar
             </LinkButton>
+            {c.email ? (
+              <LinkButton href={`mailto:${c.email}`} icon={Mail} aria-label={`Enviar e-mail para ${c.name}`}>
+                E-mail
+              </LinkButton>
+            ) : null}
           </div>
         </li>
       ))}
-    </ul>
+    </Stagger>
   )
 }
 
@@ -369,6 +371,7 @@ export default function Ficha() {
         }
       />
 
+      <Stagger>
       <Numbers d={d} />
       <div className="mt-4">
         <PortalCard link={portal.data} loading={portal.initialLoading} />
@@ -394,6 +397,7 @@ export default function Ficha() {
         {aba === 'comprovantes' ? <Comprovantes receipts={d.receipts} /> : null}
         {aba === 'contatos' ? <Contatos d={d} editar={() => setEditando(true)} /> : null}
       </div>
+      </Stagger>
 
       <ClientDrawer open={editando} onOpenChange={setEditando} client={d.client} />
     </>

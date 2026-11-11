@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { Download, FileText, Send } from 'lucide-react'
+import { Download, FileText, Link2, Send } from 'lucide-react'
 import { addMonths, monthKey, monthLabelLong, today } from '@/domain/dates'
 import { getMonthlyClientReport, getPortalLink, getSettings, listClients, useLabels, useQuery, type MonthlyClientReport } from '@/services'
-import { Banner, Button, Drawer, EmptyState, Field, Select, Skeleton, WhatsAppPreview, notify } from '@/ui'
+import { Banner, Button, Drawer, EmptyState, Field, EmailPreview, Select, Skeleton, notify } from '@/ui'
 import { formatMoney } from '@/lib/format'
 import { capitalize } from '../lib'
+import { Reveal } from '@/ui/Motion'
 import { Documento } from './Documento'
 import { brandColors, buildReportHtml, printHtml } from '../print'
 
@@ -16,18 +17,21 @@ function monthOptions() {
   })
 }
 
-export function whatsAppText(report: MonthlyClientReport, companyName: string, contactName: string, cleaningPlural: string, link: string) {
+export function emailText(report: MonthlyClientReport, companyName: string, contactName: string, cleaningPlural: string, link: string) {
   const t = report.totals
   const first = contactName.split(' ')[0]
   return [
-    `Olá, ${first}! Aqui é da ${companyName}.`,
+    `Olá, ${first},`,
     '',
-    `*Relatório de ${report.label}* da ${report.client.name}:`,
-    `• ${t.servicesDone} serviços feitos, ${report.cleanings.length} de ${cleaningPlural}`,
-    `• ${t.photos} fotos e ${t.signed} assinaturas`,
-    `• Faturado no mês: ${formatMoney(t.invoiced)}`,
+    `Segue o resumo de ${report.label} da ${report.client.name}:`,
+    `- ${t.servicesDone} serviços feitos, ${report.cleanings.length} de ${cleaningPlural}`,
+    `- ${t.photos} fotos e ${t.signed} assinaturas`,
+    `- Faturado no mês: ${formatMoney(t.invoiced)}`,
     '',
-    `Veja tudo, com as fotos, no seu portal: ${link}`,
+    `Veja tudo, com as fotos, no portal do cliente: ${link}`,
+    '',
+    'Atenciosamente,',
+    companyName,
   ].join('\n')
 }
 
@@ -41,13 +45,23 @@ function SendDrawer({ open, onOpenChange, report }: { open: boolean; onOpenChang
   const contact = contacts[idx] ?? contacts[0]
   const companyName = settings.data?.company.name ?? ''
   const ready = !!settings.data && !!link.data
-  const message = contact && ready ? whatsAppText(report, companyName, contact.name, l.cleaningPlural, link.data!) : ''
+  const message = contact && ready ? emailText(report, companyName, contact.name, l.cleaningPlural, link.data!) : ''
+
+  const copyLink = async () => {
+    if (!link.data) return
+    try {
+      await navigator.clipboard.writeText(link.data)
+      notify.success('Link do portal copiado')
+    } catch {
+      notify.error('Não foi possível copiar. Tente de novo.')
+    }
+  }
 
   const send = async () => {
     if (!contact) return
     setSending(true)
     try {
-      // envio simulado: a demonstração não chama o WhatsApp de verdade
+      // envio simulado: a demonstração não dispara e-mail de verdade
       await new Promise((res) => window.setTimeout(res, 700))
       notify.success(`Relatório enviado para ${contact.name}`)
       onOpenChange(false)
@@ -62,14 +76,14 @@ function SendDrawer({ open, onOpenChange, report }: { open: boolean; onOpenChang
     <Drawer
       open={open}
       onOpenChange={onOpenChange}
-      title="Enviar por WhatsApp"
+      title="Enviar por e-mail"
       footer={
         <>
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancelar
+          <Button variant="secondary" icon={Link2} disabled={!ready} onClick={copyLink}>
+            Copiar link do portal
           </Button>
           <Button variant="primary" icon={Send} loading={sending} disabled={!contact || !ready} onClick={send}>
-            Enviar por WhatsApp
+            Enviar por e-mail
           </Button>
         </>
       }
@@ -90,14 +104,14 @@ function SendDrawer({ open, onOpenChange, report }: { open: boolean; onOpenChang
               ))}
             </Select>
           </Field>
-          {ready ? <WhatsAppPreview from={companyName} message={message} /> : <Skeleton shape="block" className="h-56" />}
+          {ready ? <EmailPreview from={companyName} to={contact.email || contact.name} subject={`Relatório de ${report.label}: ${report.client.name}`} body={message} cta="Abrir no portal do cliente" /> : <Skeleton shape="block" className="h-56" />}
         </div>
       )}
     </Drawer>
   )
 }
 
-/** Escolha de cliente e mês, prévia do documento e as duas saídas: PDF e WhatsApp. */
+/** Escolha de cliente e mês, prévia do documento e as duas saídas: PDF e e-mail. */
 export function Mensal({ onReport }: { onReport?: (r: MonthlyClientReport | undefined) => void }) {
   const l = useLabels()
   const clients = useQuery(() => listClients(), [])
@@ -133,7 +147,8 @@ export function Mensal({ onReport }: { onReport?: (r: MonthlyClientReport | unde
   }
 
   return (
-    <section aria-label="Relatório mensal do cliente" className="mt-8">
+    <Reveal className="mt-8">
+    <section aria-label="Relatório mensal do cliente">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <h2 className="text-title-section">Relatório mensal do cliente</h2>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -141,7 +156,7 @@ export function Mensal({ onReport }: { onReport?: (r: MonthlyClientReport | unde
             Baixar PDF
           </Button>
           <Button variant="primary" size="lg" icon={Send} disabled={!report} onClick={() => setSendOpen(true)}>
-            Enviar por WhatsApp
+            Enviar por e-mail
           </Button>
         </div>
       </div>
@@ -197,5 +212,6 @@ export function Mensal({ onReport }: { onReport?: (r: MonthlyClientReport | unde
 
       {report ? <SendDrawer open={sendOpen} onOpenChange={setSendOpen} report={report} /> : null}
     </section>
+    </Reveal>
   )
 }

@@ -4,6 +4,7 @@ import { Download } from 'lucide-react'
 import type { MonthlyClientReport, OccupancyReport, RevenueByClientRow, RevenueByEquipmentRow, TeamPerformanceRow } from '@/services'
 import { useLabels } from '@/services'
 import { Button, Menu, Segmented, notify } from '@/ui'
+import { Stagger } from '@/ui/Motion'
 import { PageHeader } from '@/app/PageHeader'
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format'
 import { Equipes, Ocupacao, ReceitaClientes, Rendimento } from './components/Blocos'
@@ -111,7 +112,7 @@ function Relatorios() {
         }
       />
 
-      <div className="grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
+      <Stagger className="grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
         <div className="min-w-0 @min-[1180px]/frame:col-span-7">
           <Ocupacao key={`o-${periodo}`} range={range} onData={onOcc} />
         </div>
@@ -124,7 +125,7 @@ function Relatorios() {
         <div className="min-w-0 @min-[1180px]/frame:col-span-5">
           <Equipes key={`q-${periodo}`} range={range} onData={onEq} />
         </div>
-      </div>
+      </Stagger>
 
       <Mensal onReport={setMonthly} />
     </>

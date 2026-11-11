@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Check, ChevronDown, Copy, CircleCheck, QrCode, ReceiptText } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Badge, Button, Drawer, EmptyState, Money, cn, notify } from '@/ui'
+import { RollingMoney, Stagger, celebrate } from '@/ui/Motion'
 import { formatDate } from '@/lib/format'
 import { payInvoice, useMutation, type PortalInvoice } from '@/services'
 
@@ -48,10 +49,12 @@ function PayDrawer({ token, invoice, onClose }: { token: string; invoice: Portal
     return () => window.clearTimeout(t)
   }, [paid])
 
-  const confirm = async () => {
+  const confirm = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!invoice) return
+    const r = e.currentTarget.getBoundingClientRect()
     try {
       await pay.run(token, invoice.id)
+      celebrate({ x: r.left + r.width / 2, y: r.top + r.height / 2 })
       setPaid(true)
       notify.success('Pagamento registrado. Obrigado!')
     } catch {
@@ -88,7 +91,7 @@ function PayDrawer({ token, invoice, onClose }: { token: string; invoice: Portal
               </svg>
             </span>
             <p className="text-kpi">
-              <Money value={invoice.value} variant="kpi" />
+              <RollingMoney value={invoice.value} kpi />
             </p>
             <p className="text-body-lg font-semibold">{invoice.code} paga</p>
           </div>
@@ -115,11 +118,29 @@ function PayDrawer({ token, invoice, onClose }: { token: string; invoice: Portal
   )
 }
 
-export function InvoicesSection({ token, invoices }: { token: string; invoices: PortalInvoice[] }) {
+export function InvoicesSection({ token, invoices, focusId }: { token: string; invoices: PortalInvoice[]; focusId?: string }) {
   const open = invoices.filter(isOpen).sort((a, b) => a.dueAt.localeCompare(b.dueAt))
   const paid = invoices.filter((i) => i.status === 'paga').sort((a, b) => (b.paidAt ?? '').localeCompare(a.paidAt ?? ''))
   const [paying, setPaying] = React.useState<PortalInvoice | null>(null)
-  const [showPaid, setShowPaid] = React.useState(false)
+  const focusedPaid = !!focusId && paid.some((i) => i.id === focusId)
+  const [showPaid, setShowPaid] = React.useState(focusedPaid)
+  const [flash, setFlash] = React.useState<string | undefined>(focusId)
+
+  /* link de pagamento (?fatura=): rola até a fatura e destaca por alguns segundos */
+  React.useEffect(() => {
+    if (!focusId) return
+    if (focusedPaid) setShowPaid(true)
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(`fatura-${focusId}`)
+      el?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' })
+      setFlash(focusId)
+    }, 450)
+    const off = window.setTimeout(() => setFlash(undefined), 5000)
+    return () => {
+      window.clearTimeout(t)
+      window.clearTimeout(off)
+    }
+  }, [focusId, focusedPaid])
 
   return (
     <section aria-labelledby="faturas">
@@ -132,15 +153,15 @@ export function InvoicesSection({ token, invoices }: { token: string; invoices: 
           <EmptyState icon={CircleCheck} title="Nenhuma fatura em aberto" />
         </div>
       ) : (
-        <ul className="mt-4 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
+        <Stagger role="list" aria-label="Faturas em aberto" gap={0.07} className="mt-4 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
           {open.map((i) => (
-            <li key={i.id} className="flex flex-col rounded-card bg-raised p-5 sm:p-6">
+            <li key={i.id} id={`fatura-${i.id}`} className={cn('flex flex-col rounded-card bg-raised p-5 transition-shadow duration-300 sm:p-6', flash === i.id && 'ring-2 ring-accent')}>
               <div className="flex items-center justify-between gap-3">
                 <p className="tnum text-body font-semibold text-fg-2">{i.code}</p>
                 {i.status === 'atrasada' ? <Badge tone="danger">Atrasada há {i.daysOverdue} {i.daysOverdue === 1 ? 'dia' : 'dias'}</Badge> : <Badge tone="info">Aberta</Badge>}
               </div>
               <p className="mt-3 text-kpi">
-                <Money value={i.value} variant="kpi" />
+                <RollingMoney value={i.value} kpi />
               </p>
               <p className="mt-2 truncate text-body text-fg-2">{i.description}</p>
               <p className="tnum mt-1 text-body font-semibold">Vence em {formatDate(i.dueAt)}</p>
@@ -151,7 +172,7 @@ export function InvoicesSection({ token, invoices }: { token: string; invoices: 
               </div>
             </li>
           ))}
-        </ul>
+        </Stagger>
       )}
 
       {paid.length ? (
@@ -169,7 +190,7 @@ export function InvoicesSection({ token, invoices }: { token: string; invoices: 
           {showPaid ? (
             <ul className="mt-3 flex list-none flex-col rounded-card bg-raised p-2">
               {paid.map((i) => (
-                <li key={i.id} className="flex items-center gap-3 px-3 py-3">
+                <li key={i.id} id={`fatura-${i.id}`} className={cn('flex items-center gap-3 rounded-control px-3 py-3 transition-shadow duration-300', flash === i.id && 'ring-2 ring-accent')}>
                   <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-pill bg-ok-soft text-ok-ink">
                     <Check size={18} strokeWidth={2.5} />
                   </span>

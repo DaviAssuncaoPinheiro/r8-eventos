@@ -2,7 +2,8 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Check, ChevronDown, Plus, Search, Users } from 'lucide-react'
 import { listClients, useQuery, type ClientKind, type ClientView } from '@/services'
-import { Badge, Banner, Button, Card, EmptyState, Input, Menu, Money, Segmented, Skeleton, cn, useCountUp, useMediaQuery } from '@/ui'
+import { Badge, Banner, Button, Card, EmptyState, Input, Menu, Money, Segmented, Skeleton, cn, useMediaQuery } from '@/ui'
+import { RollingNumber, Stagger } from '@/ui/Motion'
 import { PageHeader } from '@/app/PageHeader'
 import { formatMoney } from '@/lib/format'
 import { Avatar } from './components/Avatar'
@@ -40,7 +41,6 @@ function ClientCard({ c }: { c: ClientView }) {
 }
 
 function CountTile({ title, value, onClick, hero, danger, active }: { title: string; value: number; onClick: () => void; hero?: boolean; danger?: boolean; active?: boolean }) {
-  const n = useCountUp(value)
   return (
     <button
       type="button"
@@ -65,8 +65,7 @@ function CountTile({ title, value, onClick, hero, danger, active }: { title: str
         </span>
       </span>
       <span className={cn('tnum text-kpi-lg', danger && 'text-danger-ink', hero && 'text-on-accent')}>
-        <span className="sr-only">{value}</span>
-        <span aria-hidden>{Math.round(n)}</span>
+        <RollingNumber value={value} />
       </span>
     </button>
   )
@@ -148,7 +147,7 @@ export default function Lista() {
         </>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 @min-[1000px]/frame:grid-cols-12">
+          <Stagger className="grid grid-cols-1 gap-4 @min-[1000px]/frame:grid-cols-12">
             <Card as="section" className="min-w-0 sm:p-6 @min-[1000px]/frame:col-span-8">
               <h2 className="mb-3 text-title-sub">Maiores clientes por receita</h2>
               {top5.length ? (
@@ -163,7 +162,7 @@ export default function Lista() {
               <CountTile hero title="Com locação ativa" value={ativos} active={filtro === 'ativa'} onClick={() => setFiltro((f) => (f === 'ativa' ? 'todos' : 'ativa'))} />
               <CountTile danger title="Com atraso" value={atrasados} active={filtro === 'atraso'} onClick={() => setFiltro((f) => (f === 'atraso' ? 'todos' : 'atraso'))} />
             </div>
-          </div>
+          </Stagger>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <div className="min-w-[220px] flex-1 sm:max-w-[360px]">
@@ -199,13 +198,13 @@ export default function Lista() {
           </div>
 
           {list.length ? (
-            <ul className="m-0 mt-4 grid list-none grid-cols-1 gap-4 p-0 @min-[700px]/frame:grid-cols-2 @min-[1100px]/frame:grid-cols-3 @min-[1500px]/frame:grid-cols-4">
+            <Stagger role="list" aria-label="Clientes" gap={0.035} delay={0.2} className="m-0 mt-4 grid list-none grid-cols-1 gap-4 p-0 @min-[700px]/frame:grid-cols-2 @min-[1100px]/frame:grid-cols-3 @min-[1500px]/frame:grid-cols-4">
               {list.map((c) => (
                 <li key={c.id} className="min-w-0">
                   <ClientCard c={c} />
                 </li>
               ))}
-            </ul>
+            </Stagger>
           ) : (
             <Card className="mt-4">
               {filtered ? (

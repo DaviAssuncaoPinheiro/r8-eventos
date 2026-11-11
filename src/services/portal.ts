@@ -26,7 +26,7 @@ export interface PortalInvoice extends ChargeView {
 }
 
 export interface PortalData {
-  company: { name: string; logoDataUrl?: string; brandHex: string; phone: string; /** @deprecated sempre vazio: o WhatsApp saiu do produto */ whatsapp: string; email: string }
+  company: { name: string; logoDataUrl?: string; brandHex: string; phone: string; email: string }
   client: Pick<Client, 'id' | 'name' | 'kind' | 'cnpj' | 'address' | 'contacts' | 'portalToken'>
   /** locações em campo agora, com os equipamentos */
   activeRentals: PortalRental[]
@@ -55,7 +55,7 @@ export function computePortal(token: string, month?: string): PortalData {
     .filter((x) => x.status !== 'rascunho' && x.status !== 'cancelada')
     .map((x) => (x.status === 'aberta' || x.status === 'atrasada' ? { ...x, pix: pixFor(x, co.name) } : x))
   return {
-    company: { name: co.name, logoDataUrl: data.settings.logoDataUrl, brandHex: data.settings.brandHex, phone: co.phone, whatsapp: '', email: co.email },
+    company: { name: co.name, logoDataUrl: data.settings.logoDataUrl, brandHex: data.settings.brandHex, phone: co.phone, email: co.email },
     client: { id: c.id, name: c.name, kind: c.kind, cnpj: c.cnpj, address: c.address, contacts: c.contacts, portalToken: c.portalToken },
     activeRentals: rentals.map((r) => ({
       ...r,
@@ -146,7 +146,7 @@ export function getUnitPage(idOrCode: string): Promise<UnitPage> {
       .filter((s) => s.type === 'limpeza' && s.status === 'concluido' && s.report && s.unitIds.includes(u.id))
       .sort((a, b) => b.report!.finishedAt.localeCompare(a.report!.finishedAt))[0]
     return {
-      company: { name: co.name, logoDataUrl: data.settings.logoDataUrl, brandHex: data.settings.brandHex, phone: co.phone, whatsapp: '', email: co.email },
+      company: { name: co.name, logoDataUrl: data.settings.logoDataUrl, brandHex: data.settings.brandHex, phone: co.phone, email: co.email },
       unit: { id: u.id, code: u.code, status: u.status, typeName: type?.name ?? '', photo: type?.photo ?? '' },
       lastCleaning: last ? { at: last.report!.finishedAt, photos: last.report!.photos } : undefined,
     }

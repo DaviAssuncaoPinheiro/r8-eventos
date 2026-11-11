@@ -1,13 +1,13 @@
 import * as React from 'react'
 import * as SwitchPrimitive from '@radix-ui/react-switch'
-import { Barcode, FileText, Loader2, MessageCircle, Zap, Landmark, type LucideIcon } from 'lucide-react'
+import { Barcode, FileText, Loader2, Mail, Zap, Landmark, type LucideIcon } from 'lucide-react'
 import { cn, notify, type StatusTone } from '@/ui'
 import { TONE_SOFT } from '@/app/status'
 import { formatDate } from '@/lib/format'
 import { setIntegration, useSettings, type IntegrationKey } from '@/services'
 
 const ITEMS: { key: IntegrationKey; name: string; icon: LucideIcon; tone: StatusTone }[] = [
-  { key: 'whatsapp', name: 'WhatsApp', icon: MessageCircle, tone: 'ok' },
+  { key: 'email', name: 'E-mail', icon: Mail, tone: 'ok' },
   { key: 'pix', name: 'Pix', icon: Zap, tone: 'accent' },
   { key: 'boleto', name: 'Boleto', icon: Barcode, tone: 'neutral' },
   { key: 'nfse', name: 'NFS-e', icon: FileText, tone: 'info' },

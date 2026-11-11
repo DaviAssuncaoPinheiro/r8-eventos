@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { motion } from 'motion/react'
-import { ChevronRight, Plus } from 'lucide-react'
+import { ChevronRight, Plus, type LucideIcon } from 'lucide-react'
 import { AUTOMATION_ACTIONS, AUTOMATION_TRIGGERS } from '@/services'
 import { cn } from '@/ui'
 import { reduced } from '@/ui/Motion'
@@ -9,7 +9,7 @@ import { iconFor } from './icons'
 export const triggerIcon = (kind?: string) => iconFor(AUTOMATION_TRIGGERS.find((t) => t.kind === kind)?.icon)
 export const actionIcon = (kind?: string) => iconFor(AUTOMATION_ACTIONS.find((a) => a.kind === kind)?.icon)
 
-function Node({ icon: Icon, label, tone, size, empty }: { icon: React.ComponentType<{ size?: number; strokeWidth?: number; 'aria-hidden'?: boolean }>; label: string; tone: 'trigger' | 'action'; size: number; empty?: boolean }) {
+function Node({ icon: Icon, label, tone, size, empty }: { icon: LucideIcon; label: string; tone: 'trigger' | 'action'; size: number; empty?: boolean }) {
   return (
     <div className="flex w-[36%] min-w-0 flex-col items-center gap-2 text-center">
       <span

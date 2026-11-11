@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as SwitchPrimitive from '@radix-ui/react-switch'
-import { MessageCircle, Route, Sparkles, Sunrise, Wallet, type LucideIcon } from 'lucide-react'
+import { Mail, Route, Sparkles, Sunrise, Wallet, type LucideIcon } from 'lucide-react'
 import { AiTag, cn, notify } from '@/ui'
 import { TONE_SOFT } from '@/app/status'
 import { setAiEnabled, useMutation, useSettings } from '@/services'
@@ -8,7 +8,7 @@ import { setAiEnabled, useMutation, useSettings } from '@/services'
 const POWERS: { icon: LucideIcon; title: string }[] = [
   { icon: Sunrise, title: 'Resumo do dia' },
   { icon: Wallet, title: 'Cobranças prontas' },
-  { icon: MessageCircle, title: 'Mensagens de WhatsApp' },
+  { icon: Mail, title: 'E-mails ao cliente' },
   { icon: Route, title: 'Rotas' },
 ]
 

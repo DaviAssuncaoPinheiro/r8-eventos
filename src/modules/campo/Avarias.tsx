@@ -8,6 +8,7 @@ import { listDamages, listServices, useLabels, useQuery, useSegment } from '@/se
 import { Badge, Button, EmptyState, Field, Input, StatusDot } from '@/ui'
 import { FieldActionBar } from '@/ui/FieldAction'
 import { notify } from '@/ui/Toast'
+import { RollingMoney, RollingNumber, Stagger } from '@/ui/Motion'
 import { DamageFields, parseValue } from './components/DamageForm'
 import { CampoScreen, LoadFailed } from './components/Screen'
 import { Sheet } from './components/Sheet'
@@ -95,18 +96,23 @@ export default function Avarias() {
       ) : dmg.error && !dmg.data ? (
         <LoadFailed onRetry={() => void dmg.refetch()} />
       ) : (
-        <>
+        <Stagger gap={0.07}>
           <section aria-label="Resumo de hoje" className="grid grid-cols-2 gap-3">
             <div className="flex flex-col-reverse rounded-card bg-raised p-5">
               <p className="text-body text-fg-2">Hoje</p>
-              <p className="tnum text-kpi font-semibold">{count}</p>
+              <p className="tnum text-kpi font-semibold">
+                <RollingNumber value={count} />
+              </p>
             </div>
             <div className="flex flex-col-reverse rounded-card bg-raised p-5">
               <p className="text-body text-fg-2">Valor</p>
-              <p className="tnum text-kpi font-semibold">{formatMoney(total)}</p>
+              <p className="tnum text-kpi font-semibold">
+                <RollingMoney value={total} />
+              </p>
             </div>
           </section>
 
+          <div>
           <h2 className="mt-6 mb-2 px-1 text-title-sub">Registradas hoje</h2>
           {count ? (
             <ul className="overflow-hidden rounded-card bg-raised">
@@ -148,7 +154,8 @@ export default function Avarias() {
               <EmptyState icon={AlertTriangle} title={`As ${l.damagePlural} registradas pela equipe aparecem aqui`} />
             </div>
           )}
-        </>
+          </div>
+        </Stagger>
       )}
 
       <Sheet

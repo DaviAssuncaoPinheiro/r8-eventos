@@ -3,7 +3,7 @@ import type { ServiceView } from '@/services'
 import { ServiceRow } from '@/ui/ServiceRow'
 import { fmtDuration, fmtTime, ROW_STATUS, useServiceTitle } from '../lib'
 
-/** Lista de serviços em cartão, com a linha de campo (80 px, texto 16). */
+/** Lista de serviços em cartão, com a linha do app da equipe de rua (80 px, texto 16). */
 export function ServiceList({ services, label }: { services: ServiceView[]; label: string }) {
   const navigate = useNavigate()
   const title = useServiceTitle()

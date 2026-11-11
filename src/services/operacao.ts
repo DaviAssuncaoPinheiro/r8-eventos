@@ -739,6 +739,9 @@ export interface FleetPosition {
   teamColor: string
   lat: number
   lng: number
+  /** extremos do trecho em curso (na base ou no local, os dois são o ponto onde o caminhão está ou vai sair) */
+  from: LatLng
+  to: LatLng
   /** direção em graus (0 = norte, sentido horário) */
   heading: number
   status: FleetStatus
@@ -780,8 +783,9 @@ export function computeFleetPositions(at: Date = fleetClock(), data: DbData = ge
   const min = 60000
   return data.teams.map<FleetPosition>((team) => {
     const base = { teamId: team.id, teamName: team.name, teamColor: team.color }
+    const HOME: LatLng = { lat: BASE.lat, lng: BASE.lng }
     const list = data.services.filter((s) => s.teamId === team.id && dayOf(s.start) === today && s.status !== 'cancelado').sort((a, b) => a.order - b.order || a.start.localeCompare(b.start))
-    if (!list.length) return { ...base, lat: BASE.lat, lng: BASE.lng, heading: 0, status: 'na_base', fromLabel: BASE.name, toLabel: BASE.name, progress: 0, etaMinutes: 0 }
+    if (!list.length) return { ...base, lat: BASE.lat, lng: BASE.lng, from: HOME, to: HOME, heading: 0, status: 'na_base', fromLabel: BASE.name, toLabel: BASE.name, progress: 0, etaMinutes: 0 }
     type Leg = { from: LatLng; fromLabel: string; to: LatLng; toLabel: string; depart: number; arrive: number; leave: number }
     const legs: Leg[] = []
     let prev: LatLng = BASE
@@ -818,21 +822,21 @@ export function computeFleetPositions(at: Date = fleetClock(), data: DbData = ge
     const home: Leg = { from: prev, fromLabel: prevLabel, to: BASE, toLabel: BASE.name, depart: prevLeave, arrive: prevLeave + homeTravel, leave: Infinity }
     const all = [...legs, home]
     const first = all[0]
-    if (t < first.depart) return { ...base, lat: BASE.lat, lng: BASE.lng, heading: bearing(BASE, first.to), status: 'na_base', fromLabel: BASE.name, toLabel: first.toLabel, progress: 0, etaMinutes: 0 }
+    if (t < first.depart) return { ...base, lat: BASE.lat, lng: BASE.lng, from: HOME, to: first.to, heading: bearing(BASE, first.to), status: 'na_base', fromLabel: BASE.name, toLabel: first.toLabel, progress: 0, etaMinutes: 0 }
     for (const [i, g] of all.entries()) {
       if (t >= g.depart && t < g.arrive) {
         const p = (t - g.depart) / Math.max(1, g.arrive - g.depart)
         const pos = lerp(g.from, g.to, p)
-        return { ...base, lat: pos.lat, lng: pos.lng, heading: bearing(g.from, g.to), status: 'em_rota', fromLabel: g.fromLabel, toLabel: g.toLabel, progress: Math.round(p * 1000) / 1000, etaMinutes: Math.max(0, Math.ceil((g.arrive - t) / min)) }
+        return { ...base, lat: pos.lat, lng: pos.lng, from: g.from, to: g.to, heading: bearing(g.from, g.to), status: 'em_rota', fromLabel: g.fromLabel, toLabel: g.toLabel, progress: Math.round(p * 1000) / 1000, etaMinutes: Math.max(0, Math.ceil((g.arrive - t) / min)) }
       }
       // no local: do serviço até a hora de sair para o próximo (ou para a base)
       const nextDepart = all[i + 1]?.depart ?? Infinity
       if (g !== home && t >= g.arrive && t < nextDepart) {
-        return { ...base, lat: g.to.lat, lng: g.to.lng, heading: bearing(g.from, g.to), status: 'no_local', fromLabel: g.toLabel, toLabel: g.toLabel, progress: 1, etaMinutes: Math.max(0, Math.ceil((Math.max(g.leave, t) - t) / min)) }
+        return { ...base, lat: g.to.lat, lng: g.to.lng, from: g.to, to: g.to, heading: bearing(g.from, g.to), status: 'no_local', fromLabel: g.toLabel, toLabel: g.toLabel, progress: 1, etaMinutes: Math.max(0, Math.ceil((Math.max(g.leave, t) - t) / min)) }
       }
     }
     // já voltou à base
-    return { ...base, lat: BASE.lat, lng: BASE.lng, heading: bearing(home.from, BASE), status: 'na_base', fromLabel: BASE.name, toLabel: BASE.name, progress: 0, etaMinutes: 0 }
+    return { ...base, lat: BASE.lat, lng: BASE.lng, from: HOME, to: HOME, heading: bearing(home.from, BASE), status: 'na_base', fromLabel: BASE.name, toLabel: BASE.name, progress: 0, etaMinutes: 0 }
   })
 }
 

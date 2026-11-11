@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { motion } from 'motion/react'
 import { ChevronDown, FileDown, ImageOff, ShieldCheck } from 'lucide-react'
 import { Badge, Button, EmptyState, PhotoViewer, Segmented, cn, type PhotoItem } from '@/ui'
+import { reduced } from '@/ui/Motion'
 import { SERVICE_ICON } from '@/app/status'
 import { formatDate, formatTime } from '@/lib/format'
 import { dayOf, monthKey, monthLabel } from '@/domain/dates'
@@ -21,7 +23,13 @@ function Receipt({ r, onPhoto }: { r: ServiceReceipt; onPhoto: (photos: PhotoIte
   const items: PhotoItem[] = r.photos.map((p) => ({ id: p.id, src: p.src, alt: `${p.label}, ${r.typeLabel} em ${formatDate(r.at)}` }))
   const done = r.checklist.filter((c) => c.ok).length
   return (
-    <li className="relative pl-12 sm:pl-14">
+    <motion.li
+      className="relative pl-12 sm:pl-14"
+      initial={reduced() ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -60px 0px' }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+    >
       <span aria-hidden className="absolute top-0 bottom-[-16px] left-[19px] w-px bg-edge sm:left-[21px]" />
       <span aria-hidden className="absolute top-3 left-0 grid size-10 place-items-center rounded-pill bg-accent-soft text-accent-ink ring-4 ring-[var(--app)] sm:size-11">
         <Icon size={20} strokeWidth={2} />
@@ -125,7 +133,7 @@ function Receipt({ r, onPhoto }: { r: ServiceReceipt; onPhoto: (photos: PhotoIte
           </div>
         ) : null}
       </article>
-    </li>
+    </motion.li>
   )
 }
 
