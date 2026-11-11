@@ -388,7 +388,7 @@ export default function OverlaySection() {
                 </Button>
               }
             >
-              Quando um retirador anotar uma avaria no app de campo, ela entra nesta lista.
+              Quando um retirador anotar uma avaria no app da equipe de rua, ela entra nesta lista.
             </EmptyState>
           </Card>
           <Card padding="none">

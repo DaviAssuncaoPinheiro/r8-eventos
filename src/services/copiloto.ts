@@ -73,8 +73,8 @@ function emailDamage(contact: string, items: string[], total: number) {
   )
 }
 
-/** Campos do rascunho: `draft` (assunto e corpo) e `draftMessage` (só o corpo, para as telas atuais) */
-const withDraft = (d: { subject: string; body: string }) => ({ draft: d, draftMessage: d.body })
+/** Rascunho do e-mail (assunto e corpo) */
+const withDraft = (d: { subject: string; body: string }) => ({ draft: d })
 
 function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
   const L = lookup(data)
@@ -201,7 +201,7 @@ export function approveSuggestion(id: string): Promise<CopilotSuggestion> {
       } else if (s.kind === 'mensagem_cliente') {
         const data = getData()
         const ids = newIds()
-        commit({ notifications: [{ id: ids.next('ntf'), kind: 'copiloto', title: 'E-mail enviado ao cliente', text: s.draftMessage ?? '', at: demoNowISO(), read: true }, ...data.notifications], seq: ids.seq() })
+        commit({ notifications: [{ id: ids.next('ntf'), kind: 'copiloto', title: 'E-mail enviado ao cliente', text: s.draft?.body ?? '', at: demoNowISO(), read: true }, ...data.notifications], seq: ids.seq() })
       }
     })
     const done: CopilotSuggestion = { ...s, status: 'aprovada' }
@@ -256,7 +256,3 @@ export function draftEmail(kind: SuggestionKind, refId: string): Promise<{ subje
   })
 }
 
-/** Texto do e-mail pronto (só o corpo). Mantida para as telas atuais; prefira `draftEmail`. */
-export function draftMessage(kind: SuggestionKind, refId: string): Promise<string> {
-  return draftEmail(kind, refId).then((d) => d.body)
-}

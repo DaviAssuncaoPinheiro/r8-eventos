@@ -8,7 +8,7 @@ export function InputSection() {
     <DsSection
       id="campos"
       title="Campo de texto"
-      intro="Rótulo sempre visível acima. Altura 44px (52px no app de campo), raio 12, borda com 3:1. Erro abaixo do campo."
+      intro="Rótulo sempre visível acima. Altura 44px (52px no app da equipe de rua), raio 12, borda com 3:1. Erro abaixo do campo."
     >
       <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
         <Field label="Cliente" help="Nome fantasia ou razão social.">
@@ -35,7 +35,7 @@ export function InputSection() {
         <Field label="Valor da diária" disabled help="Definido no contrato. Edite pela locação.">
           <Input prefix="R$" numeric defaultValue="85,00" />
         </Field>
-        <Field label="Placa do caminhão" help="Tamanho lg, do app de campo.">
+        <Field label="Placa do caminhão" help="Tamanho lg, do app da equipe de rua.">
           <Input size="lg" defaultValue="PAW-4B21" />
         </Field>
       </div>

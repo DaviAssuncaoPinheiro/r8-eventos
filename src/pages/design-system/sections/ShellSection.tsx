@@ -365,7 +365,7 @@ export default function ShellSection() {
       </Specimen>
 
       <Specimen
-        title="App de campo"
+        title="App da equipe de rua"
         note="390 por 720. Cabeçalho de 56, navegação de 64, ação principal de 56."
       >
         <div className="flex flex-wrap items-start gap-x-10 gap-y-8">

@@ -107,14 +107,14 @@ export const notify = {
  * Topo central no escritório (a partir de 640px), inferior acima da navegação no celular. z-index 80.
  * Renderize um só por tela. `id` faz este contêiner mostrar apenas toasts com o mesmo `toasterId`.
  */
-export function AppToaster({ id }: { id?: string }) {
+export function AppToaster({ id, top }: { id?: string; /** sempre no topo (app da equipe de rua: a ação principal fica embaixo) */ top?: boolean }) {
   const wide = useMediaQuery('(min-width: 640px)')
   return (
     <Toaster
       id={id}
-      position={wide ? 'top-center' : 'bottom-center'}
+      position={wide || top ? 'top-center' : 'bottom-center'}
       offset={16}
-      mobileOffset={{ top: 16, left: 16, right: 16, bottom: 80 }}
+      mobileOffset={{ top: top ? 'calc(var(--demo-strip-h, 0px) + 12px)' : 16, left: 16, right: 16, bottom: 80 }}
       gap={8}
       visibleToasts={3}
       toastOptions={{ unstyled: true }}

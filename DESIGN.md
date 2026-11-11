@@ -1,9 +1,9 @@
 # R8 · Design system v2
 
-Especificação de design do sistema de operação para locadoras (banheiros químicos, estruturas para eventos, som e luz, equipamentos). A primeira versão da v2 seguiu à risca um piso de raios e de números contidos e saiu seca, com cara de painel administrativo genérico; foi reprovada pelo dono do produto. Esta é a direção atual, calibrada nas referências: cartões bem arredondados, pílulas, degradê da marca no destaque, números grandes, gráficos e mapa em vez de tabela. O código manda: se este arquivo e `src/ui` divergirem, o arquivo está errado. Quem constrói tela lê este arquivo e usa `src/ui` e `src/styles/tokens.css`. Valores aqui são exatos; se algo não estiver aqui, pergunte antes de inventar.
+Especificação de design do sistema de operação para locadoras (banheiros químicos, estruturas para eventos, som e luz, equipamentos). A primeira versão da v2 seguiu à risca um piso de raios e de números contidos e saiu seca, com cara de painel administrativo genérico; foi reprovada pelo dono do produto. Esta é a direção atual, calibrada nas referências: cartões bem arredondados, pílulas, degradê da marca no destaque, números grandes, gráficos e mapa real em vez de tabela, e movimento com propósito. O código manda: se este arquivo e `src/ui` divergirem, o arquivo está errado. Quem constrói tela lê este arquivo e usa `src/ui` e `src/styles/tokens.css`. Valores aqui são exatos; se algo não estiver aqui, pergunte antes de inventar.
 
 - Página viva: `/design-system` (alternador de tema e de cor da marca no topo; laranja, verde, azul, grafite).
-- Telas de referência do padrão aprovado: `src/modules/painel/index.tsx` (escritório) e `src/modules/campo/Hoje.tsx` (celular). A seção 7 descreve a composição delas.
+- Telas de referência do padrão aprovado: `src/modules/painel/index.tsx` (escritório) e `src/modules/campo/Hoje.tsx` (celular, app da equipe de rua). Da fase 2: `src/modules/operacao` (mapa real), `src/modules/inteligencia`, `src/modules/automacoes` e `src/modules/diagnostico`. A seção 7 descreve a composição delas.
 - Código: tokens em `src/styles/tokens.css`, marca em `src/lib/brand.ts`, tema em `src/lib/theme.ts`, formatos em `src/lib/format.ts`, primitivos em `src/ui/`.
 - Telas novas usam a classe `ds-root` no contêiner raiz (aplica fonte, cor de texto, seleção, cursor, barra de rolagem e anel de foco do v2). Os tokens antigos (`canvas`, `card`, `ink`, `brand`…) continuam em `src/index.css` só para as telas antigas; não use em tela nova.
 
@@ -73,7 +73,10 @@ Vêm das preferências do dono do produto (`CLAUDE.md`), registradas em 11/11/20
 3. **Laranja é a cor da casa.** A demo abre em laranja (`#f04e0a`, derivado para passar AA). A cor continua configurável, então todo uso de marca lê `--accent*` e o contraste é garantido pela derivação, não pelo olho de quem desenha. Um bloco preenchido em degradê por tela, mais o botão primário.
 4. **Bater o olho e entender.** Em 2 segundos tem que estar claro que é um sistema de locadora (equipamento, entrega, cobrança) e o que a tela faz. Vocabulário do ofício, dinheiro em reais com centavos antes do gráfico, mapa e foto quando existirem.
 5. **Acabamento de produto premium.** Raios 22 e 28, pílulas, degradê da marca no destaque, microinteração com propósito (número que sobe, barra que cresce, seta que gira, foco de luz). Nada que pareça template ou painel administrativo genérico.
-6. **Acessível por construção, legível na rua.** AA em todo texto, foco visível, alvo de toque de 44 px. No app de campo: corpo 16 px, ação principal de 56 px no alcance do polegar, contraste máximo no texto principal para uso sob sol.
+6. **Acessível por construção, legível na rua.** AA em todo texto, foco visível, alvo de toque de 44 px. No app da equipe de rua: corpo 16 px, ação principal de 56 px no alcance do polegar, contraste máximo no texto principal para uso sob sol.
+7. **Trabalha sozinho e gera dinheiro.** Não pode parecer gerenciador de estoque: o produto é vendido com implantação mais mensalidade. Toda tela de crescimento mostra o que o sistema fez ou vai fazer, em reais: previsão de caixa e de demanda, lucro e veredito por equipamento, preço sugerido, rota otimizada, automação que executa. Previsão sem ação ao lado é enfeite; coloque o botão que executa (Aplicar, Rodar agora, Cobrar).
+8. **Movimento com propósito.** Números que rolam, blocos em cascata, transição de tela, caminhões no mapa, comemoração quando o dinheiro entra (3.9). Cada animação roda uma vez, com motivo, e some com "reduzir movimento".
+9. **O que não entra no produto.** Canal de mensagem instantânea (cobranças e avisos saem por e-mail, link de pagamento e portal do cliente), nota ou alerta de risco de inadimplência por cliente e exibição em tela de TV. Não desenhe, não cite em tooltip, não deixe espaço "para depois". O registro de cada decisão está em `DECISOES.md`.
 
 ---
 
@@ -160,18 +163,18 @@ Escala fixa em px: **12, 14, 16, 18, 22, 24, 32, 34, 44**, mais 52 e 56 só em n
 | KPI âncora | `text-kpi-lg` | 44 / 48 | 600 | -0,035em | Número do indicador (`MoneyCard`) |
 | Título de página | `text-title-page` | 34 / 40 | 600 | -0,03em | H1 do escritório |
 | KPI | `text-kpi` | 32 / 38 | 600 | -0,03em | Valor de bloco médio, número do Copiloto |
-| Título do app de campo | `text-title-field` | 24 / 30 | 600 | -0,02em | H1 no celular |
+| Título do app da equipe de rua | `text-title-field` | 24 / 30 | 600 | -0,02em | H1 no celular |
 | Título de seção | `text-title-section` | 22 / 28 | 600 | -0,015em | H2 de página longa, título de diálogo |
 | Subtítulo | `text-title-sub` | 18 / 24 | 600 | -0,01em | Título de bloco do Painel, título do topo, nome da locadora |
 | Título de cartão | `text-title-card` | 16 / 22 | 600 | -0,005em | H3 de cartão, de grupo |
-| Corpo grande | `text-body-lg` | 16 / 24 | 500 | 0 | Corpo do app de campo, botão lg e field, linha da lista de ações |
+| Corpo grande | `text-body-lg` | 16 / 24 | 500 | 0 | Corpo do app da equipe de rua, botão lg e field, linha da lista de ações |
 | Corpo | `text-body` | 14 / 20 | 500 | 0 | Corpo do escritório, célula de tabela |
 | Rótulo | `text-body font-semibold` | 14 / 20 | 600 | 0 | Rótulo de campo, botão, item de menu |
 | Legenda | `text-caption` | 12 / 16 | 500 (600 em badge e etiqueta) | 0 | Ajuda, metadado, cabeçalho de tabela |
 
-Tamanhos fora do mapa de classes, usados em componentes: número do indicador em `size="xl"` `clamp(36px, 15cqw, 56px)` e em `lg` `clamp(30px, 17.5cqw, 44px)` (acompanham a largura do cartão); centro do `ArcGauge` 52 / 56, 600, -0,035em; título do bloco "Próximo serviço" do campo 26 / 32, 600, -0,02em; item da lateral 15 / 20 (500, ativo 600); título do `MoneyCard` 15 / 20, 500, e 16 / 24 quando o cartão passa de 250 px.
+Tamanhos fora do mapa de classes, usados em componentes: número do indicador em `size="xl"` `clamp(36px, 15cqw, 56px)` e em `lg` `clamp(30px, 17.5cqw, 44px)` (acompanham a largura do cartão); centro do `ArcGauge` 52 / 56, 600, -0,035em; título do bloco "Próximo serviço" do app 26 / 32, 600, -0,02em; item da lateral 15 / 20 (500, ativo 600); título do `MoneyCard` 15 / 20, 500, e 16 / 24 quando o cartão passa de 250 px.
 
-Corpo mínimo: 14 px no escritório, 16 px no app de campo. Nada abaixo de 12 px. Prosa até 68ch. Números de tabela, dinheiro, datas e códigos sempre com `.tnum`. Caixa alta só em siglas e no rótulo de grupo da lateral (12 px, 500, tracking 0,08em).
+Corpo mínimo: 14 px no escritório, 16 px no app da equipe de rua. Nada abaixo de 12 px. Prosa até 68ch. Números de tabela, dinheiro, datas e códigos sempre com `.tnum`. Caixa alta só em siglas e no rótulo de grupo da lateral (12 px, 500, tracking 0,08em).
 
 ### 3.5 Espaçamento
 
@@ -220,37 +223,49 @@ Borda OU sombra, nunca as duas. Linhas internas: 1 px `border-hairline`. Campo: 
 
 ### 3.9 Movimento
 
+O dono pediu "animações fodas": o produto tem que parecer vivo. A regra mudou da fase 1 (sem coreografia) para a fase 2: **entra uma vez, com propósito, nunca atrasa o clique seguinte, e some por completo com "reduzir movimento"**. Tudo mora em `src/ui/Motion.tsx` (5.16), nos keyframes de `src/styles/tokens.css` e nos componentes de dado.
+
 | Token | Valor | Uso |
 |---|---|---|
 | `--dur-fast` | 150 ms | Hover, cor, foco, switch, caixa |
 | `--dur-base` | 200 ms | Menu, tooltip (entrada 150), troca de aba, seta que gira |
 | `--dur-slow` | 250 ms | Gaveta, diálogo, toast, altura da barra em foco |
-| `--ease-ui` | `cubic-bezier(0.16, 1, 0.3, 1)` (exponencial de saída) | Tudo |
+| `--ease-ui` | `cubic-bezier(0.16, 1, 0.3, 1)` (exponencial de saída) | Tudo, inclusive as animações de entrada |
 
-**Entrada de dado, uma vez ao montar.** O que mostra um número ganha vida uma vez e para; nada repete. Fica fora do limite de 250 ms porque revela dado, não decora:
+**O que anima, e por quê.** Cada item tem um motivo: mostra que o dado é vivo, guia o olho ou confirma que dinheiro entrou.
 
 | O que | Como | Duração |
 |---|---|---|
-| Número do `MoneyCard` | Sobe de 0 até o valor, saída exponencial (`useCountUp`) | 600 ms |
-| Barras do `PillBars` | Crescem de 8% da altura até 100% a partir da base (`ds-grow-y`), uma após a outra com 40 ms de intervalo | 600 ms |
-| Arco do `ArcGauge` | Traço desenhado do começo ao fim (`ds-arc`, `stroke-dashoffset`); o trecho hachurado não anima | 900 ms |
-| Rota do `MapaDF` | Linha cheia desenhada do início ao fim (`ds-route`); a tracejada (prevista) não anima | 900 ms |
+| Troca de tela (`PageTransition`) | A tela nova sobe de 10 px e aparece; a antiga some em 100 ms (`mode="wait"`). Chaveada pelo primeiro trecho da rota: abas e sub-rotas da mesma tela não animam | 280 ms |
+| Blocos em cascata (`Stagger`, `Reveal`) | Cada filho direto sobe 14 px e aparece (`ds-rise`), um após o outro, 55 ms de intervalo | 460 ms |
+| Números que rolam (`RollingMoney`, `RollingNumber`) | Os algarismos rolam de 0 até o valor ao aparecer e a cada mudança (NumberFlow, `@number-flow/react`) | 700 ms |
+| Barras do `PillBars` | Crescem de 8% da altura até 100% a partir da base (`ds-grow-y`), 40 ms de intervalo | 600 ms |
+| Arco do `ArcGauge` | Traço desenhado do começo ao fim (`ds-arc`); o trecho hachurado não anima | 900 ms |
+| Rota do `MapaReal` | Linha desenhada do início ao fim, uma vez por conjunto de rotas | 1200 ms |
+| Pino do `MapaReal` | Cai 14 px com quique curto (`ds-pin-drop`) | 420 ms |
+| Caminhão do `MapaReal` | Desliza entre duas posições, aceleração e freada suaves | 1800 ms |
+| Enquadramento do `MapaReal` | O mapa ajusta o zoom e o centro aos pontos (`fitBounds`) | 700 ms |
+| Comemoração (`celebrate`) | Confete nas cores da marca saindo do botão clicado: cobrança paga, extra faturado, preço aplicado, rota otimizada aplicada, serviço do dia concluído | 1300 ms |
 
-**Resposta ao gesto.** Botão desce 1 px ao pressionar; seta circular do indicador gira 45° no hover (200 ms); foco de luz do destaque acompanha o ponteiro (sem transição, só no destaque); altura da barra em foco muda em 250 ms.
+**Resposta ao gesto.** Botão desce 1 px ao pressionar; seta circular do indicador gira 45° no hover (200 ms); foco de luz do destaque acompanha o ponteiro (sem transição); `Tilt` inclina o destaque até 4° com o mouse (volta em 200 ms; só com ponteiro de mouse); altura da barra em foco muda em 250 ms; pino e caminhão crescem 12% no hover.
 
 **Flutuantes.** Opacidade 0 → 1 e translateY 4 px → 0 (menu, tooltip 2 px) ou escala 0,98 → 1 (diálogo); gaveta desliza 100% → 0. Saída com 70% da duração.
 
-**Em loop, só três:** esqueleto (1,4 s), spinner de botão (0,8 s) e o pulso do pino do mapa (`ds-pulse`, 1,8 s, só equipe em deslocamento ou serviço em andamento). Sem sequência de entrada de página, sem parallax. `prefers-reduced-motion: reduce` zera transições e animações (regra global em `src/index.css`); `useCountUp` devolve o valor final direto. Os keyframes de entrada e saída das sobreposições (`ds-scrim`, `ds-dialog`, `ds-drawer-side`, `ds-vaul`, `ds-menu`) e os de dado (`ds-draw`, `ds-grow-y`, `ds-arc`, `ds-pulse`) ficam em `src/styles/tokens.css`; nenhum componente injeta `<style>`.
+**Em loop, só quatro:** esqueleto (1,4 s), spinner de botão (0,8 s), pulso do pino do mapa (`ds-pulse`, 1,8 s, só equipe a caminho ou serviço em andamento) e o pontinho que percorre o fluxo de uma automação **ligada** (2,8 s, pausa de 0,9 s; desligada fica tracejada e parada). Os caminhões não são loop: a posição vem de um relógio simulado (15 vezes mais rápido que o real, `FLEET_TIME_SCALE`) lido a cada 2 s na Operação e a cada 3 s no Painel, e o mapa desliza entre as leituras.
+
+**Reduzir movimento (`prefers-reduced-motion: reduce`).** Regra global em `src/index.css` zera transições e animações de CSS (0,01 ms, uma iteração). Os componentes em JavaScript consultam `reduced()` de `Motion.tsx`: `PageTransition` não anima, `RollingMoney` e `RollingNumber` mostram o valor final, `celebrate` não desenha nada, o caminhão salta para a posição nova, a rota aparece inteira, o voo do mapa dura 0 e o pontinho do fluxo não existe. Informação nunca depende da animação: o valor final está em texto para leitor de tela (`sr-only`) e em `aria-label`.
+
+**Limites de uso.** Um `Stagger` por bloco principal da tela, não um por componente. `celebrate` só quando dinheiro entra de verdade, nunca em ação neutra. Não anime dado que muda a cada segundo, tabela, campo de formulário nem texto corrido. Os keyframes de entrada e saída das sobreposições (`ds-scrim`, `ds-dialog`, `ds-drawer-side`, `ds-vaul`, `ds-menu`) e os de dado (`ds-draw`, `ds-grow-y`, `ds-arc`, `ds-pulse`, `ds-rise`, `ds-pin-drop`) ficam em `src/styles/tokens.css`; nenhum componente injeta `<style>`.
 
 ### 3.10 Ícones
 
-lucide-react, `strokeWidth={2}` em todos os tamanhos, cor herdada (`currentColor`). Tamanhos: **14** (badge, legenda, etiqueta do indicador), **16** (botão sm, tabela, campo), **18** (botão md, seta pequena da lista de ações), **20** (botão lg, navegação lateral, topo, seta do indicador, ícone do círculo da lista de ações), **22** (botão do destaque no campo), **24** (app de campo, estado vazio). Ícone sozinho exige `aria-label` e tooltip. Decorativo leva `aria-hidden`. Nenhum emoji como ícone.
+lucide-react, `strokeWidth={2}` em todos os tamanhos, cor herdada (`currentColor`). Tamanhos: **14** (badge, legenda, etiqueta do indicador), **16** (botão sm, tabela, campo de formulário), **18** (botão md, seta pequena da lista de ações), **20** (botão lg, navegação lateral, topo, seta do indicador, ícone do círculo da lista de ações), **22** (botão do destaque no app da equipe de rua), **24** (app da equipe de rua, estado vazio). Ícone sozinho exige `aria-label` e tooltip. Decorativo leva `aria-hidden`. Nenhum emoji como ícone.
 
 ### 3.11 Breakpoints
 
 | Nome | Largura | Tailwind | Comportamento |
 |---|---|---|---|
-| Celular | 390 (base) | (sem prefixo) | App de campo; escritório com lateral em gaveta |
+| Celular | 390 (base) | (sem prefixo) | App da equipe de rua; escritório com lateral em gaveta |
 | Tablet | 640 / 768 | `sm:` / `md:` | Grades de 2 colunas; padding de cartão passa de 20 a 24 |
 | Escritório compacto | 1024 | `lg:` | Lateral recolhida (72), trilho direito vira gaveta |
 | Escritório | 1280 | `xl:` | Lateral aberta (256), trilho direito fixo (336) |
@@ -274,7 +289,7 @@ Breakpoints do `OfficeFrame` são de **contêiner** (`@container/frame`), que na
 - **Trilho direito** (contexto: dossiê do cliente, atividade, Copiloto): `bg-panel`, `rounded-panel`, 336 px, padding 20 px, fixo a partir de 1280. Entre 1024 e 1279 vira gaveta pela direita (botão só ícone no topo). Abaixo de 1024 vira tela cheia.
 - **Abaixo de 1024**: lateral vira gaveta pela esquerda (botão menu de 44 no topo), padding externo 0, painéis sem raio, padding do conteúdo 16 px.
 
-### 4.2 App de campo (celular, 390 × 844 de referência)
+### 4.2 App da equipe de rua (celular, 390 × 844 de referência)
 
 - Fundo `bg-app`. Conteúdo em cartões `bg-raised` (`rounded-card`, padding 20) com gap 12 px; margem lateral 16 px.
 - **Cabeçalho** 56 px + `env(safe-area-inset-top)`, `bg-app`, fixo: voltar (44 px, só ícone 24) à esquerda, título `text-title-sub` truncado, indicador de sincronização e ação secundária só ícone 44 à direita. Ao rolar ganha borda inferior 1 px `hairline`.
@@ -284,7 +299,9 @@ Breakpoints do `OfficeFrame` são de **contêiner** (`@container/frame`), que na
 - Alvos: ≥ 44 × 44 em tudo, ≥ 52 px de altura nos botões principais (o `field` tem 56). Distância mínima entre alvos 8 px.
 - Corpo 16 px; texto principal sempre `fg` (≥ 14:1 no claro, para sol).
 
-Contêineres: `OfficeFrame` e `FieldFrame` em `src/ui/AppFrame.tsx`. No app, passe `viewport`; num quadro de exemplo dentro de outra página (documentação), passe `embedded`: o conteúdo do escritório vira `div` em vez de `main` e o título do campo vira `p` em vez de `h1`, para não duplicar o marco principal nem quebrar a hierarquia de títulos da página que os contém.
+**Para quem é.** O app é de quem vai ao local: motorista, montador e limpador. Use sempre o rótulo "App da equipe de rua" e, onde couber, diga para quem é (o seletor de função mostra Motorista, Montador e Limpador).
+
+Contêineres: `OfficeFrame` e `FieldFrame` em `src/ui/AppFrame.tsx`. No app, passe `viewport`; num quadro de exemplo dentro de outra página (documentação), passe `embedded`: o conteúdo do escritório vira `div` em vez de `main` e o título do app da equipe de rua vira `p` em vez de `h1`, para não duplicar o marco principal nem quebrar a hierarquia de títulos da página que os contém.
 
 ### 4.3 Densidade de tabela
 
@@ -327,7 +344,7 @@ Só ícone (`iconOnly`): círculo do tamanho da altura (36, 44, 52, 56), `aria-l
 ### 5.2 Field, Input, Textarea, Select
 
 - **Field**: rótulo 14/600 `fg` (6 px até o controle), "opcional" 12 `fg-3` ao lado quando for o caso (obrigatório não leva asterisco); erro 12/600 `danger-ink` com ícone 14, 6 px abaixo do controle; ajuda 12 `fg-3`, abaixo do erro. Liga `id`, `aria-describedby` e `aria-invalid` sozinho. Rótulo e erro são exceção à regra de não ter texto de apoio; ajuda só quando evita um erro.
-- **Input**: **44 px** (`md`) ou **52 px** (`lg`, app de campo, texto 16). `bg-raised`, borda 1 px `strong`, `rounded-control` (12), padding x 12. Prefixo/sufixo `fg-3` com gap 8 ("R$", "unidades", ícone de busca 16). `numeric`: `.tnum` e alinhado à direita. A busca do topo é o mesmo Input com raio de pílula, padding x 16 e `bg-raised`.
+- **Input**: **44 px** (`md`) ou **52 px** (`lg`, app da equipe de rua, texto 16). `bg-raised`, borda 1 px `strong`, `rounded-control` (12), padding x 12. Prefixo/sufixo `fg-3` com gap 8 ("R$", "unidades", ícone de busca 16). `numeric`: `.tnum` e alinhado à direita. A busca do topo é o mesmo Input com raio de pílula, padding x 16 e `bg-raised`.
 - **Textarea**: mínimo 88 px, padding 12 × 10, redimensiona na vertical.
 - **Select**: nativo estilizado (motivo: seletor do sistema no celular, acessível sem código, sem portal), seta 18 `fg-3` a 12 px da direita, padding direito 36, `rounded-control`. Altura hoje **40 px** (`md`) e **48 px** (`lg`), menor que a do Input; ver "Perguntas em aberto". Lista com busca usa o Combobox (5.2.1).
 
@@ -416,7 +433,7 @@ Indicador em dinheiro que o dono do produto lê em 2 segundos: título, número 
 
 **Quando usar.** Número de reais que leva a uma lista de itens (alugado hoje, parado, avarias não cobradas, extras não faturados). Quatro por linha no Painel, um deles `hero`. Para variação em série ou comparação lado a lado use `Stat`/`StatStrip`.
 
-**Anatomia** (de cima para baixo, `rounded-card`, padding 20/24, coluna flex, `@container`):
+**Anatomia** (de cima para baixo, `rounded-card`, padding 20/24, coluna flex, `@container`; o número usa `RollingMoney kpi`, 5.16):
 1. Cabeçalho: título (h3, 15/20, 500; 16/24 quando o cartão passa de 250 px; 8 px de respiro no topo) à esquerda; à direita a **seta circular** de 40 × 40 (44 em toque) com `ArrowUpRight` 20 (aparece só se houver `onOpen`).
 2. Bloco do número, encostado na base do cartão (`mt-auto`, 20 px de respiro): etiqueta opcional (`tag`) e, abaixo dela, o número. A etiqueta fica acima do número para os números de todos os cartões da linha alinharem pela base.
 3. Botão (i) "como é calculado" no canto inferior direito (24 px, `ds-hit`), com a fórmula em tooltip (`formula`).
@@ -429,7 +446,7 @@ Indicador em dinheiro que o dono do produto lê em 2 segundos: título, número 
 | Padrão | `bg-raised`, `fg` | contorno 1,5 px `fg`; hover: preenche `fg` com ícone `raised` e o ícone gira 45° | `good`: `ok-soft`/`ok-ink`; `good === false`: `danger-soft`/`danger-ink`; sem `good`: `sunken`/`fg-2` |
 | Destaque (`hero`) | degradê da marca com anéis e foco de luz (5.6), texto `on-accent` | fundo `on-accent`, ícone `accent-active` | `on-accent` a 20% de fundo, texto `on-accent` |
 
-**Estados.** Hover: seta gira e preenche; (i) aparece (opacidade 0 → 1; em toque fica a 60%, sempre visível). Foco: contorno 2 px `ring` (no destaque, `on-accent`). Sem `onOpen`, não há seta. Número entra com `useCountUp` (5.15). No destaque, o foco de luz segue o ponteiro. Um `hero` por tela.
+**Estados.** Hover: seta gira e preenche; (i) aparece (opacidade 0 → 1; em toque fica a 60%, sempre visível). Foco: contorno 2 px `ring` (no destaque, `on-accent`). Sem `onOpen`, não há seta. Número entra rolando com `RollingMoney` (5.16). No destaque, o foco de luz segue o ponteiro. Um `hero` por tela.
 
 **Acessibilidade.** Seta com `aria-label` ("Ver alugado hoje" por padrão); (i) com `aria-label` "Como é calculado: título"; número com valor completo em `sr-only`.
 
@@ -466,24 +483,81 @@ Medidor em **meio arco** para uma proporção só (ocupação do estoque). Não 
 
 **Estados e entrada.** Arco desenhado em 900 ms uma vez (o trecho hachurado não anima). Sem interação. **Acessibilidade:** `role="img"` com `aria-label` que diz o número e a composição ("Ocupação do estoque: 76%. 128 em campo, 14 em limpeza, 44 parados."). **Contraste:** os trechos coloridos têm 3:1 sobre o cartão no claro; no escuro, `accent-active` e, com marcas escuras, `accent` ficam abaixo disso (13.2); o número e a legenda dizem o mesmo que a cor.
 
-### 5.14 MapaDF (`src/ui/MapaDF.tsx`)
+### 5.14 MapaReal (`src/ui/MapaReal.tsx`)
 
-Mapa estilizado do Distrito Federal, em tons neutros; **só rotas e pinos levam cor**. Não é cartografia: serve para ver onde cada equipe e cada parada estão.
+**O mapa do produto.** Mapa de verdade de Brasília (MapLibre GL, `maplibre-gl@5`; a versão 6 separa o worker em arquivo que o Vite não serve) com os estilos do OpenFreeMap, sem chave: `positron` no tema claro e `dark` no escuro, trocados sozinhos com o tema. O estilo é baixado e saneado antes de entrar no mapa (saem as camadas de escudo de rodovia e as de padrão, que geravam avisos no console). A biblioteca carrega sob demanda, então não pesa na primeira tela. Só pinos, caminhões e rotas levam cor.
 
-**Anatomia.** SVG que preenche o pai (`size-full`, herda o raio, `preserveAspectRatio="xMidYMid slice"`), viewBox de 1000 × 680; recorte padrão `[60, 40, 920, 620]`, ou `box` para aproximar (Painel: `[130, 40, 800, 560]`). Camadas, de baixo para cima: regiões em `--map-land` separadas por linha `--sunken`; parque `--map-park`; lago `--map-water`; avenidas `--map-road`; nomes das regiões opcionais (`labels`, 12 px aproximados, 500, `fg-3`); base da locadora (quadrado `fg` com miolo `raised`); rotas; pinos. Unidade `u` = largura do recorte / 100, e tudo (traço, pino, texto) é proporcional a ela.
+**Rotas pelas ruas, sem roteamento em tempo de execução.** Os trajetos foram calculados uma vez com OSRM sobre dados do OpenStreetMap e embutidos em `src/data/rotas.json` (351 pares: base com cada região e cada par de regiões). `src/lib/rotas.ts` decodifica, soma distância e tempo (`roadKm`) e dá a geometria (`pathGeometry`), o ponto na fração do trajeto (`pointAlong`) e o trecho já feito (`sliceAlong`). Motivo: o servidor público do OSRM limita requisições, e uma demo não pode depender dele. Ponto a mais de 3 km de qualquer região liga em linha reta.
 
-| Elemento | Medida | Estados |
+**Reserva.** Sem WebGL, ou se o servidor de mapa não responder em 9 s, cai no `MapaDF` (5.14.1) com os mesmos pinos e rotas. A tela nunca fica vazia.
+
+**Props.**
+
+| Prop | Tipo | Efeito |
 |---|---|---|
-| Rota | traço `accent` de 0,9u, pontas redondas; cheia = feito, tracejada (1,6u / 1,8u) = previsto | desenhada em 900 ms na entrada; com `selectedId`, as outras ficam a 25% |
-| Pino | círculo de 3,1u com anel `raised` de 0,7u e iniciais 2,5u 700; tons `accent` (em andamento), `info` (a caminho), `ok` (concluído), `danger` (atrasado), `neutral` (parada) | `pulse`: anel que cresce 1 → 2,3 e some, 1,8 s em loop, só em deslocamento; selecionado: os outros a 35%; foco de teclado: anel `ring` de 0,5u a 1,5u do pino |
+| `pins` | `RealPin[]` | `{ id, lat, lng, label, title, tone?, pulse?, group? }`. `label` são as iniciais ou o número da parada; `title` é a frase completa (dica nativa e leitor de tela) |
+| `routes` | `RealRoute[]` | `{ id, points, dashed?, group? }`. `points` são as paradas em ordem; a linha segue as ruas. Cheia é feito, tracejada é previsto |
+| `trucks` | `RealTruck[]` | `{ id, lat, lng, heading?, label, title, tone?, group?, routeId?, progress? }`. Com `routeId` e `progress` (0 a 1) o caminhão anda sobre as ruas daquela rota; a posição desliza quando muda |
+| `showBase` | `boolean` (padrão `true`) | Quadrado da base da locadora (SIA) |
+| `selectedGroup` | `string` | Grupo em destaque; o resto fica a 18% (rota) ou esmaecido (pino e caminhão). `group` padrão é o `id` |
+| `onSelect` | `(id) => void` | Com ele, pino e caminhão são botões (Enter e Espaço). Sem, são imagens |
+| `refit` | `'always' \| 'once'` | Enquadra sempre que os pontos mudam (padrão) ou só na primeira vez. O Painel usa `once` |
+| `fitGroup` | `string` | Enquadra só os pontos desse grupo (e a base) |
+| `controls` | `boolean` (padrão `true`) | Zoom mais e menos (alvo de 36 px, 44 em toque) |
+| `label` | `string` | Obrigatório. Resumo para leitor de tela ("Mapa de Brasília com 6 equipes na rua") |
+| `className` | `string` | O mapa preenche o pai; dê altura ao pai |
 
-Com `onSelect`, o pino é botão (`tabIndex`, Enter e Espaço); sem, é imagem. `<title>` em cada pino e `aria-label` com a frase completa ("Equipe Wesley: atrasada em Sobradinho"). O grupo tem `aria-label` com o resumo.
+Tons: `accent` (em andamento, o caminhão), `info` (a caminho), `ok` (concluído), `danger` (atrasado), `neutral` (agendada). Pino com anel que pulsa (`pulse`) só para o que está em movimento.
 
-**Quando usar.** Onde a pergunta é "onde" (na rua agora, rota do dia, entregas do evento). Dentro de um cartão com padding 8, altura mínima 240 e raio interno 16 (3.6). Cor do pino diz a situação e vem sempre com a frase em `aria-label`; no tema escuro `ok` e `info` são os tons mais escuros de 3.1.
+**Quando usar.** Onde a pergunta é "onde": Operação do dia, "Na rua agora" do Painel, rota otimizada. Sempre dentro de cartão com padding 8, raio interno 16 (3.6) e altura mínima 300 no escritório e 240 no celular. O crédito do mapa (OpenFreeMap, OpenMapTiles, OpenStreetMap) fica no canto, discreto, com as cores do tema; não remova, é exigência da licença.
+
+### 5.14.1 MapaDF (`src/ui/MapaDF.tsx`), mapa de reserva
+
+Mapa estilizado do Distrito Federal, em tons neutros, só rotas e pinos com cor. **Não é o padrão**: o `MapaReal` o usa por baixo quando não há WebGL ou servidor de mapa, convertendo latitude e longitude para o bairro mais próximo. Use direto só onde um desenho leve basta (miniatura sem rede). Props: `pins` (`x`, `y` no viewBox de 1000 × 680), `routes`, `box` para aproximar (`[x, y, largura, altura]`), `selectedId`, `onSelect`, `labels`, `label`. Pino de 3,1u com iniciais, rota de 0,9u, tons e `pulse` iguais aos do `MapaReal`. Tokens do desenho: `--map-land`, `--map-park`, `--map-water`, `--map-road`.
 
 ### 5.15 useCountUp (`src/ui/useCountUp.ts`)
 
-Hook que devolve o número animado: `useCountUp(value, duration = 600)`. Sobe de 0 até `value` **uma única vez ao montar**, com saída exponencial (`1 - 2^(-10t)`); se `value` mudar depois, anima a partir do valor atual (não volta a zero). Com `prefers-reduced-motion: reduce` devolve o valor final direto. Use para o número de um indicador de dinheiro ou contagem grande; não use em tabela, em campo de formulário nem em valor que muda a cada segundo. Formate o valor devolvido (`Money kpi` já faz); o leitor de tela recebe o valor final, não os intermediários.
+Hook que devolve o número animado: `useCountUp(value, duration = 600)`. Sobe de 0 até `value` uma única vez ao montar, com saída exponencial. Com `prefers-reduced-motion: reduce` devolve o valor final direto. Ficou para os casos em que o número não é de dinheiro nem de contagem de destaque (hoje o Dossiê da locação). Para o número que ancora uma tela, use `RollingMoney` ou `RollingNumber` (5.16), que rolam algarismo por algarismo.
+
+### 5.16 Motion (`src/ui/Motion.tsx`)
+
+Movimento do produto em um lugar só (3.9). Todos respeitam "reduzir movimento".
+
+| Export | Props | Quando usar |
+|---|---|---|
+| `Stagger` | `gap` (s, padrão 0,055), `delay` (s), `as` (`div`, `ul`, `ol`, `section`), `className`, `style` | Em volta de uma grade ou lista: cada filho direto entra em cascata, uma vez. CSS puro (`.ds-stagger`), sem elemento extra, então não mexe na grade. Um por bloco principal da tela |
+| `Reveal` | `delay` (s) e atributos de `div` | Um bloco só que sobe e aparece ao montar (`.ds-reveal`) |
+| `PageTransition` | `routeKey`, `children` | Em volta do conteúdo da rota, na casca (`AppLayout`). `routeKey` é o primeiro trecho da rota |
+| `RollingMoney` | `value`, `kpi?`, `className` | Dinheiro com algarismos rolando. `kpi` deixa "R$" e centavos menores, como `Money kpi`. Já está dentro do `MoneyCard` |
+| `RollingNumber` | `value`, `suffix?`, `decimals?`, `className` | Inteiro, decimal ou percentual rolando ("0,6 meses", "903%") |
+| `celebrate` | `origin?` (elemento ou `{ x, y }`) | Função, não componente. Confete de 64 peças nas cores da marca (`--accent`, `--accent-glow`, `--ok`, `--warn`, `--fg`) por 1300 ms, num canvas por cima de tudo (z 120, `aria-hidden`, sem captar clique). Passe o botão clicado |
+| `Tilt` | `max` (graus, padrão 4), `className` | Inclinação no ponteiro do cartão de destaque. Só mouse |
+| `reduced()` | | Função: `true` com "reduzir movimento". Use em animação feita em JavaScript |
+
+`RollingMoney` e `RollingNumber` entregam o valor completo em texto `sr-only` e escondem os algarismos animados (`aria-hidden`), então o leitor de tela não ouve a rolagem. O valor mostrado começa em 0 e assume o real no primeiro quadro, e é isso que faz rolar ao aparecer.
+
+### 5.17 EmailPreview (`src/ui/EmailPreview.tsx`)
+
+Prévia do e-mail que o cliente recebe. É o jeito de mostrar que cobrança e aviso saem por **e-mail, link de pagamento e portal do cliente** (não há outro canal de envio no produto). Cartão `bg-sunken` com cabeçalho de remetente (avatar de 36 em degradê da marca com as duas primeiras letras) e, dentro, uma folha `bg-raised` com assunto, anexo opcional, corpo e botão de pagar.
+
+Props: `from` (nome da locadora), `to` (e-mail do cliente), `subject`, `body` (quebras de linha mantidas), `cta?` (rótulo do botão, por exemplo "Pagar R$ 1.386,40 com Pix"; sem ele não há botão), `attachment?` (nó acima do corpo, como a foto ou a ilustração da avaria), `className`. O botão é desenho (`span`), não clica: a prévia não envia nada. O grupo tem `aria-label` "E-mail para {to}". Uso: gaveta de cobrança (Financeiro e Avarias e cobranças), régua de cobrança, relatório mensal e propostas do Copiloto.
+
+### 5.18 TypeArt (`src/modules/equipamentos/components/TypeArt.tsx`)
+
+Ilustração vetorial própria de cada tipo de equipamento, para a locadora ser reconhecida em 2 segundos mesmo sem foto. Uma família: `viewBox` 120 × 96, linha de chão em y = 84, dois tons da marca (`--accent` e `--accent-soft`), contorno de 2 px em `--accent-ink`, detalhes em `--raised`, sombra de chão em `--fg` a 12%. Segue a marca e o tema sozinha: só tokens, nenhuma cor solta. Nove desenhos, na ordem de `ART_TYPE_IDS`: `bq` banheiro químico, `pcd` cabine PcD, `pia` pia portátil, `trailer` trailer sanitário, `tnd5` tenda 5 × 5, `tnd10` tenda 10 × 10, `ala` alambrado, `fec` fechamento, `bal` balcão de bar. Tipo desconhecido recebe o desenho genérico.
+
+| Componente | Props |
+|---|---|
+| `TypeArt` | `typeId` (escolhe o desenho), `prefix` (código da unidade, "BQ", "TND", usado quando falta o `typeId`), `className`, `label`. Decorativa por padrão (`aria-hidden`); passe `label` para anunciar |
+| `TypeArtTile` | As mesmas, mais `tag` (etiqueta em pílula `bg-raised` no canto inferior esquerdo). Quadro `bg-accent-soft` com a ilustração a 92%; defina tamanho e raio pelo `className` |
+
+Onde entra: cartão de avaria, grade de equipamentos, anexo do e-mail, veredito por equipamento. Foto real, quando existir, tem prioridade sobre a ilustração. Nada de ilustração decorativa fora disso (seção 14).
+
+### 5.19 Linha do tempo da unidade (`src/modules/equipamentos/components/History.tsx`)
+
+Histórico da unidade, do mais recente ao mais antigo, na ficha do equipamento. Mesma anatomia da linha do tempo do dossiê (6.4), em tamanho de ficha: círculo de ícone de 36 (tom `neutral`, `danger`, `ok`, `warn` ou `info`, sempre `-soft` com `-ink`), linha vertical de 1 px `hairline` ligando os círculos, conteúdo a 48 px, 20 px entre eventos. Cada item: título 14/600, data e hora com metadado 12 `fg-3`, **links para a locação e para o cliente** (`accent-ink`, sublinhado no hover), foto de 64 que abre em tela cheia (`PhotoViewer`) e valor em `Money`. Ícones fixos por tipo (`HISTORY_ICON`): locação `Truck`, retorno `Undo2`, serviço `Sparkles`, avaria `TriangleAlert`, mudança de situação `Repeat`. Vazio: "O histórico desta unidade aparece aqui".
+
+Na mesma ficha, a **linha de disponibilidade** (`Timeline.tsx`, a aba "Linha do tempo" de Equipamentos) mostra cada tipo e cada unidade por dia: barra em pílula por locação (confirmada `info-soft`, em campo `accent`, retirada `warn-soft`, faturada `ok-soft`, orçamento em contorno tracejado), faixa de limpeza e manutenção hachurada, faixa de parada em `danger-soft` com os dias, e arrastar sobre os dias livres abre "Novo período". Barras entram esticando da esquerda (500 ms, 50 ms de intervalo).
 
 ---
 
@@ -505,13 +579,13 @@ Só onde a tarefa é comparar linhas (princípio 2). Com acabamento: cartão arr
 
 ### 6.2 Linha de serviço (`DataSection`)
 
-Item de lista da agenda e do app de campo. Altura mínima 72 px, padding 12 × 16, divisor `hairline`. Esquerda: horário 14/600 `.tnum` em coluna de 56 px (`fg`), abaixo duração 12 `fg-3`. Centro: tipo + quantidade 14/600 ("Limpeza, 12 unidades"), cliente e endereço 12 `fg-3` truncados, linha de badges (equipe, "Extra"). Direita: StatusDot. Tipo de serviço identificado por ícone 16 (Sparkles limpeza, Truck entrega/retirada, Wrench manutenção, Hammer montagem) em quadrado 32 `bg-sunken` `rounded-tip`, nunca por cor de borda lateral. Hover `bg-hover`; atual (em andamento) com fundo `accent-soft` e horário `accent-ink`. Atrasado: horário `danger-ink` + StatusDot danger. No campo: altura 80, texto 16, toque abre o serviço. Cliente e endereço ficam porque decidem a rota; a lista de ações do Painel (7.1) não tem esse tipo de legenda.
+Item de lista da agenda e do app da equipe de rua. Altura mínima 72 px, padding 12 × 16, divisor `hairline`. Esquerda: horário 14/600 `.tnum` em coluna de 56 px (`fg`), abaixo duração 12 `fg-3`. Centro: tipo + quantidade 14/600 ("Limpeza, 12 unidades"), cliente e endereço 12 `fg-3` truncados, linha de badges (equipe, "Extra"). Direita: StatusDot. Tipo de serviço identificado por ícone 16 (Sparkles limpeza, Truck entrega/retirada, Wrench manutenção, Hammer montagem) em quadrado 32 `bg-sunken` `rounded-tip`, nunca por cor de borda lateral. Hover `bg-hover`; atual (em andamento) com fundo `accent-soft` e horário `accent-ink`. Atrasado: horário `danger-ink` + StatusDot danger. No app da equipe de rua: altura 80, texto 16, toque abre o serviço. Cliente e endereço ficam porque decidem a rota; a lista de ações do Painel (7.1) não tem esse tipo de legenda.
 
 ### 6.3 Gráficos (`DataSection`, recharts)
 
-Para série longa, várias séries ou dois eixos. Para poucas categorias (mês a mês) prefira `PillBars` (5.12); para uma proporção, `ArcGauge` (5.13); para "onde", `MapaDF` (5.14).
+Para série longa, várias séries ou dois eixos. Para poucas categorias (mês a mês) prefira `PillBars` (5.12); para uma proporção, `ArcGauge` (5.13); para "onde", `MapaReal` (5.14).
 
-- Sempre dentro de cartão; título 16/650 + valor-resumo à direita (Money) + Segmented sm de período. Área do gráfico 240 px (escritório) / 200 px (campo).
+- Sempre dentro de cartão; título 16/650 + valor-resumo à direita (Money) + Segmented sm de período. Área do gráfico 240 px (escritório) / 200 px (app da equipe de rua).
 - Eixos: rótulos 12 `viz-axis`, sem linha de eixo; grade só horizontal, 1 px `viz-grid`, 4 a 5 linhas. Valores do eixo em reais abreviados ("R$ 12 mil"); no tooltip, valor completo.
 - Barras: largura máx. 32, raio superior 4, gap entre grupos ≥ 8. Série única: `--accent`; barra do período atual `--accent`, anteriores `--accent` a 40% (não é outra cor). Linha: 2 px, pontos só no hover (raio 4, borda 2 `raised`). Área: preenchimento da série a 12%.
 - Multi-série: `--viz-1…6` na ordem; mais de 6 séries agrupa o resto em "Outros" (`fg-3`). Legenda acima do gráfico, à esquerda, marca 8 px + rótulo 12 `fg-2`; clicar isola a série.
@@ -527,7 +601,7 @@ Lista vertical no trilho direito ou na ficha. Cada evento: ícone 16 em círculo
 
 ### 6.5 Foto (`DataSection`)
 
-Miniatura 64 × 64 (lista) ou 96 × 96 (grade do campo), `rounded-tip`, `object-fit: cover`, fundo `sunken`. Grade de fotos: gap 8, 3 colunas no celular. Toque abre visualizador em tela cheia (`bg-black`, foto contida, contador "2 de 5" 14 branco, fechar 44 px, deslize lateral). Carregando: esqueleto do mesmo tamanho. Erro: ícone ImageOff 24 `fg-3` no quadrado. Adicionar foto (campo): quadrado tracejado 1,5 px `strong`, ícone Camera 24 + "Foto" 12/600, alvo ≥ 96. Sempre com legenda acessível (`alt`: "Porta da BQ-0142 após a limpeza").
+Miniatura 64 × 64 (lista) ou 96 × 96 (grade do app da equipe de rua), `rounded-tip`, `object-fit: cover`, fundo `sunken`. Grade de fotos: gap 8, 3 colunas no celular. Toque abre visualizador em tela cheia (`bg-black`, foto contida, contador "2 de 5" 14 branco, fechar 44 px, deslize lateral). Carregando: esqueleto do mesmo tamanho. Erro: ícone ImageOff 24 `fg-3` no quadrado. Adicionar foto (app da equipe de rua): quadrado tracejado 1,5 px `strong`, ícone Camera 24 + "Foto" 12/600, alvo ≥ 96. Sempre com legenda acessível (`alt`: "Porta da BQ-0142 após a limpeza").
 
 ### 6.6 QR (`DataSection`)
 
@@ -560,7 +634,7 @@ Dentro do contêiner que estaria cheio, centralizado, padding 40 × 24, largura 
 
 ### 6.13 Passo a passo de wizard (`OverlaySection`)
 
-Escritório: barra horizontal acima do formulário, itens com número em círculo 24 (`bg-sunken` `fg-2` 12/600; atual `bg-accent` `on-accent`; concluído `bg-accent-soft` com check 14 `accent-ink`) + rótulo 14 (atual 600 `fg`, outros `fg-2`), ligados por linha 1 px `hairline` (concluída `accent`). Clicar num passo concluído volta a ele. Celular (app de campo): cabeçalho "Passo 2 de 5" 12/600 `fg-3` + título `text-title-field` + barra de progresso 4 px `sunken` com preenchimento `accent` (transição 250 ms). Rodapé: "Voltar" fantasma + "Continuar" primário (`field` no celular). Passo com erro: círculo `danger-soft` com `!`.
+Escritório: barra horizontal acima do formulário, itens com número em círculo 24 (`bg-sunken` `fg-2` 12/600; atual `bg-accent` `on-accent`; concluído `bg-accent-soft` com check 14 `accent-ink`) + rótulo 14 (atual 600 `fg`, outros `fg-2`), ligados por linha 1 px `hairline` (concluída `accent`). Clicar num passo concluído volta a ele. Celular (app da equipe de rua): cabeçalho "Passo 2 de 5" 12/600 `fg-3` + título `text-title-field` + barra de progresso 4 px `sunken` com preenchimento `accent` (transição 250 ms). Rodapé: "Voltar" fantasma + "Continuar" primário (`field` no celular). Passo com erro: círculo `danger-soft` com `!`.
 
 ### 6.14 Etiqueta "Pacote IA" e Copiloto (`OverlaySection`, `PainelSection`)
 
@@ -578,13 +652,13 @@ Ver 4.1. Ordem: título à esquerda, busca ao centro, avisos e usuário à direi
 
 ### 6.17 Navegação inferior do celular (`ShellSection`)
 
-Ver 4.2. Itens do app de campo: Hoje, Serviços, Avarias, Perfil. Foco: contorno 2 `ring` afastado -2 no item. Badge numérico 12/600 sobre o ícone (pílula 18, `bg-danger-solid` com texto branco, 5,5:1; `danger` com branco não passa) quando houver pendência.
+Ver 4.2. Itens do app da equipe de rua: Hoje, Serviços, Avarias, Perfil. Foco: contorno 2 `ring` afastado -2 no item. Badge numérico 12/600 sobre o ícone (pílula 18, `bg-danger-solid` com texto branco, 5,5:1; `danger` com branco não passa) quando houver pendência.
 
-### 6.18 Botões grandes do app de campo (`ShellSection`)
+### 6.18 Botões grandes do app da equipe de rua (`ShellSection`)
 
 - Ação principal: Button `field` primário (pílula, 56), largura total, ícone 24.
 - Ação de etapa (grade 2 colunas, gap 12): bloco de 96 px de altura, `bg-raised`, `rounded-card`, ícone 24 `accent-ink` em cima + rótulo 16/600 `fg` embaixo, padding 16. Hover/pressionado `bg-hover` / `bg-sunken`. Concluída: ícone CircleCheck `ok`, rótulo + "Feito" 12 `ok-ink`. Desabilitada `fg-disabled`. Foco contorno 2 `ring`.
-- Ação de perigo no campo ("Registrar avaria"): Button `field` variante secundário com ícone `danger-ink`; perigo sólido só para excluir.
+- Ação de perigo no app da equipe de rua ("Registrar avaria"): Button `field` variante secundário com ícone `danger-ink`; perigo sólido só para excluir.
 
 ### 6.19 Faixa "Ambiente de demonstração" (`ShellSection`)
 
@@ -594,7 +668,7 @@ Fixa no topo de tudo (z 95), altura 32, largura total, `bg-inverse` `text-on-inv
 
 ## 7. Padrão de tela
 
-As telas `src/modules/painel/index.tsx` e `src/modules/campo/Hoje.tsx` são o modelo. Tela nova segue a composição, troca o conteúdo e mantém as medidas. Em toda tela: um bloco de destaque, título curto em cada bloco, o dado, a ação; nenhuma linha de apoio.
+As telas `src/modules/painel/index.tsx` e `src/modules/campo/Hoje.tsx` (app da equipe de rua) são o modelo. Tela nova segue a composição, troca o conteúdo e mantém as medidas. Em toda tela: um bloco de destaque, título curto em cada bloco, o dado, a ação; nenhuma linha de apoio.
 
 ### 7.1 Painel (escritório): `Painel.tsx`
 
@@ -604,11 +678,11 @@ Cabeçalho: H1 `text-title-page` à esquerda; à direita `Nova locação` (prim�
 |---|---|---|---|
 | 1. Os quatro números | 3 + 3 + 3 + 3 (4 iguais) | Quatro `MoneyCard`; **o primeiro é `hero`** (o número que ancora a página: "Alugado hoje", com etiqueta de variação). Os outros três: parado no depósito, avarias não cobradas, extras não faturados | Todos com `formula` (tooltip) e `onOpen` (seta que leva à lista). Número `lg` 44. Sem frase embaixo do número. Abaixo de 1180: 1 coluna (2 a partir de `sm`) |
 | 2. Receita, cobrança, ação | 4 + 3 + 5 | **Receita:** título 18, `Segmented sm` no canto, número `text-kpi` com etiqueta de variação, `PillBars` (150 px; anteriores `soft`, penúltimo `solid`, atual `strong`). **A receber:** título, número `text-kpi`, barra de proporção em pílulas (14 px de altura, gap 4, `flex-grow` proporcional ao valor: em dia `accent`, até 15 dias `warn`, mais de 15 `danger`, tooltip em cada trecho), uma linha "Atrasados" com valor 18/600 `danger-ink`, e o primário `lg block` "Cobrar atrasados" colado na base. **Para fazer hoje:** lista de 4 ações | Item da lista de ações: círculo de 44 com ícone 20 no tom da urgência (`danger-soft`, `warn-soft`, `info-soft`, `sunken`), título `body-lg` 500, valor `body-lg` 600, botão circular de 36 com seta (contorno `edge`, hover preenche `fg`). Sem legenda embaixo do título |
-| 3. Rua, estoque, Copiloto | 5 + 4 + 3 | **Na rua agora:** cartão com padding 8, cabeçalho com título 18 e botão `sm` "Operação", `MapaDF` com pinos das equipes e rotas, altura mínima 240, raio interno 16. **Ocupação do estoque:** título, `ArcGauge` com o percentual no centro e legenda de pontos com contagem embaixo. **Copiloto:** cartão escuro `ds-copilot` com dois números e o botão branco "Ver propostas" | O cartão escuro é o único bloco escuro. A cor dos pinos diz a situação (7.3) |
+| 3. Rua, estoque, Copiloto | 5 + 4 + 3 (sem o Pacote IA: 7 + 5) | **Na rua agora:** cartão com padding 8, cabeçalho com título 18 e botão `sm` "Operação", `MapaReal` com os caminhões andando e as rotas do dia, enquadrado uma vez (`refit="once"`), altura mínima 300, raio interno 16; tocar num caminhão abre a Operação nessa equipe. **Ocupação do estoque:** título, `ArcGauge` com o percentual no centro e legenda de pontos com contagem embaixo; embaixo dele, o cartão "Sistema trabalhando" com duas linhas que levam às telas novas: **Recuperado no mês** (`RollingMoney`, abre Inteligência) e **Feito sozinho hoje** (`RollingNumber`, abre Automações). **Copiloto:** cartão escuro `ds-copilot` com dois números e o botão branco "Ver propostas" | O cartão escuro é o único bloco escuro. A cor dos pinos diz a situação (7.3) |
 
-Lateral: dois grupos com rótulo em caixa alta ("Hoje", "Gestão"), Painel de dinheiro ativo, contadores em Badge; rodapé com Configurações, Ajuda e usuário. Topo: título é a data por extenso.
+Lateral: três grupos com rótulo em caixa alta ("Hoje", "Gestão", "Crescer": Inteligência e Automações), Painel de dinheiro ativo, contadores em Badge; rodapé com Configurações, Ajuda e usuário. Topo: título é a data por extenso.
 
-### 7.2 App de campo (celular): `Campo.tsx`
+### 7.2 App da equipe de rua (celular): `Campo.tsx`
 
 De cima para baixo, em coluna de 390 px, gap 12 entre blocos:
 
@@ -620,21 +694,56 @@ De cima para baixo, em coluna de 390 px, gap 12 entre blocos:
 6. **Lista "Depois deste":** título 18/24 com 24 px acima e 8 abaixo, depois uma lista num cartão `raised` encostado (`overflow-hidden`) com `ServiceRow variant="field"` (80 px, hora, tipo, cliente, status).
 7. **Navegação inferior** de 64 px com Hoje (ativo), Serviços, Avarias (contador) e Perfil.
 
-No desktop, a prévia do campo aparece dentro de moldura de celular de 390 × 844 (raio 44, anel de 10 px `inverse`); no celular ocupa a janela.
+No desktop, a prévia do app da equipe de rua aparece dentro de moldura de celular de 390 × 844 (raio 44, anel de 10 px `inverse`); no celular ocupa a janela.
 
 ### 7.3 Como adaptar a outra tela
 
-- Escolha o **número ou o item único** que ancora a tela e dê a ele o degradê (`MoneyCard hero` no escritório, bloco de destaque no campo). Se nada ancora, não há destaque.
+- Escolha o **número ou o item único** que ancora a tela e dê a ele o degradê (`MoneyCard hero` no escritório, bloco de destaque no app da equipe de rua). Se nada ancora, não há destaque.
 - Primeira linha de escritório: números. Segunda: o que se compara no tempo ou se cobra (barras, proporção, lista de ações). Terceira: onde e quanto (mapa, medidor) e o Copiloto.
-- Pergunta "onde?" pede mapa; "quanto?" pede número grande; "quantos de quantos?" pede segmentos ou medidor; "o que fazer?" pede lista de ações com valor e seta. Tabela só se o usuário vai comparar linhas.
+- Pergunta "onde?" pede mapa real; "quanto vai entrar?" pede previsão em reais; "o que o sistema fez?" pede execução em linha do tempo; "quanto?" pede número grande; "quantos de quantos?" pede segmentos ou medidor; "o que fazer?" pede lista de ações com valor e seta. Tabela só se o usuário vai comparar linhas.
 - Cor de pino e de etiqueta é situação, não decoração: accent em andamento, info a caminho, ok concluído, danger atrasado.
 - Cada bloco: título curto (18/24), dado, ação. Se for tentador escrever uma frase embaixo, ela vira tooltip.
+
+### 7.4 Operação do dia (mapa real)
+
+O mapa é o destaque da tela e ocupa a largura toda (`MapaDoDia`, `src/modules/operacao/components/MapaDoDia.tsx`); a agenda por equipe vem embaixo. Cabeçalho: H1, seletor de dia, **Novo serviço** (secundário) e **Otimizar rotas** (primário, com a etiqueta Pacote IA). Logo abaixo, a **faixa de sugestão** quando há equipe atrasada ("Equipe Wesley atrasada. {serviço} para a Equipe Jussara: 51 min a menos") com o botão **Aplicar**. Sobre o mapa flutuam cartões: o **resumo** no canto superior esquerdo (concluídos de N com o botão "Ao vivo", segmentos de progresso, em andamento, atrasados e quilômetros do dia) e, a pedido, o **painel de comparação** à direita; a legenda de cores dos pinos fica na base do mapa. Caminhões andam pelas ruas com as iniciais da equipe; tocar num caminhão ou numa parada seleciona a equipe e esmaece o resto do mapa (`selectedGroup`). Parada atrasada em `danger`.
+
+**Otimizar rotas.** Abre o `RouteCompare` (`RouteCompare.tsx`) e desenha no mapa a rota nova por cima da antiga, que fica esmaecida. O painel mostra três números grandes (km a menos em `accent-soft`, minutos a menos, diesel em reais, com `RollingNumber` e `RollingMoney`), uma linha por equipe que muda (ordem atual contra a nova em pílulas numeradas, a parada que mudou de lugar em `accent`, quilômetros antes e depois) e os botões **Aplicar** (primário) e **Agora não**. Aplicar grava a nova ordem, recalcula os horários, registra a execução no histórico das automações e dispara `celebrate`. Só reordena o que ainda não começou, partindo de onde a equipe está. No celular o painel vai numa gaveta inferior. Sem o Pacote IA, a faixa de sugestão some; o atraso continua visível no mapa e nos cartões.
+
+### 7.5 Inteligência: `src/modules/inteligencia`
+
+Tela que prova que o sistema pensa e gera dinheiro. Composição, de cima para baixo:
+
+1. **Cabeçalho:** H1 e o botão secundário `lg` "Calculadora de perdas" (abre `/diagnostico` em outra aba).
+2. **Quatro indicadores** (`Stagger`, 4 em linha a partir de 1180 px): o primeiro é o destaque em degradê, **Caixa previsto em 30 dias**; os outros: **Recuperado no mês** (tom `ok`), **Ganho possível com preços** (com "/mês") e **Vai faltar estoque** (tom `warn`, com etiquetas "Pico em 16/11" e o tipo; quando não falta, vira "Estoque dá conta"). Cada um com ícone em círculo de 44, seta que abre a aba certa e "como é calculado" em tooltip. Números com `RollingMoney` e `RollingNumber`.
+3. **Abas** em pílula (`Caixa`, `Equipamentos`, `Preços`), rotas `/inteligencia/caixa`, `/equipamentos` e `/precos`.
+4. **Caixa:** gráfico das próximas 12 semanas, em cobranças emitidas e recorrente previsto, com o valor da semana em foco; segmentado 30, 60 e 90 dias com o total a entrar; e "O sistema recuperou", com o total do mês, a barra de proporção por origem (avarias cobradas, extras faturados, atrasados recuperados, parados realugados) e a lista de cada recuperação com valor.
+5. **Equipamentos:** um cartão por tipo, com a ilustração, o anel de ocupação, o **veredito** em pílula (`Comprar mais`, `Subir preço`, `Manter`, `Baixar preço`, `Vender`, cada um com tom e ícone) e o efeito em reais por mês; selecionar um tipo abre a previsão de demanda de 30 dias contra o estoque, com o dia do pico. Abaixo, duas listas: unidades que mais renderam e que menos renderam, com os dias parada.
+6. **Preços:** um cartão por tipo com o preço de hoje, o sugerido, a variação em pílula, a ocupação em 30 dias e o ganho por mês, e o botão **Aplicar** (primário `lg`); **Aplicar todas** abre diálogo de confirmação. Aplicar dispara `celebrate` e vai para o histórico de automações.
+
+Regras: todo número vem de soma real dos dados (`src/services/inteligencia.ts`), a regra de cálculo fica em tooltip, e todo veredito traz uma ação ou um efeito em reais. O verde é só do estado `ok` (recuperado), não da marca.
+
+### 7.6 Automações: `src/modules/automacoes`
+
+Tela que prova que o sistema trabalha sozinho. De cima para baixo:
+
+1. **Cabeçalho:** H1, **Rodar agora** (primário `lg`, com contador em pílula das ações esperando) e **Nova automação** (secundário). **Rodar agora** executa de verdade o que está pendente nas automações ligadas (cobra avarias, fatura extras, manda o lembrete da régua e redistribui rota atrasada), grava cada execução no histórico e dispara `celebrate` quando entra dinheiro. Rodar de novo em seguida não repete.
+2. **Abertura** (`Opening`, `Stagger`, 4 em linha a partir de 1180 px): o destaque **Feito sozinho hoje** com a pílula "Ao vivo", **Dinheiro recuperado**, **Horas poupadas** e **Ativas** com medidor em anel ("8 de 9").
+3. **Grade de automações** (`AutomationCard`): cada cartão tem o canal em Badge neutro, o `Switch` que liga e desliga, o nome, o **fluxo** gatilho, seta e ação (`Flow`: círculo `accent-soft` do gatilho, círculo em degradê da ação, pontinho percorrendo a linha quando ligada, tracejado e esmaecido quando desligada) e, no rodapé, as execuções em 30 dias e o dinheiro atribuído. Clicar abre a gaveta da automação (`AutomationDrawer`) com o histórico dela.
+4. **Atividade** (coluna à direita no desktop, abaixo no celular): linha do tempo das execuções agrupada por dia, com o botão **Ao vivo** que liga e pausa a chegada de novas execuções, uma por vez, e destaque na que acabou de chegar. Cada linha diz o que o sistema fez, com nome do cliente e código, e abre a cobrança ou o serviço.
+5. **Nova automação** (`NewAutomation`): diálogo com nome, gatilho, ação e canal; o `Flow` aparece montando enquanto o usuário escolhe.
+
+Canais de aviso listados: e-mail, portal do cliente, app da equipe de rua e dentro do sistema. Não há canal de mensagem instantânea no produto.
+
+### 7.7 Calculadora de perdas: `/diagnostico`
+
+Tela pública, fora da casca do escritório (sem lateral e sem topo), para usar na venda com o dono da locadora na frente. Cabeçalho com a marca da locadora e **Abrir o sistema**. Em 12 colunas: à esquerda os controles em cartões por grupo (Equipamentos, Avarias, Serviços extras, Faturamento), cada controle com campo numérico digitável e **barra deslizante** de 44 px de alvo; depois "Ajustar valores" (recolhido: valor médio de uma avaria e de um extra) e **Investimento** (implantação e mensalidade). À direita, fixo ao rolar, o resultado: o destaque em degradê **Você perde por mês** (número de até 76 px com `RollingMoney`) com o total por ano em pílula; a barra de **de onde vem a perda** (equipamento parado, atraso, avarias sem cobrança, extras sem fatura, em ordem de valor); o cartão `ok` **O sistema recupera por mês** com **Se paga em** meses e **Retorno no 1º ano**; e o botão `field` **Ver o sistema funcionando**. No celular o resultado vem primeiro e uma barra escura fixa na base mantém "Você perde por mês" à vista enquanto se mexe nos controles. Tudo recalcula a cada mudança, sem botão de calcular. As premissas de recuperação estão em `RECOVERY_RATE`.
 
 ---
 
 ## 8. Regras de uso da cor
 
-- **Acento** pode aparecer em: botão primário (degradê); um bloco preenchido por tela (degradê do destaque, no escritório e no campo); item ativo de navegação (indicador de 4 × 28 e ícone `accent-ink`); seleção (`accent-soft`); link (`accent-ink`, sublinhado no hover); anel de foco; barras, arco, segmentos de progresso e proporção no gráfico; rota e pino do mapa; brilho do cartão escuro do Copiloto (só anéis e fundo). Em nenhum outro lugar.
+- **Acento** pode aparecer em: botão primário (degradê); um bloco preenchido por tela (degradê do destaque, no escritório e no app da equipe de rua); item ativo de navegação (indicador de 4 × 28 e ícone `accent-ink`); seleção (`accent-soft`); link (`accent-ink`, sublinhado no hover); anel de foco; barras, arco, segmentos de progresso e proporção no gráfico; rota e pino do mapa; brilho do cartão escuro do Copiloto (só anéis e fundo). Em nenhum outro lugar.
 - **Um bloco preenchido por tela.** Se a tela tem dois números igualmente importantes, nenhum é destaque: use `StatStrip` ou cartões sem destaque. O cartão escuro do Copiloto não conta como preenchimento de marca e não é segundo destaque: é o único bloco escuro permitido.
 - **Estados** nunca usam o acento, mesmo que a marca seja verde (concluído é `ok`, não `accent`).
 - **Texto sobre cor**: sobre `accent` e o degradê só `on-accent`/`on-accent-2`; sobre `-soft` só o `-ink` do mesmo tom; sobre `inverse` só `on-inverse(-2)`; sobre o cartão escuro do Copiloto, branco. `--accent-glow` nunca é cor de texto.
@@ -671,7 +780,7 @@ Seleção `accent-soft` + `accent-ink`; cursor de texto `accent-ink`; barra de r
 
 ## 12. Copy
 
-Frases curtas de app de operação. Botão: verbo + objeto ("Gerar cobrança", "Registrar avaria"). Erro: problema + saída ("CNPJ incompleto. Confira os 14 números."). Vocabulário: equipamento, serviço, cobrança, locação, avaria, extra, mensalidade, retirada, limpeza. Dados de exemplo plausíveis ("Construtora Planalto", "R$ 3.184,50", "BQ-0142", "Limpeza, 12 unidades"). Proibido: travessão (— e –), frase de efeito, "Lorem ipsum", números redondos falsos, emoji em interface.
+Frases curtas de app de operação. Botão: verbo + objeto ("Gerar cobrança", "Registrar avaria"). Erro: problema + saída ("CNPJ incompleto. Confira os 14 números."). Vocabulário: equipamento, serviço, cobrança, locação, avaria, extra, mensalidade, retirada, limpeza. Dados de exemplo plausíveis ("Construtora Planalto", "R$ 3.184,50", "BQ-0142", "Limpeza, 12 unidades"). Cobrança e aviso saem por e-mail, link de pagamento e portal do cliente; não cite canal de mensagem instantânea. A equipe que vai ao local é a "equipe de rua". Proibido: travessão (— e –), frase de efeito, "Lorem ipsum", números redondos falsos, emoji em interface.
 
 **Sem texto de apoio.** Regra do dono do produto, vale para toda tela e também para esta documentação e o catálogo.
 
@@ -779,7 +888,7 @@ Todos os pares de texto da marca passam (≥ 4,50). Abaixo de 3:1, como objeto: 
 
 Medido por composição: branco sobre o acento com a camada de desenho por cima. O mínimo é 4,5:1 (texto de 12 px).
 
-| Marca | Tema | Etiqueta do destaque (branco 20% sobre o acento) | Pílula "Próximo" do campo (branco 15%) | Foco de luz 38% (sobre o acento / sobre o tom do meio) | Anel concêntrico 22% | Brilho do canto 46% |
+| Marca | Tema | Etiqueta do destaque (branco 20% sobre o acento) | Pílula "Próximo" do app (branco 15%) | Foco de luz 38% (sobre o acento / sobre o tom do meio) | Anel concêntrico 22% | Brilho do canto 46% |
 |---|---|---|---|---|---|---|
 | Laranja (padrão) | claro | 3,44 | 3,72 | 3,68 / 4,08 | 4,04 | 3,53 |
 | Verde floresta | claro | 4,08 | 4,58 | 5,10 / 5,73 | 5,64 | 4,89 |
@@ -792,7 +901,7 @@ Medido por composição: branco sobre o acento com a camada de desenho por cima.
 | Grafite | escuro | 4,63 | 5,20 | 6,13 / 5,62 | 6,73 | 5,86 |
 | Amarelo claro (teste) | escuro | 3,19 | 3,49 | 3,64 / 3,97 | 4,01 | 3,49 |
 
-Com o laranja padrão a derivação deixa o acento em 4,56:1 com branco, e qualquer camada que clareie o fundo derruba isso: a etiqueta do destaque (`on-accent` a 20%), a pílula "Próximo" do campo (15%) e o foco de luz sob o ponteiro ficam entre 3,4 e 4,1. Verde e azul passam em quase tudo no claro. Os anéis de 1,5 px e o brilho do canto ficam longe do texto na maior parte dos tamanhos de cartão.
+Com o laranja padrão a derivação deixa o acento em 4,56:1 com branco, e qualquer camada que clareie o fundo derruba isso: a etiqueta do destaque (`on-accent` a 20%), a pílula "Próximo" do app (15%) e o foco de luz sob o ponteiro ficam entre 3,4 e 4,1. Verde e azul passam em quase tudo no claro. Os anéis de 1,5 px e o brilho do canto ficam longe do texto na maior parte dos tamanhos de cartão.
 
 ---
 
@@ -807,9 +916,10 @@ Com o laranja padrão a derivação deixa o acento em 4,56:1 com branco, e qualq
 - Texto abaixo de 12 px. Texto secundário abaixo de 4,5:1. Cinza sobre cor (use a tinta do tom). `--accent-glow` como cor de texto.
 - Fonte que não seja Manrope. Inter, Roboto, mono fora de código. Peso abaixo de 400.
 - Emoji como ícone. Ícone de outra biblioteca. Traço diferente de 2.
-- Hachura como enfeite. Ilustração, memoji, avatar fictício decorativo, imagem promocional.
+- Hachura como enfeite. Memoji, avatar fictício decorativo, imagem promocional. Ilustração que não seja a do equipamento (`TypeArt`, 5.18).
 - Acento em estado (concluído verde-marca), em fundo de seção, em texto corrido sem ser link. Mais de um bloco preenchido por tela.
-- Animação de entrada de página, parallax, animação em loop fora do esqueleto, do spinner de botão e do pulso do pino. Animação de dado (número, barra, arco, rota) que repete: roda uma vez ao montar.
+- Parallax. Animação em loop fora do esqueleto, do spinner de botão, do pulso do pino e do pontinho do fluxo de automação ligada. Animação de dado (número, barra, arco, rota, cascata) que repete: roda uma vez ao montar. `celebrate` sem dinheiro entrando. Animação que atrasa o clique seguinte ou ignora "reduzir movimento".
+- Canal de mensagem instantânea em qualquer lugar (integração, canal de envio, prévia de mensagem). Nota ou alerta de risco de inadimplência por cliente. Exibição em tela de TV. Qualquer rótulo para o app do celular que não seja "App da equipe de rua".
 - Modal como primeira opção. Spinner no meio do conteúdo.
 - Travessão, frase de efeito, "Lorem ipsum", números redondos falsos.
 - Tokens antigos (`canvas`, `card`, `ink`, `brand`…) em tela nova.
@@ -820,7 +930,7 @@ Com o laranja padrão a derivação deixa o acento em 4,56:1 com branco, e qualq
 
 1. **Neutros tingidos pela marca?** Mantive neutros frios fixos para combinar com qualquer marca. Se o cliente quiser neutros puxados para a cor dele, dá para derivar em `applyBrand` (croma ≤ 0,01).
 2. **Contraste do botão preenchido e dos desenhos de marca com o fundo no escuro.** Com Grafite no escuro, accent sobre painel dá 2,37:1 e sobre o cartão 2,19:1. Nas marcas coloridas, `accent-active` sobre o cartão escuro dá de 2,75 a 2,91:1 (trecho escuro do `ArcGauge`, barra `strong` do `PillBars`). O botão é identificado pelo rótulo (WCAG 1.4.11 não exige) e o gráfico traz valor e legenda, mas pode parecer apagado. O mesmo vale para o trilho do switch ligado (2,37:1 sobre o painel no Grafite): o estado é lido pela posição do botão branco, que dá 7,7:1 com o trilho. Alternativa conservadora, não aplicada: contorno 1 px `edge` no primário e no switch ligado quando accent/painel < 3:1, e `accent` no lugar de `accent-active` no escuro.
-3. **Texto sobre o destaque com camadas de desenho.** Atualização do QA final: as camadas foram reduzidas (anéis 14%, brilho 28%, foco 10%) e as pílulas sobre o destaque passaram a `accent-active`; a varredura por pixel não acusa mais texto abaixo de 4,5:1 no destaque. Registro original: Com o laranja padrão, a etiqueta do `MoneyCard hero` (3,44:1), a pílula "Próximo" do campo (3,72:1) e o foco de luz sob o ponteiro (3,68:1, 4,08:1 no tom do meio) ficam abaixo de 4,5:1 (13.3). A causa é estrutural: o acento já está no piso de 4,5:1 e o desenho clareia o fundo. Correções possíveis, todas fora de `tokens.css`: fundo da etiqueta e da pílula em `accent-active` (escurece em vez de clarear, passa em todas as marcas) e derivar o acento com folga (5:1) em `brand.ts`; ou reduzir o foco de luz para cerca de 15%. Não apliquei: mexe no visual aprovado.
+3. **Texto sobre o destaque com camadas de desenho.** Atualização do QA final: as camadas foram reduzidas (anéis 14%, brilho 28%, foco 10%) e as pílulas sobre o destaque passaram a `accent-active`; a varredura por pixel não acusa mais texto abaixo de 4,5:1 no destaque. Registro original: Com o laranja padrão, a etiqueta do `MoneyCard hero` (3,44:1), a pílula "Próximo" do app (3,72:1) e o foco de luz sob o ponteiro (3,68:1, 4,08:1 no tom do meio) ficam abaixo de 4,5:1 (13.3). A causa é estrutural: o acento já está no piso de 4,5:1 e o desenho clareia o fundo. Correções possíveis, todas fora de `tokens.css`: fundo da etiqueta e da pílula em `accent-active` (escurece em vez de clarear, passa em todas as marcas) e derivar o acento com folga (5:1) em `brand.ts`; ou reduzir o foco de luz para cerca de 15%. Não apliquei: mexe no visual aprovado.
 4. **Barra `soft` do `PillBars` abaixo de 3:1** (1,5 a 3,2:1 sobre o cartão). A leitura não depende da cor (altura, posição, rótulo, valor em foco), mas um tom 70% em vez de 55% resolveria no claro. Mudança de componente.
 5. **Altura do Select e do Input.** O Input passou para 44 e 52; o Select continua 40 e 48. Lado a lado num formulário ficam desalinhados. Igualar é mudança de componente.
 6. **Corpo do escritório em 14 px** (o piso era 13). Densidade de tabela aceita 13 px se o cliente pedir mais linhas por tela.

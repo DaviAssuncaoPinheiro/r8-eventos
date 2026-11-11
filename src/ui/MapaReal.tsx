@@ -124,6 +124,8 @@ const routeKey = (pts: { lat: number; lng: number }[]) => pts.map((p) => `${p.ln
 /* ───────── reserva: mapa estilizado, com os pontos no bairro mais próximo ───────── */
 
 function nearestXY(lat: number, lng: number) {
+  // a base tem lugar próprio no desenho: as rotas que saem dela encontram o marcador
+  if (Math.abs(lat - BASE.lat) < 0.002 && Math.abs(lng - BASE.lng) < 0.002) return { x: BASE.x, y: BASE.y }
   let best = BAIRROS[0]
   let d = Infinity
   for (const b of BAIRROS) {

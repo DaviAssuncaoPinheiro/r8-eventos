@@ -7,7 +7,7 @@ const SIZES = [
   { px: 16, use: 'Botão sm, tabela, campo' },
   { px: 18, use: 'Botão md, navegação' },
   { px: 20, use: 'Botão lg, cabeçalho' },
-  { px: 24, use: 'App de campo, estado vazio' },
+  { px: 24, use: 'App da equipe de rua, estado vazio' },
 ]
 const SET = [Truck, Package, Wrench, Receipt, CalendarDays, ClipboardCheck, QrCode, Bell]
 

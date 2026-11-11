@@ -77,7 +77,7 @@ export function idleReRentedItems(data: Pick<DbData, 'rentals' | 'units' | 'clie
       if (value <= 0) continue
       out.push({
         kind: 'parado',
-        label: `${units.get(id)?.code ?? id} voltou a alugar depois de ${idle} dias parada (${clients.get(r.clientId)?.name ?? ''})`,
+        label: `${units.get(id)?.code ?? id} alugada após ${idle} dias parada`,
         value,
         at: atTime(r.start, 9 * 60),
         ref: { type: 'unit', id },
@@ -95,10 +95,10 @@ export function computeRecoveredMoney(data: DbData, month: string = monthKey(tod
   const inMonth = (iso: string) => monthKey(dayOf(iso)) === month && dayOf(iso) <= today
   const items: RecoveredItem[] = []
   for (const c of data.charges) {
-    if (c.kind === 'avaria' && isSent(c) && inMonth(c.sentAt!)) items.push({ kind: 'avaria', label: `Avaria cobrada de ${cname(c)} (${c.code})`, value: c.value, at: c.sentAt!, ref: { type: 'charge', id: c.id } })
-    else if (c.kind === 'extra' && isSent(c) && inMonth(c.sentAt!)) items.push({ kind: 'extra', label: `Extras faturados de ${cname(c)} (${c.code})`, value: c.value, at: c.sentAt!, ref: { type: 'charge', id: c.id } })
+    if (c.kind === 'avaria' && isSent(c) && inMonth(c.sentAt!)) items.push({ kind: 'avaria', label: `Avaria: ${cname(c)}`, value: c.value, at: c.sentAt!, ref: { type: 'charge', id: c.id } })
+    else if (c.kind === 'extra' && isSent(c) && inMonth(c.sentAt!)) items.push({ kind: 'extra', label: `Extras: ${cname(c)}`, value: c.value, at: c.sentAt!, ref: { type: 'charge', id: c.id } })
     else if (c.kind !== 'avaria' && c.kind !== 'extra' && c.status === 'paga' && c.paidAt && inMonth(c.paidAt) && c.paidAt > c.dueAt && c.reminders.some((m) => dayOf(m.at) >= c.dueAt && dayOf(m.at) <= c.paidAt!)) {
-      items.push({ kind: 'atraso', label: `${cname(c)} pagou ${c.code} depois do lembrete`, value: c.value, at: atTime(c.paidAt, 14 * 60), ref: { type: 'charge', id: c.id } })
+      items.push({ kind: 'atraso', label: `${cname(c)} pagou após o lembrete`, value: c.value, at: atTime(c.paidAt, 14 * 60), ref: { type: 'charge', id: c.id } })
     }
   }
   items.push(...idleReRentedItems(data, month, today))

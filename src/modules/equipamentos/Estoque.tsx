@@ -166,7 +166,7 @@ export default function Estoque() {
                     )}
                   >
                     {p.label}
-                    <span className={cn('tnum text-caption', on ? 'text-raised/70' : 'text-fg-3')}>{counts[p.key]}</span>
+                    {all.data ? <span className={cn('tnum text-caption', on ? 'text-raised/70' : 'text-fg-3')}>{counts[p.key]}</span> : null}
                   </button>
                 )
               })}

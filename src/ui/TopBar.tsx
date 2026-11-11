@@ -70,7 +70,7 @@ export function TopBar({
   const bellLabel = unreadCount > 0 ? `Avisos, ${unreadCount} não lidos` : 'Avisos'
 
   return (
-    <header className={cn('flex h-[72px] shrink-0 items-center gap-4 rounded-panel bg-panel px-5 text-fg', className)}>
+    <header className={cn('flex h-[72px] shrink-0 items-center gap-4 rounded-panel bg-panel px-5 text-fg @max-[639px]/frame:gap-2', className)}>
       {onMenuClick ? (
         <Tooltip content="Abrir menu">
           <button type="button" aria-label="Abrir menu" onClick={onMenuClick} className={cn(iconBtn, 'size-11 @min-[1024px]/frame:hidden')}>
@@ -81,7 +81,7 @@ export function TopBar({
 
       <p className="min-w-0 flex-1 basis-0 truncate text-title-sub">{title}</p>
 
-      <div role="search" className="min-w-0 flex-[0_1_360px]">
+      <div role="search" className="min-w-11 flex-[0_1_360px]">
         <div className={cn(compact ? 'hidden' : '@max-[1279px]/frame:hidden')}>
           <Input
             ref={inputRef}
@@ -114,16 +114,16 @@ export function TopBar({
           <DropdownMenu.Trigger asChild>
             <button
               type="button"
-              className="ml-1 flex h-12 shrink-0 items-center gap-3 rounded-pill pr-3 pl-1 text-left transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=open]:bg-hover"
+              className="ml-1 flex h-12 shrink-0 items-center gap-3 rounded-pill pr-3 pl-1 text-left @max-[639px]/frame:pr-1 transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=open]:bg-hover"
             >
               <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-pill bg-accent-soft text-body font-semibold text-accent-ink">
                 {initialsOf(user.name)}
               </span>
-              <span className="min-w-0">
+              <span className="min-w-0 @max-[639px]/frame:sr-only">
                 <span className="block max-w-[140px] truncate text-body font-semibold text-fg">{user.name}</span>
                 <span className="block max-w-[140px] truncate text-caption text-fg-3">{user.role}</span>
               </span>
-              <ChevronDown size={16} strokeWidth={2} aria-hidden className="shrink-0 text-fg-3" />
+              <ChevronDown size={16} strokeWidth={2} aria-hidden className="shrink-0 text-fg-3 @max-[639px]/frame:hidden" />
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Portal>

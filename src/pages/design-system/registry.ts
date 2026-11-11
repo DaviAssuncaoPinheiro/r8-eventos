@@ -10,6 +10,7 @@ import DataSection from './sections/DataSection'
 import PainelSection from './sections/PainelSection'
 import OverlaySection from './sections/OverlaySection'
 import ShellSection from './sections/ShellSection'
+import { AnimacaoSection, EmailSection, IlustracaoSection, MapaRealSection } from './sections/NovosSection'
 
 export type DsEntry = { id: string; title: string; Component: ComponentType }
 export type DsGroup = { title: string; items: DsEntry[] }
@@ -39,6 +40,10 @@ export const DS_GROUPS: DsGroup[] = [
       { id: 'cartoes', title: 'Cartão e indicador', Component: CardSection },
       { id: 'dinheiro', title: 'Dinheiro', Component: MoneySection },
       { id: 'painel', title: 'Painel', Component: PainelSection },
+      { id: 'mapa-real', title: 'Mapa real', Component: MapaRealSection },
+      { id: 'animacao', title: 'Animação', Component: AnimacaoSection },
+      { id: 'email', title: 'Prévia do e-mail', Component: EmailSection },
+      { id: 'ilustracoes', title: 'Ilustração do equipamento', Component: IlustracaoSection },
       { id: 'tooltip', title: 'Tooltip', Component: TooltipSection },
       { id: 'carregando', title: 'Carregando', Component: SkeletonSection },
     ],

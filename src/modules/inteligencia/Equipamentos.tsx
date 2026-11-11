@@ -3,9 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Area, Bar, CartesianGrid, ComposedChart, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, type TooltipContentProps } from 'recharts'
 import { CircleCheck, PackagePlus, Tag, TrendingDown, TrendingUp, TriangleAlert, type LucideIcon } from 'lucide-react'
 import { Banner, Button, RollingMoney, Skeleton, Stagger, Tooltip, cn, reduced } from '@/ui'
-import { diffDays, today } from '@/domain/dates'
 import { formatMoney } from '@/lib/format'
-import { getAssetProfitability, getDemandForecast, listUnits, useQuery, type AssetProfit, type AssetVerdict, type DemandTypeForecast, type UnitProfit } from '@/services'
+import { getAssetProfitability, getDemandForecast, useQuery, type AssetProfit, type AssetVerdict, type DemandTypeForecast, type UnitProfit } from '@/services'
 import { TypeArt } from '@/modules/equipamentos/components/TypeArt'
 import { GrowBar, InfoTip, Ring, ddmm } from './shared'
 
@@ -20,10 +19,12 @@ const RING: Record<AssetVerdict, string> = { comprar_mais: 'stroke-ok', manter: 
 
 const num1 = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 })
 
-function TypeCard({ a, selected, ageMonths, onSelect, index }: { a: AssetProfit; selected: boolean; ageMonths: number; onSelect: () => void; index: number }) {
+const PAYBACK_SCALE = 48
+
+function TypeCard({ a, selected, onSelect, index }: { a: AssetProfit; selected: boolean; onSelect: () => void; index: number }) {
   const v = VERDICT[a.verdict]
-  const paid = a.paybackMonths > 0 ? Math.min(ageMonths, a.paybackMonths) : 0
-  const paidPct = a.paybackMonths > 0 ? (paid / a.paybackMonths) * 100 : 0
+  // barra proporcional aos meses para se pagar (escala de 4 anos): quanto mais curta, mais rápido o tipo devolve o investimento
+  const paybackPct = a.paybackMonths > 0 ? Math.max(6, (Math.min(a.paybackMonths, PAYBACK_SCALE) / PAYBACK_SCALE) * 100) : 0
   const impactTone = a.verdict === 'baixar_preco' || a.verdict === 'subir_preco' || a.verdict === 'comprar_mais' ? 'text-ok-ink' : 'text-fg'
   return (
     <div className={cn('relative flex min-w-0 flex-col rounded-card bg-raised p-5 transition-shadow duration-200 ease-[var(--ease-ui)] sm:p-6', selected && 'ring-2 ring-accent ring-inset')}>
@@ -36,7 +37,7 @@ function TypeCard({ a, selected, ageMonths, onSelect, index }: { a: AssetProfit;
           </Ring>
         </span>
       </div>
-      <h3 className="pointer-events-none relative mt-4 truncate text-title-card">{a.type.name}</h3>
+      <h3 className="pointer-events-none relative mt-4 line-clamp-2 text-title-card">{a.type.name}</h3>
       <div className="relative mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
         <Tooltip content={a.reason} toggleOnClick>
           <button type="button" aria-label={`${v.label}: ${a.reason}`} className={cn('relative z-10 inline-flex h-10 items-center gap-2 rounded-pill px-4 text-body-lg font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring', v.cls)}>
@@ -57,11 +58,11 @@ function TypeCard({ a, selected, ageMonths, onSelect, index }: { a: AssetProfit;
       </div>
       <div className="pointer-events-none relative mt-auto pt-5">
         <div className="flex items-center justify-between gap-2 text-caption font-semibold">
-          <span className="text-fg-2">{a.paybackMonths > 0 ? `Se paga em ${num1(a.paybackMonths)} meses` : 'Sem receita ainda'}</span>
-          {a.paybackMonths > 0 ? <span className="tnum text-fg">{Math.round(paidPct)}% pago</span> : null}
+          <span className="text-fg-2">{a.paybackMonths > 0 ? 'Se paga em' : 'Sem receita ainda'}</span>
+          {a.paybackMonths > 0 ? <span className="tnum text-fg">{num1(a.paybackMonths)} {a.paybackMonths === 1 ? 'mês' : 'meses'}</span> : null}
         </div>
-        <div className="mt-1.5 h-3 rounded-pill bg-sunken" role="img" aria-label={a.paybackMonths > 0 ? `${num1(paid)} de ${num1(a.paybackMonths)} meses já pagos` : 'Sem receita'}>
-          <GrowBar pct={paidPct} delay={index * 60} className="bg-accent" />
+        <div className="mt-1.5 h-3 rounded-pill bg-sunken" role="img" aria-label={a.paybackMonths > 0 ? `Se paga em ${num1(a.paybackMonths)} meses` : 'Sem receita'}>
+          <GrowBar pct={paybackPct} delay={index * 60} className="bg-accent" />
         </div>
       </div>
     </div>
@@ -170,18 +171,7 @@ export default function Equipamentos() {
   const [params, setParams] = useSearchParams()
   const prof = useQuery(getAssetProfitability, [])
   const dem = useQuery(() => getDemandForecast(30), [])
-  const units = useQuery(() => listUnits(), [])
   const panel = React.useRef<HTMLElement>(null)
-
-  const ageByType = React.useMemo(() => {
-    const m = new Map<string, number[]>()
-    const t = today()
-    for (const u of units.data ?? []) m.set(u.typeId, [...(m.get(u.typeId) ?? []), Math.max(0, diffDays(u.acquiredAt, t)) / 30])
-    return (id: string) => {
-      const l = m.get(id) ?? []
-      return l.length ? l.reduce((a, b) => a + b, 0) / l.length : 0
-    }
-  }, [units.data])
 
   const types = prof.data?.types ?? []
   const asked = params.get('tipo')
@@ -223,7 +213,7 @@ export default function Equipamentos() {
     <>
       <Stagger gap={0.05} className="grid grid-cols-1 gap-4 @min-[760px]/frame:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
         {types.map((a, i) => (
-          <TypeCard key={a.type.id} a={a} index={i} selected={a.type.id === selectedId} ageMonths={ageByType(a.type.id)} onSelect={() => select(a.type.id)} />
+          <TypeCard key={a.type.id} a={a} index={i} selected={a.type.id === selectedId} onSelect={() => select(a.type.id)} />
         ))}
       </Stagger>
 

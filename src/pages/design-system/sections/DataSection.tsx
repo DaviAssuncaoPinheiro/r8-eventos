@@ -388,7 +388,7 @@ export default function DataSection() {
             <ServiceRow time="16:00" duration="3 h" type="montagem" title="Montagem, 1 tenda 6 x 6 m" client="Igreja Batista Central" address="EQS 706/707, Asa Sul" status="agendado" onOpen={() => {}} />
           </ul>
         </Card>
-        <p className="mt-6 mb-2 text-caption text-fg-3">App de campo: linha de 80px, texto 16.</p>
+        <p className="mt-6 mb-2 text-caption text-fg-3">App da equipe de rua: linha de 80px, texto 16.</p>
         <Card padding="none" className="max-w-[390px] overflow-hidden">
           <ul className="m-0 list-none p-0">
             <ServiceRow variant="field" time="09:00" duration="2 h" type="entrega" title="Entrega, 6 unidades" client="Produtora Cerrado Vivo" address="Parque da Cidade" status="em-andamento" onOpen={() => {}} />

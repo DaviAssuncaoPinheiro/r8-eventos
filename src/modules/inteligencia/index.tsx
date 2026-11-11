@@ -50,9 +50,8 @@ function Kpi({ title, icon: Icon, tone, formula, onOpen, tags, children }: { tit
         {title}
         <InfoTip label={title} text={formula} className={hero ? 'text-on-accent hover:text-on-accent' : undefined} />
       </h2>
-      <div className={cn('mt-auto pt-3 text-kpi-lg text-[clamp(30px,17.5cqw,44px)]', NUM[tone])}>{children}</div>
       {tags?.length ? (
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {tags.map((t) => (
             <span key={t} className={cn('inline-flex h-6 max-w-full items-center truncate rounded-pill px-2 text-caption font-semibold', CHIP[tone])}>
               {t}
@@ -60,6 +59,7 @@ function Kpi({ title, icon: Icon, tone, formula, onOpen, tags, children }: { tit
           ))}
         </div>
       ) : null}
+      <div className={cn('mt-auto pt-3 text-kpi-lg text-[clamp(30px,17.5cqw,44px)]', NUM[tone])}>{children}</div>
     </section>
   )
 }
@@ -117,7 +117,7 @@ export default function Inteligencia() {
               title="Vai faltar estoque"
               icon={PackageX}
               tone="warn"
-              tags={[`Pico em ${ddmm(s.stockout.peakDay)}`, s.stockout.typeName]}
+              tags={[`${s.stockout.typeName}, ${ddmm(s.stockout.peakDay)}`]}
               onOpen={() => navigate(`/inteligencia/equipamentos?tipo=${s.stockout!.typeId}`)}
               formula={`Maior falta de unidades no pico dos próximos 30 dias: ${s.stockout.typeName}. Soma locações confirmadas, em campo e 40% dos orçamentos, contra as unidades disponíveis.`}
             >

@@ -10,7 +10,8 @@ import { formatMoney } from '@/lib/format'
 
 /* ───────── controles ───────── */
 
-const toText = (v: number) => String(v).replace('.', ',')
+const toText = (v: number, money?: boolean) =>
+  money ? v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : String(v).replace('.', ',')
 function parse(t: string): number | null {
   let s = t.trim().replace(/\s/g, '')
   if (!s) return null
@@ -20,11 +21,12 @@ function parse(t: string): number | null {
 }
 
 function NumBox({ id, label, value, onChange, min, max, prefix, suffix, wide }: { id: string; label: string; value: number; onChange: (n: number) => void; min: number; max: number; prefix?: string; suffix?: string; wide?: boolean }) {
-  const [text, setText] = React.useState(toText(value))
+  const money = prefix === 'R$'
+  const [text, setText] = React.useState(toText(value, money))
   const focus = React.useRef(false)
   React.useEffect(() => {
-    if (!focus.current) setText(toText(value))
-  }, [value])
+    if (!focus.current) setText(toText(value, money))
+  }, [value, money])
   return (
     <div className={cn('flex h-11 shrink-0 items-center gap-1.5 rounded-control border border-strong bg-raised px-3 transition-[border-color,box-shadow] duration-150 focus-within:border-accent focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring', wide ? 'w-40' : 'w-32')}>
       {prefix ? <span className="text-fg-3">{prefix}</span> : null}
@@ -47,7 +49,7 @@ function NumBox({ id, label, value, onChange, min, max, prefix, suffix, wide }: 
           const n = parse(text)
           const v = Math.max(min, n ?? min)
           onChange(v)
-          setText(toText(v))
+          setText(toText(v, money))
         }}
         className="tnum h-full min-w-0 flex-1 bg-transparent text-right text-body-lg font-semibold outline-none"
       />

@@ -145,14 +145,14 @@ export default function PainelSection() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Specimen title="Mapa do DF" note="Neutro. Só rotas e pinos têm cor. Escolha uma equipe.">
+        <Specimen title="Mapa de reserva" note="Sem WebGL ou sem servidor de mapa. Só rotas e pinos têm cor.">
           <div className="h-[380px] overflow-hidden rounded-card bg-raised p-2">
             <div className="size-full overflow-hidden rounded-[16px]">
               <MapaDF key={run} pins={PINOS} routes={ROTAS} selectedId={sel} onSelect={(id) => setSel((cur) => (cur === id ? undefined : id))} label="Mapa do Distrito Federal com as 6 equipes" />
             </div>
           </div>
         </Specimen>
-        <Specimen title="Recorte do mapa" note="Rota cheia é feita, tracejada é prevista.">
+        <Specimen title="Recorte do mapa de reserva" note="Rota cheia é feita, tracejada é prevista.">
           <div className="h-[380px] overflow-hidden rounded-card bg-raised p-2">
             <div className="size-full overflow-hidden rounded-[16px]">
               <MapaDF key={run} pins={PINOS.filter((p) => ['fc', 'ma', 'jp'].includes(p.id))} routes={ROTAS} box={[180, 120, 560, 380]} label="Recorte do mapa com 3 equipes" />

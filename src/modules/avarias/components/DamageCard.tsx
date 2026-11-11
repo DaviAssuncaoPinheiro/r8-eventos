@@ -4,6 +4,7 @@ import { Button, Menu, StatusDot, cn, type MenuEntry } from '@/ui'
 import { CHARGE_STATUS, DAMAGE_STATUS } from '@/app/status'
 import { formatMoney } from '@/lib/format'
 import type { DamageView } from '@/services'
+import { TypeArtTile } from '@/modules/equipamentos/components/TypeArt'
 
 /** Cartão de avaria: foto 16:9, valor em destaque, código da unidade, tipo, cliente e situação. */
 export function DamageCard({
@@ -26,7 +27,8 @@ export function DamageCard({
   onOpenRental: () => void
 }) {
   const st = DAMAGE_STATUS[d.status]
-  const photo = d.photos[0]?.src ?? d.typePhoto
+  // foto tirada no local quando houver; sem ela (ou só com a foto de catálogo), a ilustração do tipo
+  const photo = d.photos.find((p) => p.src !== d.typePhoto)?.src
   const sentCharge = d.charge && d.charge.status !== 'rascunho' && d.charge.status !== 'cancelada'
   const items: MenuEntry[] = [
     { label: 'Ver unidade', onSelect: onOpenUnit },
@@ -43,7 +45,11 @@ export function DamageCard({
           aria-label={`Ampliar foto: ${d.kind}, ${d.unitCode}`}
           className="group absolute inset-0 block cursor-zoom-in focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
         >
-          <img src={photo} alt="" loading="lazy" draggable={false} className="size-full object-cover transition-transform duration-250 ease-[var(--ease-ui)] group-hover:scale-[1.03]" />
+          {photo ? (
+            <img src={photo} alt="" loading="lazy" draggable={false} className="size-full object-cover transition-transform duration-250 ease-[var(--ease-ui)] group-hover:scale-[1.03]" />
+          ) : (
+            <TypeArtTile prefix={d.unitCode.split('-')[0]} className="size-full transition-transform duration-250 ease-[var(--ease-ui)] group-hover:scale-[1.03]" />
+          )}
         </button>
         <span className="tnum pointer-events-none absolute top-3 left-3 inline-flex h-7 items-center rounded-pill bg-raised px-3 text-caption font-bold text-fg">{d.unitCode}</span>
       </div>

@@ -52,7 +52,9 @@ function scrollParent(el: Element): HTMLElement | null {
 /** Rola só o necessário para o alvo ficar entre o topo e o limite inferior livre. */
 function ensureVisible(el: Element, bottomLimit: number) {
   const r = el.getBoundingClientRect()
-  const top = MARGIN + PAD
+  // o conteúdo rola por baixo da barra do topo: a área livre começa onde o contêiner de rolagem começa
+  const sp = scrollParent(el)
+  const top = Math.max(MARGIN, sp ? sp.getBoundingClientRect().top : 0) + PAD
   const bottom = bottomLimit - PAD
   let delta = 0
   if (r.height > bottom - top) {
@@ -61,7 +63,7 @@ function ensureVisible(el: Element, bottomLimit: number) {
   } else if (r.top < top) delta = r.top - top
   else if (r.bottom > bottom) delta = r.bottom - bottom
   if (!delta) return
-  scrollParent(el)?.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior })
+  sp?.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior })
 }
 
 function measure(el: Element, fallbackRadius?: number): Box {

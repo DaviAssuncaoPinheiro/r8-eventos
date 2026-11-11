@@ -318,7 +318,7 @@ function verdictFor(u: TypeUsage, forecast: DemandTypeForecast, price: PriceSugg
     const n = u.idleUnits
     return {
       verdict: 'vender',
-      reason: `${n} de ${u.units} ${n === 1 ? 'parado' : 'parados'}, em média há ${u.idleDaysAvg} dias, e ocupação de ${util}%. Payback de ${payback.toString().replace('.', ',')} meses.`,
+      reason: `${n} de ${u.units} ${n === 1 ? 'parado' : 'parados'}, em média há ${u.idleDaysAvg} dias, e ocupação de ${util}%. Se paga em ${payback.toString().replace('.', ',')} meses.`,
       impactMonthly: r2(n * t.purchasePrice * (HOLDING_COST_PCT_MONTH / 100)),
       suggestedUnits: n,
       revenuePerUnit,
@@ -341,7 +341,7 @@ function verdictFor(u: TypeUsage, forecast: DemandTypeForecast, price: PriceSugg
   if (u.utilization30 < 45) {
     return { verdict: 'baixar_preco', reason: `Ocupação de ${util}% em 30 dias, abaixo de 45%. ${u.idleUnits} ${u.idleUnits === 1 ? 'parado' : 'parados'}.`, impactMonthly: price.monthlyGain, suggestedUnits: 0, revenuePerUnit }
   }
-  return { verdict: 'manter', reason: `Ocupação de ${util}% e payback de ${payback.toString().replace('.', ',')} meses, dentro do esperado.`, impactMonthly: 0, suggestedUnits: 0, revenuePerUnit }
+  return { verdict: 'manter', reason: `Ocupação de ${util}% e se paga em ${payback.toString().replace('.', ',')} meses, dentro do esperado.`, impactMonthly: 0, suggestedUnits: 0, revenuePerUnit }
 }
 
 export function calcAssetProfitability(data: DbData, today: ISODate = todayFn()): AssetProfitability {

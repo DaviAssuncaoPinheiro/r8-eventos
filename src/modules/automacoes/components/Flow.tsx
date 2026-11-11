@@ -11,7 +11,7 @@ export const actionIcon = (kind?: string) => iconFor(AUTOMATION_ACTIONS.find((a)
 
 function Node({ icon: Icon, label, tone, size, empty }: { icon: LucideIcon; label: string; tone: 'trigger' | 'action'; size: number; empty?: boolean }) {
   return (
-    <div className="flex w-[36%] min-w-0 flex-col items-center gap-2 text-center">
+    <div className="flex w-[40%] min-w-0 flex-col items-center gap-2 text-center">
       <span
         aria-hidden
         style={{ width: size, height: size }}
@@ -22,7 +22,7 @@ function Node({ icon: Icon, label, tone, size, empty }: { icon: LucideIcon; labe
       >
         <Icon size={size * 0.43} strokeWidth={2} aria-hidden />
       </span>
-      <span className={cn('line-clamp-2 text-caption leading-4 font-medium', empty ? 'text-fg-3' : 'text-fg-2')}>{label}</span>
+      <span className={cn('line-clamp-3 text-caption leading-4 font-medium', empty ? 'text-fg-3' : 'text-fg-2')}>{label}</span>
     </div>
   )
 }

@@ -327,8 +327,6 @@ export interface CopilotSuggestion {
   /** valor em jogo, quando houver */
   value?: number
   detail: string
-  /** texto do e-mail (igual a `draft.body`; campo mantido para as telas atuais) */
-  draftMessage?: string
   /** rascunho do e-mail ao cliente */
   draft?: { subject: string; body: string }
   /** ids que a ação usa: { damageIds }, { rentalId }, { chargeIds }, { moves }, { serviceId, clientId } */
