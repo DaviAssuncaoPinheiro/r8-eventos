@@ -18,7 +18,7 @@ const STATUS: Record<StatusKey, { label: string; tone: StatusTone }> = {
   agendado: { label: 'Agendado', tone: 'info' },
   atrasado: { label: 'Atrasado', tone: 'danger' },
   concluido: { label: 'Concluído', tone: 'ok' },
-  assinatura: { label: 'Aguardando assinatura', tone: 'warn' },
+  assinatura: { label: 'Aguardando', tone: 'warn' },
   parado: { label: 'Parado no pátio', tone: 'idle' },
 }
 

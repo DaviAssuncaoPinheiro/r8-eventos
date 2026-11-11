@@ -22,6 +22,17 @@ export function formatAxisMoney(v: number): string {
   return `R$ ${v.toLocaleString('pt-BR')}`
 }
 
+/** Marcas redondas (1, 2, 2,5 ou 5 vezes uma potência de 10), de 0 até acima do maior valor: 4 a 6 linhas de grade. */
+function niceTicks(max: number): number[] {
+  if (!(max > 0)) return [0, 1]
+  const raw = max / 4
+  const pow = 10 ** Math.floor(Math.log10(raw))
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * pow).find((st) => st >= raw) ?? pow * 10
+  const out: number[] = []
+  for (let v = 0; v < max + step * 0.999; v += step) out.push(Math.round(v * 1000) / 1000)
+  return out
+}
+
 function useReducedMotion(): boolean {
   const subscribe = React.useCallback((cb: () => void) => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -137,6 +148,7 @@ export function BarSeriesChart({ data, currentKey, valueFormat, axisFormat = for
   const pid = `hatch-${slug(React.useId())}`
   const current = currentKey ?? [...data].reverse().find((d) => !d.idle)?.key
   const hasIdle = data.some((d) => d.idle)
+  const ticks = niceTicks(Math.max(...data.map((d) => d.value)))
   return (
     <div>
       {legend ? <ChartLegend items={legend} /> : null}
@@ -152,8 +164,8 @@ export function BarSeriesChart({ data, currentKey, valueFormat, axisFormat = for
               </defs>
             ) : null}
             <CartesianGrid vertical={false} stroke="var(--viz-grid)" strokeWidth={1} />
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} interval={0} tickMargin={8} />
-            <YAxis axisLine={false} tickLine={false} tick={axisTick} tickFormatter={axisFormat} tickCount={5} width={80} domain={[0, 'auto']} />
+            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} tickMargin={8} />
+            <YAxis axisLine={false} tickLine={false} tick={axisTick} tickFormatter={axisFormat} ticks={ticks} width={64} domain={[0, ticks[ticks.length - 1]]} />
             <RTooltip
               {...tipProps}
               cursor={{ fill: 'var(--hover)', fillOpacity: 0.6 }}
@@ -206,6 +218,7 @@ export function TrendChart({ data, series, variant = 'line', valueFormat, axisFo
   const toggle = (k: string) => setIsolated((cur) => (cur === k ? null : k))
   const Chart = variant === 'area' ? AreaChart : LineChart
   const shown = series.filter((s) => isolated == null || isolated === s.key)
+  const ticks = niceTicks(Math.max(...data.flatMap((d) => series.map((s) => Number(d[s.key])))))
   return (
     <div>
       {series.length > 1 ? <ChartLegend items={series.map((s) => ({ key: s.key, label: s.label, color: s.color }))} active={isolated} onToggle={toggle} /> : null}
@@ -214,7 +227,7 @@ export function TrendChart({ data, series, variant = 'line', valueFormat, axisFo
           <Chart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--viz-grid)" strokeWidth={1} />
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} tickMargin={8} minTickGap={16} />
-            <YAxis axisLine={false} tickLine={false} tick={axisTick} tickFormatter={axisFormat} tickCount={5} width={44} domain={[0, 'auto']} />
+            <YAxis axisLine={false} tickLine={false} tick={axisTick} tickFormatter={axisFormat} ticks={ticks} width={44} domain={[0, ticks[ticks.length - 1]]} />
             <RTooltip
               {...tipProps}
               cursor={{ stroke: 'var(--strong)', strokeWidth: 1, strokeDasharray: '3 3' }}

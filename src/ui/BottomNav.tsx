@@ -25,7 +25,7 @@ export interface BottomNavItemProps {
 }
 
 const itemCls =
-  'group flex h-16 min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-caption font-semibold no-underline select-none ' +
+  'group flex h-full min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 text-caption font-semibold no-underline select-none ' +
   'transition-colors duration-150 ease-[var(--ease-ui)] ' +
   'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring ' +
   'data-[force=focus]:outline-2 data-[force=focus]:-outline-offset-2 data-[force=focus]:outline-ring'
@@ -90,7 +90,7 @@ export function BottomNav({ children, fixed = false, className }: BottomNavProps
     <nav
       aria-label="Navegação do app"
       className={cn(
-        'flex w-full shrink-0 border-t border-hairline bg-panel pb-[env(safe-area-inset-bottom)]',
+        'flex h-[calc(var(--field-nav-h)+env(safe-area-inset-bottom))] w-full shrink-0 border-t border-hairline bg-panel pb-[env(safe-area-inset-bottom)]',
         fixed && 'fixed inset-x-0 bottom-0 z-40',
         className,
       )}

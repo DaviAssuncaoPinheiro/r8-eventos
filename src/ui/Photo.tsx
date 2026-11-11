@@ -20,7 +20,7 @@ export interface PhotoThumbProps {
   size?: 64 | 96
   /** Força um estado (documentação). Sem isso, a miniatura acompanha o carregamento real. */
   state?: 'ready' | 'loading' | 'error'
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
   className?: string
 }
 
@@ -72,6 +72,8 @@ export interface PhotoViewerProps {
   open: boolean
   onIndexChange: (index: number) => void
   onOpenChange: (open: boolean) => void
+  /** Elemento que recebe o foco ao fechar (normalmente a miniatura tocada). */
+  returnFocusRef?: React.RefObject<HTMLElement | null>
 }
 
 const viewerBtn =
@@ -79,7 +81,7 @@ const viewerBtn =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-40'
 
 /** Tela cheia: foto contida, contador, setas do teclado, Esc, foco preso, deslize lateral. */
-export function PhotoViewer({ photos, index, open, onIndexChange, onOpenChange }: PhotoViewerProps) {
+export function PhotoViewer({ photos, index, open, onIndexChange, onOpenChange, returnFocusRef }: PhotoViewerProps) {
   const photo = photos[index]
   const last = photos.length - 1
   const [imgState, setImgState] = React.useState<'loading' | 'ready' | 'error'>('loading')
@@ -95,6 +97,12 @@ export function PhotoViewer({ photos, index, open, onIndexChange, onOpenChange }
         <Dialog.Overlay className="fixed inset-0 z-[70] bg-black" />
         <Dialog.Content
           aria-describedby={undefined}
+          onCloseAutoFocus={(e) => {
+            if (returnFocusRef?.current) {
+              e.preventDefault()
+              returnFocusRef.current.focus()
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowRight') (e.preventDefault(), go(index + 1))
             if (e.key === 'ArrowLeft') (e.preventDefault(), go(index - 1))
@@ -218,6 +226,7 @@ export interface PhotoGridProps {
 export function PhotoGrid({ photos, size = 96, children, className }: PhotoGridProps) {
   const [open, setOpen] = React.useState(false)
   const [index, setIndex] = React.useState(0)
+  const back = React.useRef<HTMLElement | null>(null)
   return (
     <>
       <ul className={cn('m-0 grid list-none gap-2 p-0', size === 96 ? 'grid-cols-[repeat(auto-fill,96px)]' : 'grid-cols-[repeat(auto-fill,64px)]', className)}>
@@ -227,7 +236,8 @@ export function PhotoGrid({ photos, size = 96, children, className }: PhotoGridP
               src={p.src}
               alt={p.alt}
               size={size}
-              onClick={() => {
+              onClick={(e) => {
+                back.current = e.currentTarget
                 setIndex(i)
                 setOpen(true)
               }}
@@ -236,7 +246,7 @@ export function PhotoGrid({ photos, size = 96, children, className }: PhotoGridP
         ))}
         {children ? <li>{children}</li> : null}
       </ul>
-      <PhotoViewer photos={photos} index={index} open={open} onIndexChange={setIndex} onOpenChange={setOpen} />
+      <PhotoViewer photos={photos} index={index} open={open} onIndexChange={setIndex} onOpenChange={setOpen} returnFocusRef={back} />
     </>
   )
 }
