@@ -1,14 +1,499 @@
-import { DsSection, StubNote } from '../kit'
+import * as React from 'react'
+import {
+  Boxes,
+  CalendarCheck,
+  CircleHelp,
+  ClipboardList,
+  Camera,
+  Hammer,
+  House,
+  Landmark,
+  PanelRight,
+  PenLine,
+  Play,
+  Settings,
+  Truck,
+  TriangleAlert,
+  UserRound,
+  Users,
+  Wallet,
+  Plus,
+  ChartColumn,
+  Sparkles,
+} from 'lucide-react'
+import { Button, Segmented, StatusDot, Tooltip, type StatusTone } from '@/ui'
+import { SideNav, SideNavGroup, SideNavItem, SideNavScope } from '@/ui/SideNav'
+import { TopBar } from '@/ui/TopBar'
+import { BottomNav, BottomNavItem } from '@/ui/BottomNav'
+import { FieldActionBar, FieldActionGrid, FieldActionTile } from '@/ui/FieldAction'
+import { DemoStrip } from '@/ui/DemoStrip'
+import { FieldFrame, OfficeFrame, SyncIndicator } from '@/ui/AppFrame'
+import { DsSection, Specimen, StateCell } from '../kit'
 
-/*
-  A PREENCHER. Especificação completa em DESIGN.md, seção "Casca".
-  Use só os primitivos de @/ui e os tokens de src/styles/tokens.css.
-  Mantenha o id "casca": ele já está registrado no índice (registry.ts).
-*/
-export default function ShellSection() {
+/* ───────── dados de exemplo ───────── */
+
+const BRAND = { name: 'R8 Eventos', initials: 'R8' }
+const USER = { name: 'Paula Ramos', role: 'Operação' }
+
+type NavId = 'dinheiro' | 'operacao' | 'locacoes' | 'equipamentos' | 'avarias' | 'financeiro' | 'clientes' | 'relatorios'
+
+const NAV_MAIN: { id: NavId; label: string; icon: typeof Wallet; count?: number }[] = [
+  { id: 'dinheiro', label: 'Painel de dinheiro', icon: Wallet },
+  { id: 'operacao', label: 'Operação do dia', icon: CalendarCheck, count: 14 },
+]
+const NAV_MANAGE: { id: NavId; label: string; icon: typeof Wallet; count?: number }[] = [
+  { id: 'locacoes', label: 'Locações', icon: ClipboardList },
+  { id: 'equipamentos', label: 'Equipamentos', icon: Boxes },
+  { id: 'avarias', label: 'Avarias e cobranças', icon: TriangleAlert, count: 3 },
+  { id: 'financeiro', label: 'Financeiro', icon: Landmark },
+  { id: 'clientes', label: 'Clientes', icon: Users },
+  { id: 'relatorios', label: 'Relatórios', icon: ChartColumn },
+]
+
+const SERVICES: { time: string; title: string; meta: string; tone: StatusTone; status: string }[] = [
+  { time: '08:00', title: 'Limpeza, 12 unidades', meta: 'Construtora Planalto, Setor Industrial', tone: 'ok', status: 'Concluído' },
+  { time: '09:30', title: 'Entrega, 24 unidades', meta: 'Feira Agro Centro-Oeste, Parque de Exposições', tone: 'accent', status: 'Em andamento' },
+  { time: '11:00', title: 'Retirada, 8 unidades', meta: 'Condomínio Vila Verde, Quadra 4', tone: 'info', status: 'A caminho' },
+  { time: '13:30', title: 'Limpeza, 6 unidades', meta: 'Obra Residencial Aurora, Lote 12', tone: 'warn', status: 'Aguardando assinatura' },
+  { time: '15:00', title: 'Manutenção, BQ-0142', meta: 'Pátio R8, Galpão 2', tone: 'danger', status: 'Atrasado' },
+]
+
+/* ───────── peças locais da demonstração ───────── */
+
+/** Lateral do escritório completa, com os itens da spec. Cada instância guarda o próprio estado. */
+function OfficeSideNav({
+  collapsed,
+  onCollapsedChange,
+  active,
+  onActive,
+}: {
+  collapsed: boolean
+  onCollapsedChange: (c: boolean) => void
+  active: NavId
+  onActive: (id: NavId) => void
+}) {
+  const item = (n: (typeof NAV_MAIN)[number]) => (
+    <SideNavItem key={n.id} icon={n.icon} label={n.label} count={n.count} active={active === n.id} onClick={() => onActive(n.id)} />
+  )
   return (
-    <DsSection id="casca" title="Casca" intro="Item da navegação lateral, topo, navegação inferior do celular, botões grandes do app de campo e faixa Ambiente de demonstração.">
-      <StubNote>Seção reservada. Especificação em DESIGN.md, seção "Casca".</StubNote>
+    <SideNav
+      collapsed={collapsed}
+      onCollapsedChange={onCollapsedChange}
+      brand={BRAND}
+      user={USER}
+      onUserClick={() => undefined}
+      footer={
+        <>
+          <SideNavItem icon={Settings} label="Configurações" />
+          <SideNavItem icon={CircleHelp} label="Ajuda" />
+        </>
+      }
+    >
+      <SideNavGroup>{NAV_MAIN.map(item)}</SideNavGroup>
+      <SideNavGroup label="Gestão">{NAV_MANAGE.map(item)}</SideNavGroup>
+    </SideNav>
+  )
+}
+
+function ServiceRows() {
+  return (
+    <ul className="rounded-card bg-raised">
+      {SERVICES.map((s) => (
+        <li key={s.time} className="flex items-center gap-4 border-b border-hairline px-4 py-3 last:border-b-0">
+          <span className="tnum w-12 shrink-0 text-body font-semibold">{s.time}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-body font-semibold">{s.title}</span>
+            <span className="block truncate text-caption text-fg-3">{s.meta}</span>
+          </span>
+          <StatusDot tone={s.tone}>{s.status}</StatusDot>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** Escala o quadro de largura de projeto para caber na página; abaixo de 70% passa a rolar dentro do próprio contêiner. */
+function ScaledFrame({ width, height, children }: { width: number; height: number; children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [avail, setAvail] = React.useState(width)
+  React.useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const measure = () => setAvail(el.clientWidth)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const zoom = Math.min(1, Math.max(0.7, avail / width))
+  return (
+    <div ref={ref} className="overflow-x-auto overflow-y-hidden rounded-panel" style={{ height }}>
+      <div style={{ width, height: height / zoom, transform: `scale(${zoom})`, transformOrigin: 'top left' }}>{children}</div>
+    </div>
+  )
+}
+
+function OfficeMiniature() {
+  const [mode, setMode] = React.useState<'1280' | '1024'>('1280')
+  const [collapsed, setCollapsed] = React.useState(false)
+  const [active, setActive] = React.useState<NavId>('operacao')
+  const [railOpen, setRailOpen] = React.useState(false)
+  const [navOpen, setNavOpen] = React.useState(false)
+  const width = Number(mode)
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <Segmented<'1280' | '1024'>
+          label="Largura do quadro"
+          value={mode}
+          onChange={(m) => {
+            setMode(m)
+            setCollapsed(m === '1024')
+            setRailOpen(false)
+          }}
+          options={[
+            { value: '1280', label: '1280 px' },
+            { value: '1024', label: '1024 px' },
+          ]}
+        />
+        <p className="max-w-[60ch] text-caption text-fg-3">
+          {mode === '1280'
+            ? 'Lateral aberta. O trilho direito, quando ligado, fica fixo ao lado do conteúdo.'
+            : 'Lateral recolhida e busca só ícone. O trilho direito vira gaveta pela direita.'}
+        </p>
+      </div>
+      <ScaledFrame width={width} height={600}>
+        <OfficeFrame
+          rail={
+            <div className="flex flex-col gap-4">
+              <h3 className="text-title-card">Atividade recente</h3>
+              <ul className="flex flex-col gap-3">
+                {[
+                  ['Avaria registrada na BQ-0142', '11/11/2026 às 10:12, Marcos Vieira'],
+                  ['Cobrança gerada, R$ 420,00', '11/11/2026 às 09:40, Paula Ramos'],
+                  ['Retirada concluída, 8 unidades', '10/11/2026 às 17:05, Equipe 2'],
+                ].map(([t, m]) => (
+                  <li key={t}>
+                    <p className="text-body font-semibold">{t}</p>
+                    <p className="text-caption text-fg-3">{m}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          }
+          railOpen={railOpen}
+          onRailOpenChange={setRailOpen}
+          navOpen={navOpen}
+          onNavOpenChange={setNavOpen}
+          sidebar={<OfficeSideNav collapsed={collapsed} onCollapsedChange={setCollapsed} active={active} onActive={setActive} />}
+          topbar={
+            <TopBar
+              title="Operação do dia"
+              unreadCount={3}
+              user={USER}
+              shortcut={false}
+              onMenuClick={() => setNavOpen(true)}
+              actions={
+                <Tooltip content={railOpen ? 'Ocultar atividade' : 'Mostrar atividade'}>
+                  <Button
+                    variant="ghost"
+                    iconOnly
+                    icon={PanelRight}
+                    aria-label={railOpen ? 'Ocultar atividade' : 'Mostrar atividade'}
+                    aria-pressed={railOpen}
+                    onClick={() => setRailOpen((o) => !o)}
+                  />
+                </Tooltip>
+              }
+            />
+          }
+        >
+          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <div>
+              <h2 className="text-title-page">Serviços de hoje</h2>
+              <p className="mt-1 text-body text-fg-2">11/11/2026, 5 serviços na agenda</p>
+            </div>
+            <Button variant="primary" icon={Plus}>
+              Nova locação
+            </Button>
+          </div>
+          <div className="mt-6">
+            <ServiceRows />
+          </div>
+        </OfficeFrame>
+      </ScaledFrame>
+    </div>
+  )
+}
+
+function PhoneFrame() {
+  const [tab, setTab] = React.useState<'hoje' | 'servicos' | 'avarias' | 'perfil'>('hoje')
+  const tabs = [
+    { id: 'hoje', label: 'Hoje', icon: House },
+    { id: 'servicos', label: 'Serviços', icon: ClipboardList },
+    { id: 'avarias', label: 'Avarias', icon: TriangleAlert, count: 2 },
+    { id: 'perfil', label: 'Perfil', icon: UserRound },
+  ] as const
+  return (
+    <div className="max-w-full overflow-x-auto p-2">
+      <div className="h-[720px] w-[390px] shrink-0 overflow-hidden rounded-[32px] ring-[6px] ring-edge">
+        <FieldFrame
+          title="R8 Eventos"
+          pending={3}
+          actionBar={
+            <FieldActionBar>
+              <Button variant="primary" size="field" block icon={Play}>
+                Iniciar serviço
+              </Button>
+            </FieldActionBar>
+          }
+          nav={
+            <BottomNav>
+              {tabs.map((t) => (
+                <BottomNavItem key={t.id} icon={t.icon} label={t.label} count={'count' in t ? t.count : undefined} active={tab === t.id} onClick={() => setTab(t.id)} />
+              ))}
+            </BottomNav>
+          }
+        >
+          <h2 className="text-title-field">Hoje</h2>
+          <p className="mt-1 mb-4 text-body-lg text-fg-2">5 serviços, 1 em andamento</p>
+          <ul className="rounded-card bg-raised">
+            {SERVICES.map((s) => (
+              <li key={s.time} className="flex min-h-20 items-center gap-3 border-b border-hairline px-4 py-3 last:border-b-0">
+                <span className="tnum w-12 shrink-0 text-body-lg font-semibold">{s.time}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-body-lg font-semibold">{s.title}</span>
+                  <span className="mt-0.5 block">
+                    <StatusDot tone={s.tone}>{s.status}</StatusDot>
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </FieldFrame>
+      </div>
+    </div>
+  )
+}
+
+/* ───────── seção ───────── */
+
+export default function ShellSection() {
+  const [openCollapsed, setOpenCollapsed] = React.useState(false)
+  const [closedCollapsed, setClosedCollapsed] = React.useState(true)
+  const [openActive, setOpenActive] = React.useState<NavId>('locacoes')
+  const [closedActive, setClosedActive] = React.useState<NavId>('operacao')
+  const [resets, setResets] = React.useState(0)
+
+  return (
+    <DsSection
+      id="casca"
+      title="Casca"
+      intro="Lateral, topo, navegação inferior do celular, botões grandes do app de campo e faixa de demonstração. Os componentes preenchem o contêiner pai; o aplicativo real dá a eles a janela inteira."
+    >
+      <Specimen
+        title="Item da lateral"
+        note="40 px de altura, ícone 18, rótulo 14/500. O ativo sobe um tom (fundo cartão, texto 600, ícone na tinta do acento), sem barra colorida. Recebe href, onClick ou render; com o roteador: render={(p) => <NavLink to=&quot;/locacoes&quot; {...p} />}."
+      >
+        <div className="rounded-panel bg-panel p-4 ring-1 ring-hairline ring-inset">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(232px,1fr))] gap-x-6 gap-y-6">
+            <StateCell label="Padrão" className="w-full">
+              <SideNavItem icon={ClipboardList} label="Locações" />
+            </StateCell>
+            <StateCell label="Hover" className="w-full">
+              <SideNavItem icon={ClipboardList} label="Locações" forceState="hover" />
+            </StateCell>
+            <StateCell label="Foco (teclado)" className="w-full p-1">
+              <SideNavItem icon={ClipboardList} label="Locações" forceState="focus" />
+            </StateCell>
+            <StateCell label="Ativo" className="w-full">
+              <SideNavItem icon={ClipboardList} label="Locações" active />
+            </StateCell>
+            <StateCell label="Com contador" className="w-full">
+              <SideNavItem icon={TriangleAlert} label="Avarias e cobranças" count={3} />
+            </StateCell>
+            <StateCell label="Ativo com contador" className="w-full">
+              <SideNavItem icon={CalendarCheck} label="Operação do dia" count={14} active />
+            </StateCell>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-x-10 gap-y-6">
+            <StateCell label="Desabilitado, com tooltip (sem permissão)" className="min-w-[232px] sm:min-w-[480px]">
+              <div className="w-[232px]">
+                <SideNavItem icon={ChartColumn} label="Relatórios" disabled disabledReason="Sem permissão. Peça acesso ao administrador." forceTooltip />
+              </div>
+            </StateCell>
+            <StateCell label="Recolhida, tooltip à direita" className="min-w-[200px] sm:min-w-[320px]">
+              <CollapsedItemDemo />
+            </StateCell>
+          </div>
+        </div>
+      </Specimen>
+
+      <Specimen title="Lateral aberta e recolhida" note="248 e 72 px, animação de largura em 200 ms. A marca, o rodapé e o usuário permanecem; recolhida, os rótulos somem e o tooltip aparece à direita. Os botões de recolher funcionam.">
+        <div className="flex flex-wrap items-start gap-4">
+          <div className="h-[672px] rounded-panel bg-app p-3">
+            <OfficeSideNav collapsed={openCollapsed} onCollapsedChange={setOpenCollapsed} active={openActive} onActive={setOpenActive} />
+          </div>
+          <div className="h-[672px] rounded-panel bg-app p-3">
+            <OfficeSideNav collapsed={closedCollapsed} onCollapsedChange={setClosedCollapsed} active={closedActive} onActive={setClosedActive} />
+          </div>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Topo"
+        note="64 px: título da tela, busca central (Ctrl K), avisos com ponto de não lidos e usuário com menu. Com o quadro em 1280 px ou mais a busca é um campo; de 1024 a 1279 vira só ícone. O slot actions recebe botões da tela."
+      >
+        <div className="flex flex-col gap-3 overflow-x-auto rounded-panel bg-app p-3">
+          <div className="min-w-[760px]">
+            <StateCell label="Quadro de 1280 px ou mais" className="w-full">
+              <TopBar title="Operação do dia" unreadCount={3} user={USER} shortcut={false} className="w-full" />
+            </StateCell>
+          </div>
+          <div className="min-w-[760px]">
+            <StateCell label="Quadro de 1024 a 1279 px, sem avisos não lidos" className="w-full">
+              <TopBar title="Operação do dia" compact user={USER} shortcut={false} className="w-full" />
+            </StateCell>
+          </div>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Casca do escritório"
+        note="OfficeFrame com lateral, topo, conteúdo e trilho direito opcional. O quadro tem 600 px de altura e corta o que passar. Experimente recolher a lateral, ligar o trilho no topo e trocar a largura."
+      >
+        <OfficeMiniature />
+      </Specimen>
+
+      <Specimen
+        title="App de campo"
+        note="390 por 720. Cabeçalho de 56 px com título e indicador de sincronização, conteúdo rolável, ação principal no rodapé e navegação inferior de 64 px. Itens com no mínimo 48 px de alvo."
+      >
+        <div className="flex flex-wrap items-start gap-x-10 gap-y-8">
+          <PhoneFrame />
+          <div className="flex min-w-0 flex-1 basis-[320px] flex-col gap-6">
+            <div className="flex flex-col gap-3">
+              <h4 className="text-body font-semibold">Navegação inferior, estados</h4>
+              <div className="flex max-w-[390px] flex-col gap-4">
+                <StateCell label="Item ativo, com contador, e itens inativos" className="w-full">
+                  <div className="w-full overflow-hidden rounded-card ring-1 ring-hairline ring-inset">
+                    <BottomNav>
+                      <BottomNavItem icon={House} label="Hoje" active />
+                      <BottomNavItem icon={ClipboardList} label="Serviços" />
+                      <BottomNavItem icon={TriangleAlert} label="Avarias" count={2} />
+                      <BottomNavItem icon={UserRound} label="Perfil" />
+                    </BottomNav>
+                  </div>
+                </StateCell>
+                <StateCell label="Foco (teclado) no item Serviços" className="w-full">
+                  <div className="w-full overflow-hidden rounded-card ring-1 ring-hairline ring-inset">
+                    <BottomNav>
+                      <BottomNavItem icon={House} label="Hoje" active />
+                      <BottomNavItem icon={ClipboardList} label="Serviços" forceFocus />
+                      <BottomNavItem icon={TriangleAlert} label="Avarias" count={2} />
+                      <BottomNavItem icon={UserRound} label="Perfil" />
+                    </BottomNav>
+                  </div>
+                </StateCell>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <h4 className="text-body font-semibold">Sincronização</h4>
+              <div className="flex flex-wrap gap-3">
+                <SyncIndicator />
+                <SyncIndicator pending={3} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Botões grandes do campo"
+        note="Ação de etapa: grade de 2 colunas, 96 px de altura, ícone 24 em cima e rótulo 16/600 embaixo. Ação principal: Button field primário em largura total. Avaria: Button field secundário com ícone na tinta de perigo."
+      >
+        <div className="flex flex-wrap items-start gap-x-10 gap-y-8 rounded-panel bg-app p-5">
+          <div className="grid w-full max-w-[560px] grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3">
+            <StateCell label="Padrão" className="w-full">
+              <FieldActionTile icon={Truck} label="Cheguei" />
+            </StateCell>
+            <StateCell label="Hover" className="w-full">
+              <FieldActionTile icon={Truck} label="Cheguei" forceState="hover" />
+            </StateCell>
+            <StateCell label="Pressionado" className="w-full">
+              <FieldActionTile icon={Truck} label="Cheguei" forceState="active" />
+            </StateCell>
+            <StateCell label="Foco (teclado)" className="w-full p-1">
+              <FieldActionTile icon={Truck} label="Cheguei" forceState="focus" />
+            </StateCell>
+            <StateCell label="Concluída" className="w-full">
+              <FieldActionTile icon={Camera} label="Fotos" done />
+            </StateCell>
+            <StateCell label="Desabilitada" className="w-full">
+              <FieldActionTile icon={PenLine} label="Assinatura" disabled />
+            </StateCell>
+          </div>
+          <div className="flex w-full max-w-[358px] flex-col gap-3">
+            <StateCell label="Ação principal" className="w-full">
+              <Button variant="primary" size="field" block icon={Sparkles}>
+                Iniciar limpeza
+              </Button>
+            </StateCell>
+            <StateCell label="Ação de avaria" className="w-full">
+              <Button variant="secondary" size="field" block icon={TriangleAlert} className="[&>svg]:text-danger-ink">
+                Registrar avaria
+              </Button>
+            </StateCell>
+            <StateCell label="Principal desabilitada" className="w-full">
+              <Button variant="primary" size="field" block icon={Hammer} disabled>
+                Concluir montagem
+              </Button>
+            </StateCell>
+          </div>
+          <div className="w-full max-w-[358px]">
+            <FieldActionGrid>
+              <FieldActionTile icon={Truck} label="Cheguei" done />
+              <FieldActionTile icon={Sparkles} label="Iniciar limpeza" />
+              <FieldActionTile icon={Camera} label="Fotos" />
+              <FieldActionTile icon={PenLine} label="Assinatura" disabled />
+            </FieldActionGrid>
+            <p className="mt-2 text-caption text-fg-3">Grade de etapas, 2 colunas com gap de 12 px.</p>
+          </div>
+        </div>
+      </Specimen>
+
+      <Specimen
+        title="Faixa Ambiente de demonstração"
+        note="Fixa no topo da janela (z 95) e empurra a casca: publica a altura em --demo-strip-h, 32 px no escritório e 28 px no celular. Aqui aparece no fluxo, sem fixar."
+      >
+        <div className="flex flex-col gap-5">
+          <StateCell label="Escritório, 32 px" className="w-full">
+            <div className="w-full overflow-hidden rounded-card">
+              <DemoStrip compact={false} onReset={() => setResets((n) => n + 1)} />
+            </div>
+          </StateCell>
+          <StateCell label="Celular, 28 px" className="w-full max-w-[390px]">
+            <div className="w-full overflow-hidden rounded-card">
+              <DemoStrip compact />
+            </div>
+          </StateCell>
+          <p aria-live="polite" className="text-caption text-fg-3">
+            {resets === 0 ? 'Restaurar dados ainda não foi acionado nesta página.' : `Restaurar dados acionado ${resets} ${resets === 1 ? 'vez' : 'vezes'}.`}
+          </p>
+        </div>
+      </Specimen>
     </DsSection>
+  )
+}
+
+/** Item recolhido isolado, com o tooltip aberto. */
+function CollapsedItemDemo() {
+  return (
+    <div className="w-12 rounded-panel bg-panel">
+      <SideNavScope collapsed>
+        <SideNavItem icon={ClipboardList} label="Locações" count={12} active forceTooltip />
+      </SideNavScope>
+    </div>
   )
 }
