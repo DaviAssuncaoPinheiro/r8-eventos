@@ -32,6 +32,9 @@ export default function Perfil() {
                 </span>
                 <div className="min-w-0">
                   <h2 className="truncate text-title-field">{team.name}</h2>
+                  <Badge tone="accent" className="mb-1">
+                    Equipe de rua
+                  </Badge>
                   <p className="truncate text-body-lg text-fg-2">{team.members.join(', ')}</p>
                 </div>
               </div>

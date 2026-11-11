@@ -16,12 +16,13 @@ Registradas em 11/11/2026, a partir da revisão dele da primeira prévia do Pain
 
 Acrescentadas em 11/11/2026, na revisão do sistema completo (palavras dele, resumidas):
 
-7. **Não pode parecer "gerenciador de estoque".** Ele quer cobrar implantação (na casa de R$ 5 mil) mais mensalidade. O sistema precisa mostrar que trabalha sozinho e gera dinheiro: inteligência (previsão, lucro por equipamento, preço sugerido, risco de calote) e automações de verdade, que é "a ideia da IA".
+7. **Não pode parecer "gerenciador de estoque".** Ele quer cobrar implantação (na casa de R$ 5 mil) mais mensalidade. O sistema precisa mostrar que trabalha sozinho e gera dinheiro: inteligência (previsão de caixa e de demanda, lucro por equipamento, preço sugerido) e automações de verdade, que é "a ideia da IA".
 8. **Mapa real.** Mapa de verdade de Brasília, não desenho estilizado.
 9. **Sem integração com WhatsApp por enquanto.** Ele acha a API difícil e não quer prometer. Cobranças e avisos saem por e-mail, link de pagamento e portal do cliente. Não exibir WhatsApp como integração, canal de envio nem prévia de mensagem.
 10. **Sem modo TV.**
 11. **Animações.** Ele pediu "animações fodas": números que rolam, entradas em cascata, transições de tela, caminhões andando no mapa, comemoração quando o dinheiro entra. Sempre respeitando "reduzir movimento".
 12. **App do celular: dizer para quem é.** É para quem vai ao local (motorista, montador, limpador). Não usar "agente de campo" nem "app de campo" como rótulo; usar "equipe de rua" e deixar explícito que é para quem vai ao local.
+14. **Sem risco de calote.** Ele descartou nota ou alerta de risco de inadimplência por cliente: não entra no produto.
 13. **Visual:** manter o estilo claro com laranja aprovado, porém mais rico (mapa real, gráficos mais elaborados, ilustração dos equipamentos, mais movimento).
 
 Interpretação minha (não foi dito por ele): tooltip "como é calculado" pode ficar, porque não ocupa a tela; rótulos de campo de formulário e textos de erro ficam, porque são necessários para usar.

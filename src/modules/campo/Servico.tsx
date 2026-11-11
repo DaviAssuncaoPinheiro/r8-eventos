@@ -1,4 +1,4 @@
-import { CircleCheck, Clock, MapPin, MessageCircle, Navigation, Phone, Play } from 'lucide-react'
+import { CircleCheck, Clock, MapPin, Navigation, Phone, Play } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SERVICE_ICON, SERVICE_STATUS } from '@/app/status'
 import { formatPhone } from '@/lib/format'
@@ -137,9 +137,6 @@ export default function Servico() {
             <div className="mt-4 flex gap-2.5">
               <LinkButton href={`tel:+${wa}`} icon={Phone}>
                 Ligar
-              </LinkButton>
-              <LinkButton href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" icon={MessageCircle}>
-                WhatsApp
               </LinkButton>
             </div>
           </Block>

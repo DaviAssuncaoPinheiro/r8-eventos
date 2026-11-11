@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Hammer, SprayCan, Truck } from 'lucide-react'
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { useBrandSync } from '@/app/AppLayout'
@@ -67,15 +67,32 @@ export default function Campo() {
         <FrameContext.Provider value={frame}>
           {wide ? (
             <div className="grid min-h-dvh place-items-center bg-app px-6 pt-[calc(var(--demo-strip-h,0px)+24px)] pb-6">
-              <Link
-                to="/"
-                className="fixed top-[calc(var(--demo-strip-h,0px)+12px)] left-6 z-10 inline-flex h-11 items-center gap-2 rounded-pill px-3 text-body font-semibold text-fg-2 no-underline transition-colors duration-150 hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                <ArrowLeft size={18} strokeWidth={2} aria-hidden />
-                Voltar ao escritório
-              </Link>
-              <div ref={setFrame} className="relative h-[844px] max-h-[calc(100dvh-80px)] w-[390px] overflow-hidden rounded-[44px] bg-app ring-[10px] ring-inverse">
-                {routes}
+              <div className="flex flex-col items-center gap-6 min-[1000px]:flex-row min-[1000px]:gap-14">
+                <div className="flex flex-col items-center gap-4 text-center min-[1000px]:w-[300px] min-[1000px]:items-start min-[1000px]:text-left">
+                  <h1 className="text-title-page">App da equipe de rua</h1>
+                  <ul aria-label="Quem usa" className="flex list-none flex-wrap justify-center gap-2 p-0 min-[1000px]:justify-start">
+                    {[
+                      { label: 'Motorista', icon: Truck },
+                      { label: 'Montador', icon: Hammer },
+                      { label: 'Limpador', icon: SprayCan },
+                    ].map(({ label, icon: Icon }) => (
+                      <li key={label} className="inline-flex h-10 items-center gap-2 rounded-pill bg-raised px-4 text-body font-semibold text-fg">
+                        <Icon size={18} strokeWidth={2} aria-hidden className="text-accent-ink" />
+                        {label}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to="/"
+                    className="-ml-3 inline-flex h-11 items-center gap-2 rounded-pill px-3 text-body font-semibold text-fg-2 no-underline transition-colors duration-150 hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <ArrowLeft size={18} strokeWidth={2} aria-hidden />
+                    Voltar ao escritório
+                  </Link>
+                </div>
+                <div ref={setFrame} className="relative h-[844px] max-h-[calc(100dvh-170px)] w-[390px] shrink-0 overflow-hidden rounded-[44px] bg-app ring-[10px] ring-inverse min-[1000px]:max-h-[calc(100dvh-80px)]">
+                  {routes}
+                </div>
               </div>
             </div>
           ) : (
