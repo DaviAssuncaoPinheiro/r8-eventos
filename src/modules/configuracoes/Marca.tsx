@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { Check, ExternalLink, ImagePlus, Play, Trash2 } from 'lucide-react'
+import { Check, ClipboardList, ExternalLink, House, ImagePlus, Play, Sparkles, Trash2, TriangleAlert, UserRound } from 'lucide-react'
 import { Button, Field, Input, cn, notify } from '@/ui'
 import { BRAND_PRESETS, applyBrand, normalizeHex } from '@/lib/brand'
-import { formatMoney } from '@/lib/format'
+import { formatDate, formatMoney } from '@/lib/format'
+import { today } from '@/domain/dates'
 import { getPortal, setBrand, useQuery, useSettings } from '@/services'
 import { BrandMark } from '../portal/components/PublicShell'
 
@@ -40,7 +41,7 @@ function MiniFrame({ title, children, className }: { title: string; children: Re
   return (
     <figure className={cn('m-0 flex min-w-0 flex-col gap-3', className)}>
       <figcaption className="text-body font-semibold text-fg-2">{title}</figcaption>
-      <div aria-hidden {...{ inert: '' }} className="pointer-events-none flex-1 rounded-panel bg-app p-3 ring-1 ring-edge ring-inset">
+      <div aria-hidden {...{ inert: '' }} className="pointer-events-none flex flex-1 flex-col rounded-panel bg-app p-4 ring-1 ring-edge ring-inset">
         {children}
       </div>
     </figure>
@@ -72,7 +73,19 @@ function MiniPortal({ name, logo, client, units, cleanings, open }: { name: stri
           </div>
         </div>
       </div>
-      <div className="mt-3 flex h-11 items-center justify-center rounded-pill bg-accent text-body font-semibold text-on-accent">Pagar com Pix</div>
+      <div className="mt-3 flex items-center gap-3 rounded-card bg-raised p-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-pill bg-accent-soft text-accent-ink">
+          <Sparkles size={20} strokeWidth={2} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-body font-semibold">Limpeza</span>
+          <span className="tnum block text-caption text-fg-2">{formatDate(today())}</span>
+        </span>
+        <img src="/produtos/banheiro-quimico.jpg" alt="" className="size-12 shrink-0 rounded-control object-cover" />
+      </div>
+      <div className="mt-3 flex h-12 items-center justify-center rounded-pill bg-accent text-body font-semibold text-on-accent">
+        Pagar com Pix
+      </div>
     </MiniFrame>
   )
 }
@@ -91,6 +104,22 @@ function MiniCampo({ name, logo }: { name: string; logo?: string }) {
           <Play size={18} strokeWidth={2} aria-hidden />
           Iniciar serviço
         </div>
+      </div>
+      <div className="mt-3 rounded-card bg-raised p-4">
+        <p className="text-body font-semibold">Seu dia</p>
+        <div className="mt-2 flex gap-1.5">
+          <span className="h-3 flex-1 rounded-pill bg-accent" />
+          <span className="h-3 flex-1 rounded-pill bg-accent" />
+          <span className="h-3 flex-1 rounded-pill bg-accent-soft ring-2 ring-accent ring-inset" />
+          <span className="ds-hatch h-3 flex-1 rounded-pill bg-sunken" />
+        </div>
+      </div>
+      <div className="mt-auto grid grid-cols-4 gap-1 pt-3">
+        {[House, ClipboardList, TriangleAlert, UserRound].map((I, i) => (
+          <span key={i} className={cn('grid h-10 place-items-center rounded-pill', i === 0 ? 'bg-accent-soft text-accent-ink' : 'text-fg-2')}>
+            <I size={20} strokeWidth={2} />
+          </span>
+        ))}
       </div>
     </MiniFrame>
   )
@@ -221,9 +250,9 @@ export default function Marca() {
         </div>
       </section>
 
-      <section aria-label="Prévia ao vivo" className="min-w-0 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-7">
+      <section aria-label="Prévia ao vivo" className="flex min-w-0 flex-col rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-7">
         <h2 className="text-title-sub">Prévia</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,280px)]">
+        <div className="mt-4 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,280px)]">
           <MiniPortal name={s.company.name} logo={s.logoDataUrl} client={pd?.client.name ?? 'Construtora Aurora'} units={pd ? new Set(pd.activeRentals.flatMap((r) => r.units.map((u) => u.id))).size : 0} cleanings={pd?.monthlyReport.cleanings.length ?? 0} open={openTotal} />
           <MiniCampo name={s.company.name} logo={s.logoDataUrl} />
         </div>

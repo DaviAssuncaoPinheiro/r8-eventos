@@ -201,10 +201,9 @@ export function Rendimento({ range, onData }: { range: DateRange; onData?: (d: {
                   ) : null}
                 </div>
               </div>
-              <div className="text-right">
-                <p className="tnum text-body-lg font-semibold whitespace-nowrap">{formatMoney(r.value)}</p>
-                <p className="tnum text-caption whitespace-nowrap text-fg-3">{formatMoney(perUnit[r.type.id] ?? 0)} por {l.unit}</p>
-              </div>
+              <p className="tnum text-right text-body-lg font-semibold whitespace-nowrap" title={`${formatMoney(perUnit[r.type.id] ?? 0)} por ${l.unit}`}>
+                {formatMoney(r.value)}
+              </p>
               <span aria-hidden className="col-span-3 -mt-0.5 block h-2.5 rounded-pill">
                 <span
                   className={cn('block h-full rounded-pill', isIdle ? 'ds-hatch bg-sunken ring-1 ring-idle ring-inset' : isTop ? 'bg-accent-active' : 'bg-[var(--bar-soft)]')}

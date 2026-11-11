@@ -111,7 +111,7 @@ export function streetFor(bairroId: string, rng: Rng): string {
 }
 
 const OBRA_TIPO = ['Edifício Residencial', 'Residencial', 'Condomínio', 'Galpão logístico', 'Centro empresarial', 'Reforma da Escola Classe', 'Posto de saúde', 'Shopping', 'Hospital', 'Centro comercial', 'Loteamento']
-const OBRA_NOME = ['Jardins do Lago', 'Noroeste 104', 'Águas Claras Prime', 'Vale do Sol', 'Park Imperial', 'Cerrado Verde', 'Ipê Roxo', 'Monumental', 'Alvorada', 'Bosque das Aves', 'Mirante do Planalto', 'Villa Serena', 'Horizonte Azul', 'Santa Clara', 'Buriti', 'Pequi', 'Aroeira', 'Lagoa Bonita', 'Residencial das Palmas', 'Sucupira']
+const OBRA_NOME = ['Jardins do Lago', 'Noroeste 104', 'Águas Claras Prime', 'Vale do Sol', 'Park Imperial', 'Cerrado Verde', 'Ipê Roxo', 'Monumental', 'Alvorada', 'Bosque das Aves', 'Mirante do Planalto', 'Villa Serena', 'Horizonte Azul', 'Santa Clara', 'Buriti', 'Pequi', 'Aroeira', 'Lagoa Bonita', 'das Palmas', 'Sucupira']
 const OBRA_ESPECIAIS = ['Duplicação da via de acesso', 'Recapeamento da via principal', 'Praça e quadra poliesportiva', 'Ampliação do pronto atendimento', 'Galpão de armazenagem', 'Fachada e cobertura do bloco B', 'Reforma do ginásio', 'Estação de bombeamento']
 
 export function obraTitle(rng: Rng, bairroName: string): string {

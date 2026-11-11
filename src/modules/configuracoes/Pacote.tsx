@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Check, HeartPulse, Speaker, Tent, Construction, type LucideIcon } from 'lucide-react'
+import { ArrowRight, Check, HeartPulse, Speaker, Tent, Construction, type LucideIcon } from 'lucide-react'
 import { Badge, Button, Dialog, cn, notify } from '@/ui'
 import { SEGMENT_LIST, setSegment, useMutation, useSegment, type SegmentId } from '@/services'
 
@@ -14,15 +14,17 @@ export default function Pacote() {
 
   const pack = SEGMENT_LIST.find((p) => p.id === picked) ?? active
   const L = pack.labels
-  const names: [string, string][] = [
-    ['Equipamento', L.equipment],
-    ['Vários equipamentos', L.equipmentPlural],
-    ['Cada item', L.unit],
-    ['Limpeza', L.serviceTypes.limpeza],
-    ['Entrega', L.serviceTypes.entrega],
-    ['Retirada', L.serviceTypes.retirada],
-    ['Avaria', L.damage],
+  const A = active.labels
+  const names: [string, string, string][] = [
+    ['Equipamento', A.equipment, L.equipment],
+    ['Equipamentos', A.equipmentPlural, L.equipmentPlural],
+    ['Cada item', A.unit, L.unit],
+    ['Limpeza', A.serviceTypes.limpeza, L.serviceTypes.limpeza],
+    ['Entrega', A.serviceTypes.entrega, L.serviceTypes.entrega],
+    ['Retirada', A.serviceTypes.retirada, L.serviceTypes.retirada],
+    ['Avaria', A.damage, L.damage],
   ]
+  const changing = picked !== active.id
 
   const apply = async () => {
     try {
@@ -65,7 +67,6 @@ export default function Pacote() {
                       </Badge>
                     ) : null}
                   </span>
-                  <span className="mt-1 block text-body text-fg-2">{p.description}</span>
                 </span>
               </button>
             </li>
@@ -84,11 +85,19 @@ export default function Pacote() {
       <section aria-label={`Prévia do pacote ${pack.name}`} className="grid grid-cols-1 gap-6 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:grid-cols-3">
         <div>
           <h2 className="text-title-sub">Nomes no sistema</h2>
-          <ul className="m-0 mt-4 flex list-none flex-wrap gap-2 p-0">
-            {names.map(([k, v]) => (
-              <li key={k} className="rounded-pill bg-sunken py-1.5 pr-4 pl-3.5">
-                <span className="text-caption text-fg-3">{k}</span>
-                <span className="ml-2 text-body font-semibold">{v}</span>
+          <ul className="m-0 mt-4 flex list-none flex-col p-0">
+            {names.map(([k, before, after]) => (
+              <li key={k} className="flex min-h-11 items-center gap-3 border-b border-hairline py-2 last:border-b-0">
+                <span className="w-24 shrink-0 text-body text-fg-2">{k}</span>
+                {changing && before !== after ? (
+                  <>
+                    <span className="min-w-0 truncate text-body text-fg-2">{before}</span>
+                    <ArrowRight size={16} strokeWidth={2} aria-hidden className="shrink-0 text-fg-3" />
+                    <span className="min-w-0 truncate rounded-pill bg-accent-soft px-3 py-1 text-body font-semibold text-accent-ink">{after}</span>
+                  </>
+                ) : (
+                  <span className="min-w-0 truncate text-body font-semibold">{changing ? after : before}</span>
+                )}
               </li>
             ))}
           </ul>

@@ -107,6 +107,18 @@ export function resetDemo(): void {
   const s = freshState()
   useDb.setState({ ...s, version: useDb.getState().version + 1 }, true)
   writeStorage(useDb.getState())
+  // estados auxiliares que os módulos guardam por conta própria também voltam ao início;
+  // tema, tour e a cor em cache ficam (a cor é reaplicada pelas configurações restauradas)
+  try {
+    const keep = new Set(['r8.theme', 'r8.tour.v1', 'r8.brand'])
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i)
+      if (k && k.startsWith('r8.') && !keep.has(k)) localStorage.removeItem(k)
+    }
+  } catch {
+    /* armazenamento indisponível: nada a limpar */
+  }
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('app:reset'))
 }
 
 /** Cópia do estado completo, para depuração */
