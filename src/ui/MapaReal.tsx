@@ -66,6 +66,8 @@ export interface MapaRealProps {
   onSelect?: (id: string) => void
   /** Enquadra sempre que os pontos mudam (padrão) ou só na primeira vez. */
   refit?: 'always' | 'once'
+  /** Enquadra só os pontos deste grupo (pinos, caminhões e base). Sem valor, enquadra tudo. */
+  fitGroup?: string
   /** Controles de zoom. */
   controls?: boolean
   className?: string
@@ -135,6 +137,39 @@ function nearestXY(lat: number, lng: number) {
   return { x: best.x + (lng - best.lng) * 1500, y: best.y - (lat - best.lat) * 1500 }
 }
 
+/** Mapa de reserva: recorta o desenho na proporção do contêiner, para os pinos não saírem ampliados nem cortados. */
+function FallbackMap(props: { pins: FlatPin[]; routes: FlatRoute[]; selectedId?: string; onSelect?: (id: string) => void; label?: string; className?: string }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [size, setSize] = React.useState({ w: 600, h: 400 })
+  React.useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const read = () => {
+      const r = el.getBoundingClientRect()
+      if (r.width > 0 && r.height > 0) setSize({ w: r.width, h: r.height })
+    }
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // área útil do desenho: 60..980 x 40..660; a caixa cobre tudo e cresce no eixo que sobra
+  const cx = 520
+  const cy = 350
+  let w = 920
+  let h = 620
+  const ratio = size.w / size.h
+  if (ratio > w / h) w = h * ratio
+  else h = w / ratio
+  // pino com cerca de 15 px de raio em qualquer largura (o raio no desenho é 3,1 unidades)
+  const unit = Math.min(w / 100, (4.84 * w) / size.w)
+  return (
+    <div ref={ref} className={cn('size-full overflow-hidden rounded-[inherit] bg-[var(--map-land)]', props.className)}>
+      <MapaDF pins={props.pins} routes={props.routes} selectedId={props.selectedId} onSelect={props.onSelect} labels={false} label={props.label ?? 'Mapa'} box={[cx - w / 2, cy - h / 2, w, h]} unit={unit} />
+    </div>
+  )
+}
+
 function Fallback({ pins, routes, trucks, selectedGroup, onSelect, label, className }: MapaRealProps) {
   const flatPins: FlatPin[] = [
     ...(pins ?? []).map((p) => ({ id: p.id, ...nearestXY(p.lat, p.lng), label: p.label, title: p.title, tone: p.tone, pulse: p.pulse })),
@@ -142,7 +177,7 @@ function Fallback({ pins, routes, trucks, selectedGroup, onSelect, label, classN
   ]
   const flatRoutes: FlatRoute[] = (routes ?? []).map((r) => ({ id: r.id, points: r.points.map((p) => nearestXY(p.lat, p.lng)), dashed: r.dashed }))
   const sel = selectedGroup ? flatPins.find((p) => p.id === selectedGroup)?.id : undefined
-  return <MapaDF pins={flatPins} routes={flatRoutes} selectedId={sel} onSelect={onSelect} labels={false} label={label} className={className} />
+  return <FallbackMap pins={flatPins} routes={flatRoutes} selectedId={sel} onSelect={onSelect} label={label} className={className} />
 }
 
 /* ───────── elementos dos marcadores ───────── */
@@ -190,7 +225,7 @@ function truckEl(t: RealTruck, onSelect?: (id: string) => void) {
 
 /** Mapa real de Brasília com pinos, caminhões e rotas pelas ruas. */
 export function MapaReal(props: MapaRealProps) {
-  const { pins = [], routes = [], trucks = [], showBase = true, selectedGroup, onSelect, refit = 'always', controls = true, className, label } = props
+  const { pins = [], routes = [], trucks = [], showBase = true, selectedGroup, onSelect, refit = 'always', fitGroup, controls = true, className, label } = props
   const box = React.useRef<HTMLDivElement>(null)
   const mapRef = React.useRef<MlMap | null>(null)
   const libRef = React.useRef<typeof import('maplibre-gl') | null>(null)
@@ -438,22 +473,31 @@ export function MapaReal(props: MapaRealProps) {
     }
   }, [selectedGroup, pinsKey, trucksKey, state])
 
-  // 8. enquadra os pontos
+  // 8. enquadra os pontos (todos, ou só os do grupo pedido)
   const fitKey = [...pins, ...placed].map((p) => `${p.lat.toFixed(3)},${p.lng.toFixed(3)}`).join('|')
+  const lastFitGroup = React.useRef<string | undefined>(undefined)
   React.useEffect(() => {
     const map = mapRef.current
     const lib = libRef.current
     if (!map || !lib || state !== 'ready') return
-    if (refit === 'once' && fitted.current) return
-    const pts: [number, number][] = [...pins.map((p) => [p.lng, p.lat] as [number, number]), ...placed.map((t) => [t.lng, t.lat] as [number, number])]
+    const groupChanged = lastFitGroup.current !== fitGroup
+    if (refit === 'once' && fitted.current && !groupChanged) return
+    const inGroup = (g: string | undefined, id: string) => !fitGroup || (g ?? id) === fitGroup
+    let pts: [number, number][] = [
+      ...pins.filter((p) => inGroup(p.group, p.id)).map((p) => [p.lng, p.lat] as [number, number]),
+      ...placed.filter((t) => inGroup(t.group, t.id)).map((t) => [t.lng, t.lat] as [number, number]),
+    ]
+    // grupo sem ponto no mapa: volta ao enquadramento geral
+    if (fitGroup && !pts.length) pts = [...pins, ...placed].map((p) => [p.lng, p.lat] as [number, number])
     if (showBase) pts.push([BASE.lng, BASE.lat])
     if (!pts.length) return
     const b = new lib.LngLatBounds(pts[0], pts[0])
     for (const p of pts) b.extend(p)
     fitted.current = true
-    map.fitBounds(b, { padding: 56, maxZoom: 13.5, duration: reducedMotion() ? 0 : 700 })
+    lastFitGroup.current = fitGroup
+    map.fitBounds(b, { padding: fitGroup ? 88 : 56, maxZoom: 13.5, duration: reducedMotion() ? 0 : 700 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fitKey, state, refit, showBase])
+  }, [fitKey, state, refit, showBase, fitGroup])
 
   if (state === 'failed') return <Fallback {...props} />
 

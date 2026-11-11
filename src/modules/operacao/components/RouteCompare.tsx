@@ -21,7 +21,7 @@ export interface RouteCompareProps {
 
 function Pill({ n, moved, title }: { n: number; moved?: boolean; title: string }) {
   return (
-    <li title={title} className={cn('grid h-7 min-w-7 place-items-center rounded-pill px-1.5 text-caption font-bold tnum', moved ? 'bg-accent text-on-accent' : 'bg-sunken text-fg-2')}>
+    <li title={title} className={cn('grid h-6 min-w-6 place-items-center rounded-pill px-1.5 text-caption font-bold tnum', moved ? 'bg-accent text-on-accent' : 'bg-raised text-fg-2 ring-1 ring-edge ring-inset')}>
       <span className="sr-only">{title}: </span>
       {n}
     </li>
@@ -39,8 +39,8 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
         {aiEnabled ? <AiTag /> : null}
       </div>
 
-      <dl className={cn('grid grid-cols-3 gap-1.5', !bare && 'mt-3')}>
-        <div className="min-w-0 rounded-control bg-accent-soft p-2.5">
+      <dl className={cn('grid grid-cols-3 gap-1.5', !bare && 'mt-2.5')}>
+        <div className="min-w-0 rounded-control bg-accent-soft p-2">
           <dd className="text-[26px] leading-[30px] font-semibold tracking-[-0.02em] text-accent-ink">
             <RollingNumber value={proposal.kmSaved} decimals={1} />
           </dd>
@@ -49,7 +49,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
             km a menos
           </dt>
         </div>
-        <div className="min-w-0 rounded-control bg-sunken p-2.5">
+        <div className="min-w-0 rounded-control bg-sunken p-2">
           <dd className="text-[26px] leading-[30px] font-semibold tracking-[-0.02em]">
             <RollingNumber value={proposal.minutesSaved} />
           </dd>
@@ -58,7 +58,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
             min a menos
           </dt>
         </div>
-        <div className="min-w-0 rounded-control bg-sunken p-2.5">
+        <div className="min-w-0 rounded-control bg-sunken p-2">
           <dd className="text-[26px] leading-[30px] font-semibold tracking-[-0.02em]">
             <RollingMoney kpi value={proposal.fuelSaved} />
           </dd>
@@ -69,7 +69,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
         </div>
       </dl>
 
-      <ul className="mt-3 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5 pb-4 [mask-image:linear-gradient(to_bottom,black_calc(100%-24px),transparent)]" aria-label="Equipes que mudam">
+      <ul className="mt-2.5 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5 pb-3 [mask-image:linear-gradient(to_bottom,black_calc(100%-24px),transparent)]" aria-label="Equipes que mudam">
         {changed.map((t) => {
           const team = teamOf(t.teamId)
           const route = visibleOf(routeOf(services, t.teamId))
@@ -87,7 +87,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
                 <span className="min-w-0 flex-1 truncate text-title-card">{t.teamName}</span>
                 <span className="inline-flex h-6 items-center rounded-pill bg-ok-soft px-2 text-caption font-semibold text-ok-ink tnum">-{km(t.kmSaved)} km</span>
               </div>
-              <div className="mt-2 flex flex-col gap-1.5">
+              <div className="mt-2 flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="w-11 shrink-0 text-caption font-semibold text-fg-3">Atual</span>
                   <ol className="m-0 flex min-w-0 flex-1 list-none flex-wrap gap-1 p-0" aria-label="Ordem atual">
@@ -115,7 +115,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
         })}
       </ul>
 
-      <div className="mt-3 flex gap-2">
+      <div className="mt-2 flex gap-2">
         <Button variant="primary" className="flex-1" loading={applying} onClick={(e) => onApply(e.currentTarget)}>
           Aplicar
         </Button>

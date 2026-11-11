@@ -293,7 +293,7 @@ export default function Operacao() {
               services={services}
               teams={teams}
               fleet={isToday ? fleet : []}
-              selectedTeamId={selectedTeamId}
+              selectedTeamId={equipeParam && teams.some((t) => t.id === equipeParam) ? equipeParam : undefined}
               proposal={proposal}
               onSelectTeam={(id) => setQuery({ equipe: id })}
               onOpenService={setOpenId}

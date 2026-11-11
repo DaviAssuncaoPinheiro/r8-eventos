@@ -466,17 +466,19 @@ export default function Painel() {
               Operação
             </Button>
           </div>
-          <div className="relative h-[300px] flex-1 overflow-hidden rounded-[16px] @min-[1180px]/frame:h-auto @min-[1180px]/frame:min-h-[300px]">
-            <MapaReal
-              trucks={map.trucks}
-              routes={map.routes}
-              refit="once"
-              onSelect={(id) => {
-                const t = teamOfTruck(id)
-                if (t) navigate(`/operacao?equipe=${t}`)
-              }}
-              label={`Mapa de Brasília com ${plural(map.trucks.length, 'equipe', 'equipes')} na rua`}
-            />
+          <div className="relative min-h-[300px] flex-1 overflow-hidden rounded-[16px]">
+            <div className="absolute inset-0">
+              <MapaReal
+                trucks={map.trucks}
+                routes={map.routes}
+                refit="once"
+                onSelect={(id) => {
+                  const t = teamOfTruck(id)
+                  if (t) navigate(`/operacao?equipe=${t}`)
+                }}
+                label={`Mapa de Brasília com ${plural(map.trucks.length, 'equipe', 'equipes')} na rua`}
+              />
+            </div>
           </div>
         </section>
 
@@ -488,7 +490,7 @@ export default function Painel() {
             </h2>
             <div className="mt-4 flex items-center gap-4">
               <ArcGauge
-                className="max-w-[168px] shrink-0 [&>div>span:first-child]:text-[28px] [&>div>span:first-child]:leading-[32px]"
+                className="max-w-[132px] shrink-0 [&>div>span:first-child]:text-[24px] [&>div>span:first-child]:leading-[28px]"
                 center={`${Math.round(occupancy.pct)}%`}
                 caption=""
                 label={`Ocupação do estoque: ${Math.round(occupancy.pct)}%. ${occupancy.inField} em campo, ${gaugeLimpeza} em ${cleaningLabel.toLowerCase()}, ${occupancy.idle} parados.`}
@@ -498,19 +500,19 @@ export default function Painel() {
                   { label: 'Parados', value: occupancy.idle, tone: 'idle' },
                 ]}
               />
-              <ul className="flex min-w-0 flex-1 flex-col gap-3 text-caption text-fg-2">
+              <ul className="flex min-w-0 flex-1 flex-col gap-3 text-caption whitespace-nowrap text-fg-2">
                 <li className="flex items-center gap-2">
-                  <span className="w-8 shrink-0 text-title-card text-fg tnum">{occupancy.inField}</span>
+                  <span className="w-7 shrink-0 text-title-card text-fg tnum">{occupancy.inField}</span>
                   <span aria-hidden className="size-3 shrink-0 rounded-pill bg-accent" />
                   <span className="min-w-0 truncate">Em campo</span>
                 </li>
                 <li className="flex items-center gap-2" title={cleaningLabel}>
-                  <span className="w-8 shrink-0 text-title-card text-fg tnum">{gaugeLimpeza}</span>
+                  <span className="w-7 shrink-0 text-title-card text-fg tnum">{gaugeLimpeza}</span>
                   <span aria-hidden className="size-3 shrink-0 rounded-pill bg-accent-active" />
                   <span className="min-w-0 truncate">{cap(l.cleaning)}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-8 shrink-0 text-title-card text-fg tnum">{occupancy.idle}</span>
+                  <span className="w-7 shrink-0 text-title-card text-fg tnum">{occupancy.idle}</span>
                   <span aria-hidden className="ds-hatch size-3 shrink-0 rounded-pill bg-sunken ring-1 ring-idle ring-inset" />
                   <span className="min-w-0 truncate">Parados</span>
                 </li>

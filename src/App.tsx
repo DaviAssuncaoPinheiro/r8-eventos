@@ -19,7 +19,6 @@ const Campo = lazy(() => import('./modules/campo'))
 const Portal = lazy(() => import('./modules/portal'))
 const Unidade = lazy(() => import('./modules/portal/Unidade'))
 const DesignSystem = lazy(() => import('./pages/design-system/DesignSystem'))
-const MapaTeste = lazy(() => import('./app/MapaTeste'))
 
 /* Links antigos com # (/#/locacoes/12) viram /locacoes/12 antes do primeiro render */
 if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
@@ -34,7 +33,6 @@ export default function App() {
       <Suspense fallback={<Blank />}>
         <Routes>
           <Route path="/design-system" element={<DesignSystem />} />
-          <Route path="/_mapa" element={<MapaTeste />} />
           {/* fora da casca do escritório: app de campo e páginas públicas com a marca da locadora */}
           <Route path="/campo/*" element={<Campo />} />
           <Route path="/portal/:token/*" element={<Portal />} />

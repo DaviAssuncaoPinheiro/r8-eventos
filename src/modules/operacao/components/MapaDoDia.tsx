@@ -76,6 +76,7 @@ export function MapaDoDia({ mapKey, services, teams, fleet, selectedTeamId, prop
         trucks={trucks}
         selectedGroup={preview ? 'nova' : selectedTeamId}
         refit="once"
+        fitGroup={preview ? undefined : selectedTeamId}
         onSelect={onSelect}
         label={selectedTeamId ? `Mapa do dia com as paradas da ${teams.find((t) => t.id === selectedTeamId)?.name} em destaque` : 'Mapa do dia com as paradas e os caminhões das equipes'}
       />
@@ -93,7 +94,7 @@ export function MapaDoDia({ mapKey, services, teams, fleet, selectedTeamId, prop
         </ul>
 
         {panel ? (
-          <div className="pointer-events-auto absolute top-3 right-14 bottom-3 flex w-[392px] max-w-[calc(100%-24px)] flex-col rounded-card bg-raised p-4 shadow-overlay">{panel}</div>
+          <div className="pointer-events-auto absolute top-3 right-14 bottom-3 z-[3] flex w-[392px] max-w-[calc(100%-24px)] flex-col rounded-card bg-raised p-3.5 shadow-overlay">{panel}</div>
         ) : focusFleet && focusTeam ? (
           <div role="status" className="pointer-events-auto absolute right-2 bottom-9 w-[min(264px,calc(100%-16px))] rounded-card bg-raised p-3 shadow-overlay sm:right-3 sm:bottom-10">
             <div className="flex items-center gap-2.5">

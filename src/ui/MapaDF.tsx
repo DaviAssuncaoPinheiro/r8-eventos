@@ -30,6 +30,8 @@ export interface MapaDFProps {
   onSelect?: (id: string) => void
   /** Recorte do mapa: [x, y, largura, altura] no viewBox. Padrão: enquadra o DF inteiro. */
   box?: [number, number, number, number]
+  /** Tamanho base de traços e pinos, em unidades do viewBox. Padrão: 1% da largura do recorte. */
+  unit?: number
   /** Mostra os nomes das regiões. */
   labels?: boolean
   className?: string
@@ -61,10 +63,10 @@ function smooth(points: { x: number; y: number }[]) {
  * Mapa estilizado do Distrito Federal em tons neutros; só rotas e pinos levam cor.
  * Não é cartografia: serve para ver onde cada equipe e cada parada estão, de relance.
  */
-export function MapaDF({ pins = [], routes = [], selectedId, onSelect, box, labels = true, className, label }: MapaDFProps) {
+export function MapaDF({ pins = [], routes = [], selectedId, onSelect, box, unit, labels = true, className, label }: MapaDFProps) {
   const [x, y, w, h] = box ?? [60, 40, VIEWBOX.w - 80, VIEWBOX.h - 60]
   // tamanho dos pinos em unidades do viewBox, proporcional ao recorte
-  const u = w / 100
+  const u = unit ?? w / 100
   return (
     <svg
       viewBox={`${x} ${y} ${w} ${h}`}
