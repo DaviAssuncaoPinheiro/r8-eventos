@@ -68,7 +68,9 @@ export default function Ficha() {
     for (const c of readChanges(unit)) {
       out.push({ id: `chg-${c.at}`, at: c.at, icon: HISTORY_ICON.situacao, tone: 'warn', title: `Situação: ${MENU_LABEL[c.from]} para ${MENU_LABEL[c.to]}` })
     }
-    return out.sort((a, b) => b.at.localeCompare(a.at))
+    // histórico é o que já aconteceu: saídas agendadas para depois de hoje ficam na faixa dos próximos dias
+    const t0 = today()
+    return out.filter((x) => x.at.slice(0, 10) <= t0).sort((a, b) => b.at.localeCompare(a.at))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detail, unit, rentals.data, services.data, seg, logTick])
 
@@ -150,7 +152,6 @@ export default function Ficha() {
             <QrTile
               value={unitUrl(unit.code)}
               code={unit.code}
-              name={unit.type.name}
               size={140}
               onPrint={() => printer.print([unit])}
               onCopied={() => notify.success('Link copiado')}

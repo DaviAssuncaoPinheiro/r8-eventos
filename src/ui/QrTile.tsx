@@ -10,8 +10,8 @@ export interface QrTileProps {
   value: string
   /** "BQ-0142" */
   code: string
-  /** "Banheiro químico standard" */
-  name: string
+  /** "Banheiro químico standard". Sem valor, a legenda mostra só o código. */
+  name?: string
   /** 160 na tela. Na impressão a etiqueta usa 3 cm. */
   size?: number
   onPrint?: () => void
@@ -48,7 +48,7 @@ export function QrTile({ value, code, name, size = 160, onPrint, onCopied, class
       </div>
       <figcaption className="mt-3">
         <div className="tnum text-body font-semibold">{code}</div>
-        <div className="text-caption text-fg-3">{name}</div>
+        {name ? <div className="text-caption text-fg-3">{name}</div> : null}
       </figcaption>
       <div className="mt-3 flex items-center gap-2 print:hidden">
         <Button variant="secondary" size="sm" icon={Printer} onClick={onPrint ?? (() => window.print())}>

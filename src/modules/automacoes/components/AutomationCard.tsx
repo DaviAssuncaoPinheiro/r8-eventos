@@ -28,7 +28,7 @@ export function AutomationCard({ a, pulse, isNew, busy, onOpen, onToggle }: { a:
       </div>
       <div className={cn('mt-3 flex flex-1 flex-col transition-opacity duration-300', !a.enabled && 'opacity-55')}>
         <h3 className="text-title-card">
-          <button type="button" onClick={(e) => (e.stopPropagation(), onOpen())} className="rounded-[6px] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+          <button type="button" onClick={(e) => (e.stopPropagation(), onOpen())} className="ds-touch rounded-[6px] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
             {a.name}
           </button>
         </h3>

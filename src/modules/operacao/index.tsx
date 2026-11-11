@@ -64,6 +64,7 @@ export default function Operacao() {
   const [newOpen, setNewOpen] = React.useState(false)
   const [paused, setPaused] = React.useState(false)
   const [proposal, setProposal] = React.useState<RouteOptimization | undefined>()
+  const optimizeBtn = React.useRef<HTMLButtonElement>(null)
   const [dragId, setDragId] = React.useState<string | null>(null)
   const [over, setOver] = React.useState<{
     teamId: string
@@ -186,7 +187,7 @@ export default function Operacao() {
           <Button variant="secondary" icon={Plus} onClick={() => setNewOpen(true)}>
             Novo serviço
           </Button>
-          <Button variant="primary" icon={Route} loading={optimize.loading} onClick={() => void runOptimize()}>
+          <Button ref={optimizeBtn} variant="primary" icon={Route} loading={optimize.loading} onClick={() => void runOptimize()}>
             Otimizar rotas
             {settings.aiEnabled ? <AiTag className="ml-1 hidden sm:inline-flex" /> : null}
           </Button>
@@ -246,6 +247,7 @@ export default function Operacao() {
       applying={applyRoutes.loading}
       onApply={(el) => void runApply(el)}
       onClose={() => setProposal(undefined)}
+      returnFocus={() => optimizeBtn.current?.focus({ preventScroll: true })}
       bare={!wide}
     />
   ) : null

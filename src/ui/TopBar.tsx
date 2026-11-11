@@ -114,16 +114,16 @@ export function TopBar({
           <DropdownMenu.Trigger asChild>
             <button
               type="button"
-              className="ml-1 flex h-12 shrink-0 items-center gap-3 rounded-pill pr-3 pl-1 text-left @max-[639px]/frame:pr-1 transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=open]:bg-hover"
+              className="ml-1 flex h-12 shrink-0 items-center gap-3 rounded-pill pr-3 pl-1 text-left @max-[1279px]/frame:pr-1 transition-colors duration-150 ease-[var(--ease-ui)] hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=open]:bg-hover"
             >
               <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-pill bg-accent-soft text-body font-semibold text-accent-ink">
                 {initialsOf(user.name)}
               </span>
-              <span className="min-w-0 @max-[639px]/frame:sr-only">
+              <span className="min-w-0 @max-[1279px]/frame:sr-only">
                 <span className="block max-w-[140px] truncate text-body font-semibold text-fg">{user.name}</span>
                 <span className="block max-w-[140px] truncate text-caption text-fg-3">{user.role}</span>
               </span>
-              <ChevronDown size={16} strokeWidth={2} aria-hidden className="shrink-0 text-fg-3 @max-[639px]/frame:hidden" />
+              <ChevronDown size={16} strokeWidth={2} aria-hidden className="shrink-0 text-fg-3 @max-[1279px]/frame:hidden" />
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Portal>

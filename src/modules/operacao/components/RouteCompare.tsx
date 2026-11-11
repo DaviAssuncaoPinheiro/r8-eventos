@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { ArrowRight, Fuel, Route as RouteIcon, Timer } from 'lucide-react'
 import { AiTag, Button, cn } from '@/ui'
 import { RollingMoney, RollingNumber } from '@/ui/Motion'
@@ -15,6 +16,8 @@ export interface RouteCompareProps {
   applying: boolean
   onApply: (origin: HTMLElement) => void
   onClose: () => void
+  /** para onde o foco volta quando o painel fecha (desktop) */
+  returnFocus?: () => void
   /** no celular o painel vai numa gaveta, que já tem título e rodapé */
   bare?: boolean
 }
@@ -29,13 +32,44 @@ function Pill({ n, moved, title }: { n: number; moved?: boolean; title: string }
 }
 
 /** Comparação das rotas: o que a otimização economiza e, por equipe, a ordem atual contra a nova */
-export function RouteCompare({ proposal, services, teams, aiEnabled, applying, onApply, onClose, bare }: RouteCompareProps) {
+export function RouteCompare({ proposal, services, teams, aiEnabled, applying, onApply, onClose, returnFocus, bare }: RouteCompareProps) {
   const changed = proposal.teams.filter((t) => t.changed)
   const teamOf = (id: string) => teams.find((t) => t.id === id)
+  // no desktop o painel não é modal: recebe o foco ao abrir, Esc fecha e o foco volta para quem abriu
+  const title = React.useRef<HTMLHeadingElement>(null)
+  const back = React.useRef(returnFocus)
+  back.current = returnFocus
+  React.useEffect(() => {
+    if (bare) return
+    title.current?.focus({ preventScroll: true })
+    const root = title.current?.closest('[data-route-compare]')
+    return () => {
+      // aplicou ou fechou por fora: não deixa o foco cair no corpo da página
+      const a = document.activeElement
+      if (!a || a === document.body || root?.contains(a))
+        window.setTimeout(() => {
+          // só quando o painel saiu de fato da tela (no modo estrito o efeito roda duas vezes)
+          if (!root?.isConnected) back.current?.()
+        }, 0)
+    }
+  }, [bare])
+  const close = () => {
+    onClose()
+    if (!bare) window.setTimeout(() => back.current?.(), 0)
+  }
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div
+      data-route-compare
+      className="flex min-h-0 flex-1 flex-col"
+      onKeyDown={(e) => {
+        if (!bare && e.key === 'Escape' && !applying) {
+          e.stopPropagation()
+          close()
+        }
+      }}
+    >
       <div className={cn('flex items-center justify-between gap-3', bare && 'hidden')}>
-        <h2 className="text-title-sub">Rotas otimizadas</h2>
+        <h2 ref={title} tabIndex={-1} className="text-title-sub outline-none">Rotas otimizadas</h2>
         {aiEnabled ? <AiTag /> : null}
       </div>
 
@@ -119,7 +153,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
         <Button variant="primary" className="flex-1" loading={applying} onClick={(e) => onApply(e.currentTarget)}>
           Aplicar
         </Button>
-        <Button variant="secondary" disabled={applying} onClick={onClose}>
+        <Button variant="secondary" disabled={applying} onClick={close}>
           Agora não
         </Button>
       </div>

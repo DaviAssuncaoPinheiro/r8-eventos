@@ -45,7 +45,7 @@ const card = 'min-w-0 rounded-card'
 /** Os quatro indicadores de abertura. Cada filho direto entra em cascata (o pai usa Stagger). */
 export function openingBlocks(s: AutomationSummary, status: LiveStatus) {
   return [
-    <section key="hero" aria-label="Feito sozinho hoje" className={cn(card, 'ds-hero ds-hero-card @container relative col-span-2 flex flex-col p-5 sm:p-6 @min-[1180px]/frame:col-span-1')}>
+    <section key="hero" aria-label="Feito sozinho hoje" className={cn(card, 'ds-hero ds-hero-card @container relative col-span-2 flex flex-col p-5 sm:p-6 @min-[640px]/frame:col-span-1')}>
       <div className="flex items-start justify-between gap-3">
         <h2 className="min-w-0 pt-2 text-[15px] leading-5 font-medium @min-[250px]:text-body-lg">Feito sozinho hoje</h2>
         <InfoTip label="Feito sozinho hoje" text="Execuções feitas hoje pelas automações ligadas, sem ninguém clicar." className="text-on-accent opacity-80" />
@@ -60,9 +60,9 @@ export function openingBlocks(s: AutomationSummary, status: LiveStatus) {
         </span>
       </div>
     </section>,
-    <MoneyCard key="money" title="Dinheiro recuperado" value={s.moneyMonth} formula="Soma do valor das cobranças e extras que as automações geraram nos últimos 30 dias." />,
+    <MoneyCard key="money" title="Cobrado em 30 dias" value={s.moneyMonth} formula="Soma do valor das cobranças e extras que as automações geraram nos últimos 30 dias." />,
     <MoneyCard key="hours" title="Horas poupadas" display={<RollingNumber value={s.hoursSavedMonth} decimals={1} suffix=" h" />} formula="Tempo de trabalho manual que cada execução evita (por exemplo, 14 minutos para gerar e enviar uma cobrança de avaria), somado nos últimos 30 dias." />,
-    <section key="active" aria-label="Ativas" className={cn(card, 'group/card @container relative col-span-2 flex flex-col bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-1')}>
+    <section key="active" aria-label="Ativas" className={cn(card, 'group/card @container relative col-span-2 flex flex-col bg-raised p-5 sm:p-6 @min-[640px]/frame:col-span-1')}>
       <div className="flex items-start justify-between gap-3">
         <h2 className="pt-2 text-[15px] leading-5 font-medium @min-[250px]:text-body-lg">Ativas</h2>
         <InfoTip label="Ativas" text="Automações ligadas, entre todas as que existem. Desligue uma no cartão dela." className="text-fg-3" />
@@ -82,7 +82,7 @@ export function OpeningSkeleton() {
   return (
     <div aria-busy="true" aria-label="Carregando indicadores" className="grid grid-cols-2 gap-4 @min-[1180px]/frame:grid-cols-4">
       {[0, 1, 2, 3].map((i) => (
-        <div key={i} className={cn(card, 'flex h-[168px] flex-col justify-between bg-raised p-5 sm:p-6', i % 3 === 0 && 'col-span-2 @min-[1180px]/frame:col-span-1')}>
+        <div key={i} className={cn(card, 'flex h-[168px] flex-col justify-between bg-raised p-5 sm:p-6', i % 3 === 0 && 'col-span-2 @min-[640px]/frame:col-span-1')}>
           <Skeleton className="h-4 w-1/2" />
           <Skeleton className="h-10 w-3/4" />
         </div>

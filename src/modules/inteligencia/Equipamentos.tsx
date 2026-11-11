@@ -40,7 +40,7 @@ function TypeCard({ a, selected, onSelect, index }: { a: AssetProfit; selected: 
       <h3 className="pointer-events-none relative mt-4 line-clamp-2 text-title-card">{a.type.name}</h3>
       <div className="relative mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
         <Tooltip content={a.reason} toggleOnClick>
-          <button type="button" aria-label={`${v.label}: ${a.reason}`} className={cn('relative z-10 inline-flex h-10 items-center gap-2 rounded-pill px-4 text-body-lg font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring', v.cls)}>
+          <button type="button" aria-label={`${v.label}: ${a.reason}`} className={cn('relative z-10 inline-flex h-11 items-center gap-2 rounded-pill px-4 text-body-lg font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring', v.cls)}>
             <v.icon size={18} strokeWidth={2} aria-hidden />
             {v.label}
           </button>
