@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Check, LogIn, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { Badge, Button, Dialog, Drawer, EmptyState, Field, Input, Select, Skeleton, Banner, Tooltip, cn, notify, type StatusTone } from '@/ui'
 import { TONE_SOFT } from '@/app/status'
@@ -43,6 +44,7 @@ function Avatar({ user, size = 48 }: { user: Pick<User, 'initials' | 'role'>; si
 
 export default function Usuarios() {
   const settings = useSettings()
+  const navigate = useNavigate()
   const q = useQuery(listUsers, [])
   const users = q.data ?? settings.users
   const [draft, setDraft] = React.useState<Draft | null>(null)
@@ -80,6 +82,7 @@ export default function Usuarios() {
     try {
       await switchTo.run(u.id)
       notify.success(`Agora você está como ${u.name}`)
+      if (u.role === 'campo') navigate('/campo')
     } catch {
       notify.error('Não foi possível trocar de usuário. Tente de novo.')
     }

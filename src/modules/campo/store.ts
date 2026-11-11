@@ -151,3 +151,11 @@ export function resetCampo() {
 useDb.subscribe((s, p) => {
   if (s.clients !== p.clients && s.units !== p.units && s.teams !== p.teams && s.types !== p.types) resetCampo()
 })
+
+/* a base avisa que foi restaurada: descarta o que estava na memória, sem regravar o estado antigo */
+if (typeof window !== 'undefined') {
+  window.addEventListener('app:reset', () => {
+    clearTimeout(timer)
+    resetCampo()
+  })
+}

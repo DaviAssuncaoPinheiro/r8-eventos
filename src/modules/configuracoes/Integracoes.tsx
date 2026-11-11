@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as SwitchPrimitive from '@radix-ui/react-switch'
 import { Barcode, FileText, Loader2, MessageCircle, Zap, Landmark, type LucideIcon } from 'lucide-react'
-import { Badge, cn, notify, type StatusTone } from '@/ui'
+import { cn, notify, type StatusTone } from '@/ui'
 import { TONE_SOFT } from '@/app/status'
 import { formatDate } from '@/lib/format'
 import { setIntegration, useSettings, type IntegrationKey } from '@/services'
@@ -66,18 +66,13 @@ export default function Integracoes() {
               </div>
             </div>
             <h2 className="mt-4 text-title-sub">{it.name}</h2>
-            <div className="mt-2 min-h-[44px]">
+            <div className="mt-1 min-h-[28px]">
               {connected && !busy ? (
-                <>
-                  <Badge tone="ok">Conectado</Badge>
-                  <p className="mt-2 truncate text-body text-fg-2">
-                    {st.account}
-                    {st.connectedAt ? <span className="tnum"> · desde {formatDate(st.connectedAt)}</span> : null}
-                  </p>
-                </>
-              ) : (
-                <Badge tone="idle">{busy ? 'Conectando…' : 'Desconectado'}</Badge>
-              )}
+                <p className="truncate text-body text-fg-2">
+                  {st.account}
+                  {st.connectedAt ? <span className="tnum"> · desde {formatDate(st.connectedAt)}</span> : null}
+                </p>
+              ) : null}
             </div>
           </li>
         )

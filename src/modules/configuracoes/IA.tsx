@@ -5,11 +5,11 @@ import { AiTag, cn, notify } from '@/ui'
 import { TONE_SOFT } from '@/app/status'
 import { setAiEnabled, useMutation, useSettings } from '@/services'
 
-const POWERS: { icon: LucideIcon; title: string; text: string }[] = [
-  { icon: Sunrise, title: 'Resumo do dia', text: 'O que fazer hoje, em uma tela' },
-  { icon: Wallet, title: 'Cobranças prontas', text: 'Você só aprova e envia' },
-  { icon: MessageCircle, title: 'Mensagens de WhatsApp', text: 'Textos prontos para cada cliente' },
-  { icon: Route, title: 'Rotas', text: 'Sugere a melhor ordem das equipes' },
+const POWERS: { icon: LucideIcon; title: string }[] = [
+  { icon: Sunrise, title: 'Resumo do dia' },
+  { icon: Wallet, title: 'Cobranças prontas' },
+  { icon: MessageCircle, title: 'Mensagens de WhatsApp' },
+  { icon: Route, title: 'Rotas' },
 ]
 
 export default function IA() {
@@ -41,7 +41,7 @@ export default function IA() {
         </div>
         <div className="flex items-center gap-4">
           <label htmlFor="copiloto-switch" className="text-body-lg font-semibold">
-            Copiloto <span className="sr-only">{on ? 'ligado' : 'desligado'}</span>
+            <span className="sr-only">Copiloto {on ? 'ligado' : 'desligado'}</span>
           </label>
           <SwitchPrimitive.Root
             id="copiloto-switch"
@@ -62,7 +62,6 @@ export default function IA() {
               <p.icon size={22} strokeWidth={2} />
             </span>
             <h3 className="mt-4 text-title-card">{p.title}</h3>
-            <p className="mt-1 text-body text-fg-2">{p.text}</p>
           </li>
         ))}
       </ul>
