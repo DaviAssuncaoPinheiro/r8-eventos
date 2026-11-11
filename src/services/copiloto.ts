@@ -111,7 +111,7 @@ function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {
       value,
       detail: `${c.name}. ${ss.map((s) => s.note ?? 'Serviço extra').join('; ')}.`,
       ...withDraft(mail(`Serviços extras em ${r.title}`, firstName(c.contacts[0]?.name ?? c.name), `Fizemos ${ss.length === 1 ? 'um serviço extra' : ss.length + ' serviços extras'} em ${r.title}, fora do contrato, no total de ${formatMoney(value)}. Vamos enviar a cobrança com o link de pagamento.`)),
-      payload: { rentalId, serviceIds: ss.map((s) => s.id) },
+      payload: { rentalId, clientId: c.id, serviceIds: ss.map((s) => s.id) },
       status: 'pendente',
     })
   }

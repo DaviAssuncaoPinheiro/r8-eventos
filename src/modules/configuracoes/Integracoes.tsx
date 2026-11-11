@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as SwitchPrimitive from '@radix-ui/react-switch'
 import { Barcode, FileText, Loader2, Mail, Zap, Landmark, type LucideIcon } from 'lucide-react'
 import { cn, notify, type StatusTone } from '@/ui'
+import { Stagger } from '@/ui/Motion'
 import { TONE_SOFT } from '@/app/status'
 import { formatDate } from '@/lib/format'
 import { setIntegration, useSettings, type IntegrationKey } from '@/services'
@@ -36,7 +37,7 @@ export default function Integracoes() {
   }
 
   return (
-    <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
+    <Stagger role="list" aria-label="Integrações" className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
       {ITEMS.map((it) => {
         const st = s.integrations[it.key]
         const busy = pending.has(it.key)
@@ -77,6 +78,6 @@ export default function Integracoes() {
           </li>
         )
       })}
-    </ul>
+    </Stagger>
   )
 }

@@ -36,10 +36,6 @@ export interface MapaDoDiaProps {
 /** Mapa real do dia: paradas por equipe, rotas, caminhões andando e cartões flutuantes */
 export function MapaDoDia({ mapKey, services, teams, fleet, selectedTeamId, proposal, onSelectTeam, onOpenService, summary, panel, className }: MapaDoDiaProps) {
   const [focus, setFocus] = React.useState<string | undefined>()
-  React.useEffect(() => {
-    if (focus && focus !== selectedTeamId) setFocus(undefined)
-  }, [focus, selectedTeamId])
-
   const preview = Boolean(proposal)
   const model = React.useMemo(() => {
     const now = buildRealMap(services, teams)
@@ -59,8 +55,8 @@ export function MapaDoDia({ mapKey, services, teams, fleet, selectedTeamId, prop
     return preview ? list.map((t) => ({ ...t, group: 'nova' })) : list
   }, [fleet, teams, preview])
 
-  const focusFleet = focus ? fleet.find((f) => f.teamId === focus) : undefined
-  const focusTeam = focus ? teams.find((t) => t.id === focus) : undefined
+  const focusFleet = focus && focus === selectedTeamId ? fleet.find((f) => f.teamId === focus) : undefined
+  const focusTeam = focus && focus === selectedTeamId ? teams.find((t) => t.id === focus) : undefined
   const stops = focus ? visibleOf(routeOf(services, focus)).length : 0
 
   const onSelect = (id: string) => {

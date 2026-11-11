@@ -51,7 +51,7 @@ export function DaySummary({ services, totalKm, live, className }: DaySummaryPro
         ) : null}
       </div>
 
-      <div className="mt-3 flex gap-1" role="img" aria-label={`${done} de ${total} serviços concluídos`}>
+      <div className="mt-3 hidden gap-1 sm:flex" role="img" aria-label={`${done} de ${total} serviços concluídos`}>
         {segs.length === 0 ? <span className="ds-hatch h-2.5 flex-1 rounded-pill bg-sunken" /> : null}
         {segs.map((s) => (
           <span
@@ -67,7 +67,7 @@ export function DaySummary({ services, totalKm, live, className }: DaySummaryPro
         ))}
       </div>
 
-      <dl className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-body">
+      <dl className="mt-2 flex flex-wrap sm:mt-3 items-center gap-x-4 gap-y-1.5 text-body">
         <div className="flex items-baseline gap-1.5">
           <dd className="tnum text-title-card">
             <RollingNumber value={going} />

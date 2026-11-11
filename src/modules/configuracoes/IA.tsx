@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as SwitchPrimitive from '@radix-ui/react-switch'
 import { Mail, Route, Sparkles, Sunrise, Wallet, type LucideIcon } from 'lucide-react'
 import { AiTag, cn, notify } from '@/ui'
+import { Stagger } from '@/ui/Motion'
 import { TONE_SOFT } from '@/app/status'
 import { setAiEnabled, useMutation, useSettings } from '@/services'
 
@@ -27,7 +28,7 @@ export default function IA() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <Stagger className="flex flex-col gap-4">
       <section aria-label="Copiloto" className="ds-copilot relative flex flex-wrap items-center justify-between gap-6 overflow-hidden rounded-card p-6 sm:p-8">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
@@ -65,6 +66,6 @@ export default function IA() {
           </li>
         ))}
       </ul>
-    </div>
+    </Stagger>
   )
 }

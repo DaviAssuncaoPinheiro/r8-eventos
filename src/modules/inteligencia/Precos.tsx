@@ -41,7 +41,7 @@ function SuggestionCard({ s, onApply, loading }: { s: PriceSuggestion; onApply: 
         <div className="flex items-center justify-between text-caption font-semibold text-fg-2"><span>Ocupação em 30 dias</span><span className="tnum text-fg">{Math.round(occ)}%</span></div>
         <div className="mt-1.5 h-3 rounded-pill bg-sunken" role="img" aria-label={`Ocupação de ${Math.round(occ)}% em 30 dias`}><GrowBar pct={occ} className="bg-accent" /></div>
       </div>
-      <div className="mt-6 flex flex-wrap items-end justify-between gap-3 pt-1">
+      <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-6">
         <div>
           <p className="text-caption font-semibold text-fg-2">Ganho por mês</p>
           <p className="text-kpi text-ok-ink"><RollingMoney kpi value={s.monthlyGain} /></p>

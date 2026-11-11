@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { ArrowRight, Check, HeartPulse, Speaker, Tent, Construction, type LucideIcon } from 'lucide-react'
 import { Badge, Button, Dialog, cn, notify } from '@/ui'
+import { Stagger } from '@/ui/Motion'
 import { SEGMENT_LIST, setSegment, useMutation, useSegment, type SegmentId } from '@/services'
 
 const ICON: Record<SegmentId, LucideIcon> = { eventos: Tent, estruturas: Speaker, hospitalar: HeartPulse, maquinas: Construction }
@@ -38,7 +39,7 @@ export default function Pacote() {
 
   return (
     <div className="flex flex-col gap-4">
-      <ul role="radiogroup" aria-label="Pacotes de segmento" className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
+      <Stagger role="radiogroup" aria-label="Pacotes de segmento" className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2">
         {SEGMENT_LIST.map((p) => {
           const Icon = ICON[p.id]
           const on = p.id === picked
@@ -72,7 +73,7 @@ export default function Pacote() {
             </li>
           )
         })}
-      </ul>
+      </Stagger>
 
       {picked !== active.id ? (
         <div className="flex justify-end">

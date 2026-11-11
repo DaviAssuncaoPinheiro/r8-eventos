@@ -2,13 +2,14 @@ import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check, LogIn, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { Badge, Button, Dialog, Drawer, EmptyState, Field, Input, Select, Skeleton, Banner, Tooltip, cn, notify, type StatusTone } from '@/ui'
+import { Stagger } from '@/ui/Motion'
 import { TONE_SOFT } from '@/app/status'
 import { listUsers, removeUser, saveUser, setCurrentUser, useMutation, useQuery, useSettings, type User, type UserRole } from '@/services'
 
 const ROLE: Record<UserRole, { label: string; tone: StatusTone }> = {
   dono: { label: 'Dono', tone: 'accent' },
   escritorio: { label: 'Escritório', tone: 'info' },
-  campo: { label: 'Campo', tone: 'ok' },
+  campo: { label: 'Equipe de rua', tone: 'ok' },
 }
 const ROLES: UserRole[] = ['dono', 'escritorio', 'campo']
 
@@ -22,7 +23,7 @@ const AREAS: { label: string; roles: UserRole[] }[] = [
   { label: 'Clientes', roles: ['dono', 'escritorio'] },
   { label: 'Relatórios', roles: ['dono'] },
   { label: 'Configurações', roles: ['dono'] },
-  { label: 'App de campo', roles: ['dono', 'campo'] },
+  { label: 'App da equipe de rua', roles: ['dono', 'campo'] },
 ]
 
 interface Draft {
@@ -110,7 +111,7 @@ export default function Usuarios() {
           <EmptyState title="Nenhum usuário cadastrado" action={<Button variant="primary" icon={Plus} onClick={() => setDraft(EMPTY)}>Adicionar usuário</Button>} />
         </div>
       ) : (
-        <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
+        <Stagger role="list" aria-label="Usuários" gap={0.045} className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3">
           {users.map((u) => {
             const me = u.id === settings.currentUserId
             return (
@@ -147,7 +148,7 @@ export default function Usuarios() {
               </li>
             )
           })}
-        </ul>
+        </Stagger>
       )}
 
       <section aria-labelledby="acessos" className="rounded-card bg-raised p-5 sm:p-6">

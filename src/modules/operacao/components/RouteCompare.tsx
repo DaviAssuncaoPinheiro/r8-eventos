@@ -1,4 +1,4 @@
-import { ArrowRight, Fuel, Timer, Route as RouteIcon } from 'lucide-react'
+import { ArrowRight, Fuel, Route as RouteIcon, Timer } from 'lucide-react'
 import { AiTag, Button, cn } from '@/ui'
 import { RollingMoney, RollingNumber } from '@/ui/Motion'
 import type { RouteOptimization, ServiceView, Team } from '@/services'
@@ -39,33 +39,33 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
         {aiEnabled ? <AiTag /> : null}
       </div>
 
-      <dl className={cn('grid grid-cols-2 gap-2', !bare && 'mt-3')}>
-        <div className="rounded-control bg-accent-soft p-3">
-          <dd className="text-kpi leading-none text-accent-ink">
+      <dl className={cn('grid grid-cols-3 gap-1.5', !bare && 'mt-3')}>
+        <div className="min-w-0 rounded-control bg-accent-soft p-2.5">
+          <dd className="text-[26px] leading-[30px] font-semibold tracking-[-0.02em] text-accent-ink">
             <RollingNumber value={proposal.kmSaved} decimals={1} />
-            <span className="ml-1 text-title-card">km</span>
           </dd>
-          <dt className="mt-1.5 flex items-center gap-1 text-body font-semibold text-accent-ink">
-            <RouteIcon size={14} strokeWidth={2} aria-hidden />a menos
+          <dt className="mt-1 flex items-center gap-1 text-caption font-semibold text-accent-ink">
+            <RouteIcon size={13} strokeWidth={2} aria-hidden />
+            km a menos
           </dt>
         </div>
-        <div className="rounded-control bg-sunken p-3">
-          <dd className="text-kpi leading-none">
+        <div className="min-w-0 rounded-control bg-sunken p-2.5">
+          <dd className="text-[26px] leading-[30px] font-semibold tracking-[-0.02em]">
             <RollingNumber value={proposal.minutesSaved} />
-            <span className="ml-1 text-title-card text-fg-2">min</span>
           </dd>
-          <dt className="mt-1.5 flex items-center gap-1 text-body font-semibold text-fg-2">
-            <Timer size={14} strokeWidth={2} aria-hidden />a menos
+          <dt className="mt-1 flex items-center gap-1 text-caption font-semibold text-fg-2">
+            <Timer size={13} strokeWidth={2} aria-hidden />
+            min a menos
           </dt>
         </div>
-        <div className="col-span-2 flex items-center justify-between gap-3 rounded-control bg-sunken p-3">
-          <dt className="flex items-center gap-1 text-body font-semibold text-fg-2">
-            <Fuel size={16} strokeWidth={2} aria-hidden />
-            Diesel economizado
-          </dt>
-          <dd className="text-kpi leading-none">
+        <div className="min-w-0 rounded-control bg-sunken p-2.5">
+          <dd className="text-[26px] leading-[30px] font-semibold tracking-[-0.02em]">
             <RollingMoney kpi value={proposal.fuelSaved} />
           </dd>
+          <dt className="mt-1 flex items-center gap-1 text-caption font-semibold text-fg-2">
+            <Fuel size={13} strokeWidth={2} aria-hidden />
+            de diesel
+          </dt>
         </div>
       </dl>
 
@@ -116,7 +116,7 @@ export function RouteCompare({ proposal, services, teams, aiEnabled, applying, o
       </ul>
 
       <div className="mt-3 flex gap-2">
-        <Button variant="primary" block loading={applying} onClick={(e) => onApply(e.currentTarget)}>
+        <Button variant="primary" className="flex-1" loading={applying} onClick={(e) => onApply(e.currentTarget)}>
           Aplicar
         </Button>
         <Button variant="secondary" disabled={applying} onClick={onClose}>

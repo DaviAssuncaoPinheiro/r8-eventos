@@ -334,7 +334,7 @@ export default function Avarias() {
                 />
               </div>
             ) : (
-              <Stagger role="list" aria-label="Avarias" gap={0.04} className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
+              <Stagger role="list" aria-label="Avarias" gap={0.04} className="m-0 grid list-none grid-cols-1 p-0 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
                 {visible.map((d) => (
                   <DamageCard
                     key={d.id}
@@ -372,7 +372,7 @@ export default function Avarias() {
                 <EmptyState icon={Check} title="Nenhum extra para faturar" />
               </div>
             ) : (
-              <Stagger role="list" aria-label="Extras por locação" gap={0.04} className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
+              <Stagger role="list" aria-label="Extras por locação" gap={0.04} className="m-0 grid list-none grid-cols-1 p-0 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
                 {groups.map((g) => (
                   <ExtraCard key={g.rentalId} g={g} busy={busy === g.rentalId} onBill={(el) => void bill(g, el)} />
                 ))}

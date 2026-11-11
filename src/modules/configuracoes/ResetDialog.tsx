@@ -1,7 +1,7 @@
 import { Dialog, notify } from '@/ui'
 import { resetDemo, useMutation } from '@/services'
 
-/** Confirmação única de "Restaurar dados": o mesmo texto na aba Demonstração e na faixa do app de campo. */
+/** Confirmação única de "Restaurar dados": o mesmo texto na aba Demonstração e na faixa do app da equipe de rua. */
 export function ResetDialog({ open, onOpenChange, onDone }: { open: boolean; onOpenChange: (v: boolean) => void; onDone?: () => void }) {
   const reset = useMutation(resetDemo)
   const run = async () => {

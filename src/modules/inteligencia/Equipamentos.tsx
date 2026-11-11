@@ -55,7 +55,7 @@ function TypeCard({ a, selected, ageMonths, onSelect, index }: { a: AssetProfit;
           )}
         </p>
       </div>
-      <div className="pointer-events-none relative mt-5">
+      <div className="pointer-events-none relative mt-auto pt-5">
         <div className="flex items-center justify-between gap-2 text-caption font-semibold">
           <span className="text-fg-2">{a.paybackMonths > 0 ? `Se paga em ${num1(a.paybackMonths)} meses` : 'Sem receita ainda'}</span>
           {a.paybackMonths > 0 ? <span className="tnum text-fg">{Math.round(paidPct)}% pago</span> : null}

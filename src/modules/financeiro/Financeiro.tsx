@@ -696,7 +696,7 @@ export default function Financeiro() {
                           icon={Send}
                           loading={busy === c.id}
                           onClick={() => void quick(c)}
-                          aria-label={`${c.status === "rascunho" ? "Enviar" : c.status === "aberta" ? "Lembrar" : "Cobrar"} ${c.clientName}`}
+                          aria-label={`${c.status === "rascunho" ? "Enviar cobrança a" : c.status === "aberta" ? "Lembrar" : "Cobrar"} ${c.clientName}`}
                         >
                           {c.status === "rascunho"
                             ? "Enviar"

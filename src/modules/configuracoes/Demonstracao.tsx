@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { RotateCcw, WifiOff } from 'lucide-react'
 import { Badge, Button, Switch, notify } from '@/ui'
+import { Stagger } from '@/ui/Motion'
 import { getFailureRate, setFailureRate } from '@/services'
 import { ResetDialog } from './ResetDialog'
 
@@ -18,7 +19,8 @@ export default function Demonstracao() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <>
+    <Stagger className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <section className="flex flex-col rounded-card bg-raised p-5 sm:p-6">
         <span aria-hidden className="grid size-14 place-items-center rounded-pill bg-accent-soft text-accent-ink">
           <RotateCcw size={26} strokeWidth={2} />
@@ -43,8 +45,8 @@ export default function Demonstracao() {
           <Switch label="Simular falha de conexão" checked={fail} onCheckedChange={onFail} />
         </div>
       </section>
-
+    </Stagger>
       <ResetDialog open={confirm} onOpenChange={setConfirm} />
-    </div>
+    </>
   )
 }

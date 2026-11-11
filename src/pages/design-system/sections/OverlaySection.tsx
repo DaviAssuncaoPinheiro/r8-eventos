@@ -80,7 +80,7 @@ function DialogDemos() {
         <Dialog
           size="sm"
           title="Gerar cobrança"
-          description="A cobrança vai para a Construtora Planalto por e-mail e WhatsApp."
+          description="A cobrança vai para a Construtora Planalto por e-mail, com link de pagamento."
           confirmLabel="Gerar cobrança"
           onConfirm={() => notify.success('Cobrança gerada para a Construtora Planalto', { toasterId: TOASTER })}
           trigger={<Button variant="primary">Diálogo pequeno</Button>}
@@ -212,7 +212,7 @@ export default function OverlaySection() {
           <DialogDemos />
           <div className="grid grid-cols-1 gap-6 rounded-card bg-scrim p-4 sm:p-8 xl:grid-cols-2">
             <div className="flex min-w-0 flex-col items-center gap-2">
-              <DialogStatic size="sm" title="Gerar cobrança" description="A cobrança vai para a Construtora Planalto por e-mail e WhatsApp." confirmLabel="Gerar cobrança">
+              <DialogStatic size="sm" title="Gerar cobrança" description="A cobrança vai para a Construtora Planalto por e-mail, com link de pagamento." confirmLabel="Gerar cobrança">
                 <ChargeForm />
               </DialogStatic>
             </div>

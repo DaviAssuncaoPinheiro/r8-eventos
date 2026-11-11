@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { Check, ClipboardList, ExternalLink, House, ImagePlus, Play, Sparkles, Trash2, TriangleAlert, UserRound } from 'lucide-react'
+import { motion, useAnimationControls } from 'motion/react'
 import { Button, Field, Input, cn, notify } from '@/ui'
+import { Stagger, reduced } from '@/ui/Motion'
 import { BRAND_PRESETS, applyBrand, normalizeHex } from '@/lib/brand'
 import { formatDate, formatMoney } from '@/lib/format'
 import { today } from '@/domain/dates'
@@ -41,7 +43,7 @@ function MiniFrame({ title, children, className }: { title: string; children: Re
   return (
     <figure className={cn('m-0 flex min-w-0 flex-col gap-3', className)}>
       <figcaption className="text-body font-semibold text-fg-2">{title}</figcaption>
-      <div aria-hidden {...{ inert: '' }} className="pointer-events-none flex flex-1 flex-col rounded-panel bg-app p-4 ring-1 ring-edge ring-inset">
+      <div aria-hidden {...{ inert: '' }} className="pointer-events-none flex flex-1 flex-col rounded-panel bg-app p-4 ring-1 ring-edge ring-inset transition-colors duration-[250ms] [&_*]:transition-[background-color,color,box-shadow] [&_*]:duration-[250ms] [&_*]:ease-[var(--ease-ui)]">
         {children}
       </div>
     </figure>
@@ -92,7 +94,7 @@ function MiniPortal({ name, logo, client, units, cleanings, open }: { name: stri
 
 function MiniCampo({ name, logo }: { name: string; logo?: string }) {
   return (
-    <MiniFrame title="App de campo">
+    <MiniFrame title="App da equipe de rua">
       <div className="flex items-center gap-2 px-1 pb-3">
         <BrandMark company={{ name, logoDataUrl: logo }} size={28} />
         <span className="min-w-0 flex-1 truncate text-body font-semibold">Hoje</span>
@@ -133,6 +135,17 @@ export default function Marca() {
   const portal = useQuery(() => getPortal('construtora-aurora'), [])
 
   React.useEffect(() => setHex(s.brandHex), [s.brandHex])
+
+  /* a troca de cor faz as prévias "respirarem": leve pulso de escala, além da transição de cor */
+  const breathe = useAnimationControls()
+  const firstBrand = React.useRef(true)
+  React.useEffect(() => {
+    if (firstBrand.current) {
+      firstBrand.current = false
+      return
+    }
+    if (!reduced()) void breathe.start({ scale: [1, 1.018, 1], transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } })
+  }, [s.brandHex, breathe])
 
   const norm = normalizeHex(hex)
   const invalid = hex.trim() !== '' && !/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex.trim())
@@ -177,7 +190,7 @@ export default function Marca() {
   const openTotal = pd ? pd.invoices.filter((i) => i.status === 'aberta' || i.status === 'atrasada').reduce((a, i) => a + i.value, 0) : 0
 
   return (
-    <div className="grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
+    <Stagger className="grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
       <section aria-label="Marca" className="flex min-w-0 flex-col gap-6 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-5">
         <div>
           <h2 className="text-title-sub">Logo</h2>
@@ -252,11 +265,11 @@ export default function Marca() {
 
       <section aria-label="Prévia ao vivo" className="flex min-w-0 flex-col rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-7">
         <h2 className="text-title-sub">Prévia</h2>
-        <div className="mt-4 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,280px)]">
+        <motion.div animate={breathe} className="mt-4 grid flex-1 grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,280px)]">
           <MiniPortal name={s.company.name} logo={s.logoDataUrl} client={pd?.client.name ?? 'Construtora Aurora'} units={pd ? new Set(pd.activeRentals.flatMap((r) => r.units.map((u) => u.id))).size : 0} cleanings={pd?.monthlyReport.cleanings.length ?? 0} open={openTotal} />
           <MiniCampo name={s.company.name} logo={s.logoDataUrl} />
-        </div>
+        </motion.div>
       </section>
-    </div>
+    </Stagger>
   )
 }

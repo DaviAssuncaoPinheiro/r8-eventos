@@ -50,7 +50,7 @@ function Kpi({ title, icon: Icon, tone, formula, onOpen, tags, children }: { tit
         {title}
         <InfoTip label={title} text={formula} className={hero ? 'text-on-accent hover:text-on-accent' : undefined} />
       </h2>
-      <div className={cn('mt-2 text-kpi-lg text-[clamp(30px,17.5cqw,44px)]', NUM[tone])}>{children}</div>
+      <div className={cn('mt-auto pt-3 text-kpi-lg text-[clamp(30px,17.5cqw,44px)]', NUM[tone])}>{children}</div>
       {tags?.length ? (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {tags.map((t) => (

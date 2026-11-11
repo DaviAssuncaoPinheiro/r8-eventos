@@ -1,23 +1,23 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowUpRight, Download, FileWarning, Info, PackageOpen, Plus, ReceiptText, Route, Send, Sparkles, Truck, type LucideIcon } from 'lucide-react'
-import { ArcGauge, Banner, Button, Money, MapaDF, MoneyCard, PillBars, Segmented, Skeleton, Tooltip, cn, notify, type MapPin, type MapRoute } from '@/ui'
+import { ArrowUpRight, Download, FileWarning, Info, PackageOpen, PiggyBank, Plus, ReceiptText, Route, Send, Sparkles, Truck, Zap, type LucideIcon } from 'lucide-react'
+import { ArcGauge, Banner, Button, Money, MoneyCard, PillBars, Segmented, Skeleton, Tooltip, cn, notify } from '@/ui'
+import { MapaReal, type RealRoute } from '@/ui/MapaReal'
+import { RollingMoney, RollingNumber, Stagger, Tilt } from '@/ui/Motion'
+import { fleetTrucks, teamOfTruck, useFleet } from '@/modules/operacao/fleet'
 import { PageHeader } from '@/app/PageHeader'
-import { SERVICE_STATUS } from '@/app/status'
-import { BAIRRO, BASE } from '@/data/geo'
 import { MONTHS_LONG, MONTHS_SHORT, today } from '@/domain/dates'
 import { formatMoney, formatPercent } from '@/lib/format'
 import {
   getDailySummary,
   getMoneyPanel,
   getReceivables,
-  listServices,
+  listTeams,
   useLabels,
   useQuery,
   useSettings,
   type MoneyPanel,
   type RecommendedAction,
-  type ServiceView,
 } from '@/services'
 import { openCopiloto } from '@/modules/copiloto'
 
@@ -54,71 +54,6 @@ function InfoTip({ label, text }: { label: string; text: string }) {
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
-
-/** Pino de cada equipe: no serviço em andamento ou a caminho; senão no atrasado, no próximo ou no último concluído */
-function buildMap(panel: MoneyPanel, services: ServiceView[]) {
-  const pins: MapPin[] = []
-  const routes: MapRoute[] = []
-  const used = new Map<string, number>()
-  for (const t of panel.teamsNow) {
-    if (t.status === 'sem_servico') continue
-    const mine = services.filter((s) => s.teamId === t.team.id && s.status !== 'cancelado')
-    const target =
-      mine.find((s) => s.id === t.current?.id) ??
-      mine.find((s) => s.status === 'atrasado') ??
-      mine.find((s) => s.status === 'agendado') ??
-      [...mine].reverse().find((s) => s.status === 'concluido')
-    const b = target && BAIRRO[target.bairroId]
-    if (!target || !b) continue
-    const n = used.get(b.id) ?? 0
-    used.set(b.id, n + 1)
-    const x = b.x + n * 16
-    const y = b.y + n * 12
-    const tone = t.status === 'atrasada' ? 'danger' : t.status === 'em_servico' ? 'accent' : t.status === 'a_caminho' ? 'info' : t.status === 'concluida' ? 'ok' : 'neutral'
-    pins.push({
-      id: t.team.id,
-      x,
-      y,
-      label: t.team.initials,
-      title: `${t.team.name}: ${target.typeLabel.toLowerCase()} ${SERVICE_STATUS[target.status].label.toLowerCase()} em ${b.name}`,
-      tone,
-      pulse: t.status === 'em_servico' || t.status === 'a_caminho',
-    })
-    if (t.status === 'em_servico' || t.status === 'a_caminho') {
-      const dx = x - BASE.x
-      const dy = y - BASE.y
-      const bend = 0.12
-      routes.push({
-        id: t.team.id,
-        dashed: t.status === 'a_caminho',
-        points: [
-          { x: BASE.x, y: BASE.y },
-          { x: BASE.x + dx * 0.33 - dy * bend, y: BASE.y + dy * 0.33 + dx * bend },
-          { x: BASE.x + dx * 0.66 - dy * bend * 0.6, y: BASE.y + dy * 0.66 + dx * bend * 0.6 },
-          { x, y },
-        ],
-      })
-    }
-  }
-  return { pins, routes }
-}
-
-/** Recorte do mapa que enquadra a base e todos os pinos, na proporção do cartão */
-function fitBox(pins: MapPin[], ratio: number): [number, number, number, number] {
-  const xs = [BASE.x, ...pins.map((p) => p.x)]
-  const ys = [BASE.y, ...pins.map((p) => p.y)]
-  const pad = 175
-  const minX = Math.min(...xs) - pad
-  const maxX = Math.max(...xs) + pad
-  const minY = Math.min(...ys) - pad
-  const maxY = Math.max(...ys) + pad
-  // sem teto na largura: com o recorte em "slice", limitar só a largura cortava os pinos de cima e de baixo
-  const w = Math.max(maxX - minX, (maxY - minY) * ratio, 420)
-  const h = w / ratio
-  const cx = (minX + maxX) / 2
-  const cy = (minY + maxY) / 2
-  return [cx - w / 2, cy - h / 2, w, h]
-}
 
 function csvEscape(v: string | number) {
   const s = String(v)
@@ -253,14 +188,10 @@ export default function Painel() {
   const [periodo, setPeriodo] = React.useState<Periodo>('6m')
   const panelQ = useQuery(getMoneyPanel, [])
   const recQ = useQuery(getReceivables, [])
-  const svcQ = useQuery(() => listServices({ date: today() }), [])
+  const teamsQ = useQuery(listTeams, [])
   const panel = panelQ.data
-  // proporção do cartão do mapa, para o recorte enquadrar todos os pinos
-  const [mapRatio, setMapRatio] = React.useState(1.7)
-  const mapRef = React.useRef<HTMLDivElement | null>(null)
-  const mapNode = React.useCallback((el: HTMLDivElement | null) => {
-    mapRef.current = el
-  }, [])
+  // caminhões ao vivo: a posição é recalculada a cada 3 s e o mapa desliza entre elas
+  const fleet = useFleet(3000)
   const rec = recQ.data
 
   const aging = React.useMemo(() => {
@@ -274,7 +205,12 @@ export default function Painel() {
     ]
   }, [rec])
 
-  const map = React.useMemo(() => (panel ? buildMap(panel, svcQ.data ?? []) : { pins: [], routes: [] }), [panel, svcQ.data])
+  const map = React.useMemo(() => {
+    const idle = new Set((panel?.teamsNow ?? []).filter((t) => t.status === 'sem_servico').map((t) => t.team.id))
+    const live = fleet.filter((f) => !idle.has(f.teamId))
+    const routes: RealRoute[] = live.filter((f) => f.status === 'em_rota').map((f) => ({ id: f.teamId, group: f.teamId, dashed: true, points: [f.from, f.to] }))
+    return { trucks: fleetTrucks(live, (id) => teamsQ.data?.find((t) => t.id === id)), routes }
+  }, [fleet, panel, teamsQ.data])
 
   const revenue = React.useMemo(() => {
     if (!panel) return undefined
@@ -318,18 +254,6 @@ export default function Painel() {
     }
   }
 
-  const ready = Boolean(panel && rec && revenue)
-  React.useEffect(() => {
-    const el = mapRef.current
-    if (!el || typeof ResizeObserver === 'undefined') return
-    const ro = new ResizeObserver(() => {
-      const r = el.getBoundingClientRect()
-      if (r.width && r.height) setMapRatio(Math.round((r.width / r.height) * 20) / 20)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [ready])
-
   const header = (
     <PageHeader
       title="Painel de dinheiro"
@@ -368,7 +292,7 @@ export default function Painel() {
       </>
     )
   }
-  if (!panel || !rec || !revenue) {
+  if (!panel || !rec || !revenue || !teamsQ.data) {
     return (
       <>
         {header}
@@ -392,15 +316,18 @@ export default function Painel() {
       {header}
 
       {/* 1. os quatro números */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-4">
+      <Stagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-4">
+        <Tilt className="h-full min-w-0">
         <MoneyCard
           hero
+          className="h-full"
           title="Alugado hoje"
           value={rentedToday.value}
           tag={deltaTag}
           formula={`${rentedToday.units} de ${rentedToday.totalUnits} ${l.unitPlural} em campo hoje × valor mensal de tabela de cada uma.`}
           onOpen={() => navigate('/equipamentos?status=em_campo')}
         />
+        </Tilt>
         <MoneyCard
           title="Parado no depósito"
           value={idle.monthlyValue}
@@ -419,7 +346,7 @@ export default function Painel() {
           formula={`${plural(unbilledExtras.count, 'serviço fora do contrato feito', 'serviços fora do contrato feitos')} em ${plural(unbilledExtras.rentals, 'locação', 'locações')} e ainda fora de fatura.`}
           onOpen={() => navigate('/avarias?aba=extras')}
         />
-      </div>
+      </Stagger>
 
       {/* 2. receita, cobrança e o que fazer hoje */}
       <div className="mt-4 grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
@@ -530,7 +457,7 @@ export default function Painel() {
         </section>
       </div>
 
-      {/* 3. operação, estoque e Copiloto */}
+      {/* 3. operação, estoque, sistema trabalhando e Copiloto */}
       <div className="mt-4 grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
         <section className={cn('flex min-w-0 flex-col rounded-card bg-raised p-2', aiEnabled ? '@min-[1180px]/frame:col-span-5' : '@min-[1180px]/frame:col-span-7')}>
           <div className="flex items-center justify-between gap-3 px-3 pt-3 pb-3 sm:px-4 sm:pt-4">
@@ -539,50 +466,97 @@ export default function Painel() {
               Operação
             </Button>
           </div>
-          <div ref={mapNode} className="relative min-h-[260px] flex-1 overflow-hidden rounded-[16px]">
-            <MapaDF
-              pins={map.pins}
+          <div className="relative h-[300px] flex-1 overflow-hidden rounded-[16px] @min-[1180px]/frame:h-auto @min-[1180px]/frame:min-h-[300px]">
+            <MapaReal
+              trucks={map.trucks}
               routes={map.routes}
-              labels={false}
-              box={map.pins.length ? fitBox(map.pins, mapRatio) : [130, 40, 800, 560]}
-              label={`Mapa do Distrito Federal com ${plural(map.pins.length, 'equipe', 'equipes')}`}
-              onSelect={(id) => navigate(`/operacao?equipe=${id}`)}
-              className="absolute inset-0"
+              refit="once"
+              onSelect={(id) => {
+                const t = teamOfTruck(id)
+                if (t) navigate(`/operacao?equipe=${t}`)
+              }}
+              label={`Mapa de Brasília com ${plural(map.trucks.length, 'equipe', 'equipes')} na rua`}
             />
           </div>
         </section>
 
-        <section className={cn('min-w-0 rounded-card bg-raised p-5 sm:p-6', aiEnabled ? '@min-[1180px]/frame:col-span-4' : '@min-[1180px]/frame:col-span-5')}>
-          <h2 className="flex items-center gap-1.5 text-title-sub">
-            Ocupação do estoque
-            <InfoTip label="Ocupação do estoque" text={`${occupancy.inField} de ${occupancy.total} ${l.unitPlural} em campo hoje. Limpeza, manutenção e parados ficam fora da conta.`} />
-          </h2>
-          <ArcGauge
-            className="mt-5"
-            center={`${Math.round(occupancy.pct)}%`}
-            caption=""
-            label={`Ocupação do estoque: ${Math.round(occupancy.pct)}%. ${occupancy.inField} em campo, ${gaugeLimpeza} em ${cleaningLabel.toLowerCase()}, ${occupancy.idle} parados.`}
-            segments={[
-              { label: 'Em campo', value: occupancy.inField, tone: 'solid' },
-              { label: cleaningLabel, value: gaugeLimpeza, tone: 'strong' },
-              { label: 'Parados', value: occupancy.idle, tone: 'idle' },
-            ]}
-          />
-          <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-caption text-fg-2">
-            <li className="flex items-center gap-2">
-              <span aria-hidden className="size-3 rounded-pill bg-accent" />
-              Em campo <span className="font-semibold text-fg">{occupancy.inField}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden className="size-3 rounded-pill bg-accent-active" />
-              {cleaningLabel} <span className="font-semibold text-fg">{gaugeLimpeza}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden className="ds-hatch size-3 rounded-pill bg-sunken ring-1 ring-idle ring-inset" />
-              Parados <span className="font-semibold text-fg">{occupancy.idle}</span>
-            </li>
-          </ul>
-        </section>
+        <div className={cn('flex min-w-0 flex-col gap-4', aiEnabled ? '@min-[1180px]/frame:col-span-4' : '@min-[1180px]/frame:col-span-5')}>
+          <section className="min-w-0 rounded-card bg-raised p-5 sm:p-6">
+            <h2 className="flex items-center gap-1.5 text-title-sub">
+              Ocupação do estoque
+              <InfoTip label="Ocupação do estoque" text={`${occupancy.inField} de ${occupancy.total} ${l.unitPlural} em campo hoje. Limpeza, manutenção e parados ficam fora da conta.`} />
+            </h2>
+            <div className="mt-4 flex items-center gap-5">
+              <ArcGauge
+                className="max-w-[196px] shrink-0 [&>div>span:first-child]:text-[32px] [&>div>span:first-child]:leading-[36px]"
+                center={`${Math.round(occupancy.pct)}%`}
+                caption=""
+                label={`Ocupação do estoque: ${Math.round(occupancy.pct)}%. ${occupancy.inField} em campo, ${gaugeLimpeza} em ${cleaningLabel.toLowerCase()}, ${occupancy.idle} parados.`}
+                segments={[
+                  { label: 'Em campo', value: occupancy.inField, tone: 'solid' },
+                  { label: cleaningLabel, value: gaugeLimpeza, tone: 'strong' },
+                  { label: 'Parados', value: occupancy.idle, tone: 'idle' },
+                ]}
+              />
+              <ul className="flex min-w-0 flex-1 flex-col gap-2.5 text-caption text-fg-2">
+                <li className="flex items-center gap-2">
+                  <span aria-hidden className="size-3 shrink-0 rounded-pill bg-accent" />
+                  <span className="min-w-0 flex-1 leading-4">Em campo</span>
+                  <span className="font-semibold text-fg tnum">{occupancy.inField}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span aria-hidden className="size-3 shrink-0 rounded-pill bg-accent-active" />
+                  <span className="min-w-0 flex-1 leading-4">{cleaningLabel}</span>
+                  <span className="font-semibold text-fg tnum">{gaugeLimpeza}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span aria-hidden className="ds-hatch size-3 shrink-0 rounded-pill bg-sunken ring-1 ring-idle ring-inset" />
+                  <span className="min-w-0 flex-1 leading-4">Parados</span>
+                  <span className="font-semibold text-fg tnum">{occupancy.idle}</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <section aria-label="Sistema trabalhando" className="flex min-w-0 flex-1 flex-col justify-center gap-1 rounded-card bg-raised p-3 sm:p-4">
+            <button
+              type="button"
+              onClick={() => navigate('/inteligencia/caixa')}
+              className="group flex items-center gap-3.5 rounded-control p-2 text-left transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-pill bg-ok-soft text-ok-ink">
+                <PiggyBank size={22} strokeWidth={2} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-body font-semibold text-fg-2">Recuperado no mês</span>
+                <span className="block text-kpi">
+                  <RollingMoney kpi value={panel.recovered.total} />
+                </span>
+              </span>
+              <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-pill text-fg ring-1 ring-edge transition-colors duration-150 ring-inset group-hover:bg-fg group-hover:text-raised group-hover:ring-fg">
+                <ArrowUpRight size={18} strokeWidth={2} className="transition-transform duration-200 ease-[var(--ease-ui)] group-hover:rotate-45" />
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/automacoes')}
+              className="group flex items-center gap-3.5 rounded-control p-2 text-left transition-colors duration-150 hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-pill bg-accent-soft text-accent-ink">
+                <Zap size={22} strokeWidth={2} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-body font-semibold text-fg-2">Feito sozinho hoje</span>
+                <span className="block text-kpi">
+                  <RollingNumber value={panel.automations.runsToday} />
+                </span>
+              </span>
+              <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-pill text-fg ring-1 ring-edge transition-colors duration-150 ring-inset group-hover:bg-fg group-hover:text-raised group-hover:ring-fg">
+                <ArrowUpRight size={18} strokeWidth={2} className="transition-transform duration-200 ease-[var(--ease-ui)] group-hover:rotate-45" />
+              </span>
+            </button>
+          </section>
+        </div>
 
         {aiEnabled ? <CopilotCardDark /> : null}
       </div>

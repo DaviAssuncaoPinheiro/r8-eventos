@@ -4,19 +4,21 @@ import {
   ChevronDown,
   CircleCheck,
   FileWarning,
-  MessageSquare,
+  Mail,
   ReceiptText,
   Route,
   Send,
   Sparkles,
   type LucideIcon,
 } from 'lucide-react'
-import { AiTag, Button, Drawer, EmptyState, Money, Skeleton, Tooltip, WhatsAppPreview, cn, notify } from '@/ui'
+import { AiTag, Button, Drawer, EmptyState, EmailPreview, Money, Skeleton, Tooltip, cn, notify } from '@/ui'
+import { RollingMoney, RollingNumber, Stagger, celebrate } from '@/ui/Motion'
 import {
   approveSuggestion,
   dismissSuggestion,
   getDailySummary,
   getMoneyPanel,
+  listClients,
   listServices,
   listSuggestions,
   useMutation,
@@ -35,7 +37,7 @@ const KIND: Record<SuggestionKind, { icon: LucideIcon; tone: string; done: strin
   faturar_extra: { icon: ReceiptText, tone: 'bg-warn-soft text-warn-ink', done: 'Extras faturados e cobrança enviada' },
   lembrar_atraso: { icon: Send, tone: 'bg-info-soft text-info-ink', done: 'Lembrete enviado' },
   redistribuir_rota: { icon: Route, tone: 'bg-accent-soft text-accent-ink', done: 'Rota redistribuída' },
-  mensagem_cliente: { icon: MessageSquare, tone: 'bg-ok-soft text-ok-ink', done: 'Mensagem enviada' },
+  mensagem_cliente: { icon: Mail, tone: 'bg-ok-soft text-ok-ink', done: 'E-mail enviado' },
 }
 
 const topBtn =
@@ -91,10 +93,14 @@ function Summary() {
   const n = q.data.numbers
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-5 rounded-card bg-sunken p-5">
-      <Big label="serviços hoje">{n.servicesToday}</Big>
-      <Big label="em risco">{n.atRisk}</Big>
+      <Big label="serviços hoje">
+        <RollingNumber value={n.servicesToday} />
+      </Big>
+      <Big label="em risco">
+        <RollingNumber value={n.atRisk} />
+      </Big>
       <Big label="a cobrar" className="col-span-2">
-        <Money value={n.toCollect} variant="kpi" />
+        <RollingMoney value={n.toCollect} kpi />
       </Big>
     </div>
   )
@@ -114,18 +120,20 @@ function RouteMoves({ s, teams }: { s: CopilotSuggestion; teams: { id: string; n
   )
 }
 
-function SuggestionCard({ s, teams, fromTeam, onDone }: { s: CopilotSuggestion; teams: { id: string; name: string }[]; fromTeam?: string; onDone: (s: CopilotSuggestion) => void }) {
+function SuggestionCard({ s, teams, fromTeam, toEmail, onDone }: { s: CopilotSuggestion; teams: { id: string; name: string }[]; fromTeam?: string; toEmail?: string; onDone: (s: CopilotSuggestion) => void }) {
   const { company } = useSettings()
   const [open, setOpen] = React.useState(false)
   const approve = useMutation(approveSuggestion)
   const dismiss = useMutation(dismissSuggestion)
   const k = KIND[s.kind]
   const busy = approve.loading || dismiss.loading
-  const hasMsg = Boolean(s.draftMessage)
+  const hasMsg = Boolean(s.draft)
 
-  const doApprove = async () => {
+  const doApprove = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
     try {
       await approve.run(s.id)
+      if (s.kind === 'faturar_extra') celebrate({ x: r.left + r.width / 2, y: r.top + r.height / 2 })
       onDone(s)
     } catch {
       notify.error('Não foi possível aprovar. Tente de novo.')
@@ -156,11 +164,11 @@ function SuggestionCard({ s, teams, fromTeam, onDone }: { s: CopilotSuggestion; 
         </div>
       </div>
 
-      {hasMsg && open ? <WhatsAppPreview className="mt-3" from={company.name} message={s.draftMessage ?? ''} /> : null}
+      {s.draft && open ? <EmailPreview className="mt-3" from={company.name} to={toEmail ?? 'cliente'} subject={s.draft.subject} body={s.draft.body} /> : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button size="sm" variant="primary" loading={approve.loading} disabled={busy} onClick={doApprove}>
-          {hasMsg && open ? 'Aprovar e enviar' : 'Aprovar'}
+          {hasMsg ? 'Aprovar e enviar' : 'Aprovar'}
         </Button>
         <Button size="sm" variant="ghost" loading={dismiss.loading} disabled={busy} onClick={doDismiss}>
           Dispensar
@@ -169,7 +177,7 @@ function SuggestionCard({ s, teams, fromTeam, onDone }: { s: CopilotSuggestion; 
           <button
             type="button"
             aria-expanded={open}
-            aria-label={open ? 'Ocultar mensagem' : 'Ver mensagem'}
+            aria-label={open ? 'Ocultar e-mail' : 'Ver e-mail'}
             onClick={() => setOpen((o) => !o)}
             className="ds-touch ds-touch-sq ml-auto inline-flex size-9 items-center justify-center rounded-pill text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
@@ -189,6 +197,11 @@ interface Confirmed {
 function Body() {
   const { pending, initialLoading, error, refetch } = usePending()
   const panel = useQuery(getMoneyPanel, [])
+  const clients = useQuery(() => listClients(), [])
+  const emailOf = (s: CopilotSuggestion) => {
+    const id = s.payload.clientId as string | undefined
+    return id ? clients.data?.find((c) => c.id === id)?.contacts[0]?.email : undefined
+  }
   const [confirmed, setConfirmed] = React.useState<Confirmed[]>([])
   const [all, setAll] = React.useState(false)
   const list = all ? pending : pending.slice(0, VISIBLE)
@@ -230,7 +243,7 @@ function Body() {
           ))}
         </ul>
       ) : (
-        <ul aria-label="Propostas" className="flex flex-col gap-3">
+        <Stagger role="list" aria-label="Propostas" gap={0.06} className="flex list-none flex-col gap-3 p-0">
           {confirmed.map((c) => (
             <li key={`ok-${c.id}`} role="status" className="flex items-center gap-3 rounded-card bg-ok-soft p-4 text-ok-ink">
               <CircleCheck size={20} strokeWidth={2} aria-hidden />
@@ -238,7 +251,7 @@ function Body() {
             </li>
           ))}
           {list.map((s) => (
-            <SuggestionCard key={s.id} s={s} teams={teams} fromTeam={fromTeamOf(s)} onDone={onDone} />
+            <SuggestionCard key={s.id} s={s} teams={teams} fromTeam={fromTeamOf(s)} toEmail={emailOf(s)} onDone={onDone} />
           ))}
           {!all && pending.length > VISIBLE ? (
             <li className="flex justify-center">
@@ -252,7 +265,7 @@ function Body() {
               <EmptyState icon={Sparkles} title="Nada pendente agora" />
             </li>
           ) : null}
-        </ul>
+        </Stagger>
       )}
     </div>
   )

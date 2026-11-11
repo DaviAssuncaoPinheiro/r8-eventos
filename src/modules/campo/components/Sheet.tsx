@@ -13,7 +13,7 @@ export interface SheetProps {
   footer?: React.ReactNode
 }
 
-/** Gaveta inferior do app de campo. */
+/** Gaveta inferior do app da equipe de rua. */
 export function Sheet({ open, onOpenChange, title, children, footer }: SheetProps) {
   const container = React.useContext(FrameContext)
   return (

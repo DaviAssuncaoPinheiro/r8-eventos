@@ -3,6 +3,7 @@ import { Save } from 'lucide-react'
 import { Button, Field, Input, notify } from '@/ui'
 import { formatCNPJ, formatPhone } from '@/lib/format'
 import { updateCompany, useMutation, useSettings, type Company } from '@/services'
+import { Reveal } from '@/ui/Motion'
 import { BrandMark } from '../portal/components/PublicShell'
 
 export default function Empresa() {
@@ -26,6 +27,7 @@ export default function Empresa() {
   }
 
   return (
+    <Reveal>
     <form onSubmit={submit} className="rounded-card bg-raised p-5 sm:p-6">
       <div className="flex items-center gap-4">
         <BrandMark company={{ name: draft.name || 'Empresa', logoDataUrl: s.logoDataUrl }} size={64} className="rounded-card text-title-sub" />
@@ -68,5 +70,6 @@ export default function Empresa() {
         </Button>
       </div>
     </form>
+    </Reveal>
   )
 }

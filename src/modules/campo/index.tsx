@@ -68,9 +68,9 @@ export default function Campo() {
           {wide ? (
             <div className="grid min-h-dvh place-items-center bg-app px-6 pt-[calc(var(--demo-strip-h,0px)+24px)] pb-6">
               <div className="flex flex-col items-center gap-6 min-[1000px]:flex-row min-[1000px]:gap-14">
-                <div className="flex flex-col items-center gap-4 text-center min-[1000px]:w-[300px] min-[1000px]:items-start min-[1000px]:text-left">
+                <div className="flex flex-col items-center gap-4 text-center min-[1000px]:w-[400px] min-[1000px]:items-start min-[1000px]:text-left">
                   <h1 className="text-title-page">App da equipe de rua</h1>
-                  <ul aria-label="Quem usa" className="flex list-none flex-wrap justify-center gap-2 p-0 min-[1000px]:justify-start">
+                  <ul aria-label="Quem usa" className="flex list-none flex-wrap justify-center gap-2 p-0 min-[1000px]:flex-nowrap min-[1000px]:justify-start">
                     {[
                       { label: 'Motorista', icon: Truck },
                       { label: 'Montador', icon: Hammer },

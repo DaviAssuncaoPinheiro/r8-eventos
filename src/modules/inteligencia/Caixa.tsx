@@ -73,7 +73,7 @@ function WeekChart({ weeks }: { weeks: CashWeek[] }) {
                       <span className="block rounded-pill bg-accent transition-[height] duration-[800ms] ease-[var(--ease-ui)] motion-reduce:transition-none" style={{ height: seg(hE, wk.expected), transitionDelay: `${i * 45}ms` }} />
                       <span className="block rounded-pill bg-[var(--bar-soft)] transition-[height] duration-[800ms] ease-[var(--ease-ui)] motion-reduce:transition-none" style={{ height: seg(hR, wk.recurring), transitionDelay: `${i * 45 + 60}ms` }} />
                     </span>
-                    <span aria-hidden className={cn('absolute bottom-0 flex h-[22px] items-center text-caption', i === 0 ? 'font-semibold text-accent-ink' : i === focus ? 'font-semibold text-fg' : 'text-fg-3')}>
+                    <span aria-hidden className={cn('absolute bottom-0 flex h-[22px] items-center text-caption', i === 0 ? 'font-semibold text-accent-ink' : i === focus ? 'font-semibold text-fg' : 'text-fg-3', i % 2 === 1 && i !== focus && 'max-sm:invisible')}>
                       {i === 0 ? 'Hoje' : wk.label}
                     </span>
                   </button>
@@ -199,7 +199,7 @@ function RecoveredBlock() {
                 <span className="flex-1 rounded-pill bg-sunken" />
               )}
             </div>
-            <ul className="mt-5 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+            <ul className="mt-5 grid grid-cols-1 gap-y-3">
               {parts(r).map((p) => (
                 <li key={p.kind} className="flex items-center justify-between gap-3 text-body">
                   <span className="flex min-w-0 items-center gap-2 font-medium text-fg-2"><span aria-hidden className={cn('size-3 shrink-0 rounded-pill', KIND[p.kind].bar)} /><span className="truncate">{KIND[p.kind].label}</span></span>

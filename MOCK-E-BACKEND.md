@@ -14,7 +14,7 @@ Tudo o que a interface mostra passa por `src/services`. As telas nunca leem os d
 |---|---|---|
 | `painel.ts` | Soma os indicadores a partir das coleções locais. | `GET /painel` calculado no servidor (consultas agregadas ou visão materializada). |
 | `locacoes.ts` | Lista, cria, confirma, assina e avança locações no estado local; disponibilidade por contagem. | `GET/POST /locacoes`, `POST /locacoes/:id/confirmar`; disponibilidade com trava no banco para evitar reserva dupla. |
-| `operacao.ts` | Agenda e status em memória; "ao vivo" por temporizador. | `GET /servicos?data=`, `PATCH /servicos/:id`; posição e status por WebSocket ou notificação do app de campo. |
+| `operacao.ts` | Agenda e status em memória; "ao vivo" por temporizador. | `GET /servicos?data=`, `PATCH /servicos/:id`; posição e status por WebSocket ou notificação do app da equipe de rua. |
 | `equipamentos.ts` | Unidades, histórico e calendário derivados das locações locais. | `GET /unidades`, `GET /unidades/:codigo`; calendário por consulta de períodos. |
 | `avarias.ts` | Registra avaria e cria a cobrança ligada. | `POST /avarias` com envio da foto para armazenamento de arquivos; `POST /avarias/:id/cobrar`. |
 | `financeiro.ts` | Cobranças, lembretes e régua no estado local; Pix e boleto com códigos fictícios; CSV montado no navegador. | Provedor de pagamento (Pix e boleto reais, com aviso de pagamento por webhook); régua executada por agendador no servidor; exportação pelo servidor. |
@@ -30,11 +30,11 @@ Tudo o que a interface mostra passa por `src/services`. As telas nunca leem os d
 
 | Integração | Hoje | Real |
 |---|---|---|
-| WhatsApp | Só a pré-visualização da mensagem; "enviar" marca como enviado. | API oficial do WhatsApp Business, com modelos de mensagem aprovados. |
+| E-mail transacional | Só a pré-visualização do e-mail; "enviar" marca como enviado, e o link de pagamento abre o portal do cliente. | Provedor de e-mail transacional (Amazon SES, SendGrid ou similar), com domínio da locadora autenticado e modelos de e-mail. |
 | Pix e boleto | QR e linha digitável fictícios. | Banco ou provedor de pagamento, com conciliação automática. |
 | NFS-e | Estado "conectado". | Emissor da prefeitura ou serviço de emissão. |
 | Conta Azul | "Sincronizar" simula o envio. | API do Conta Azul: lançamentos e clientes. |
 | Contrato e assinatura | Texto gerado no navegador; assinatura desenhada na tela. | Geração de PDF no servidor e assinatura eletrônica com validade jurídica. |
-| Fotos do campo | Miniaturas no navegador e fotos de exemplo. | Envio para armazenamento de arquivos, com fila sem sinal no aparelho. |
+| Fotos da equipe de rua | Miniaturas no navegador e fotos de exemplo. | Envio para armazenamento de arquivos, com fila sem sinal no aparelho. |
 | QR dos equipamentos | Aponta para `/u/<código>` neste mesmo site. | Mesmo endereço, em domínio da locadora. |
 | Mapa | Desenho estilizado do DF, posições por bairro. | Mapa real com geocodificação e posição do caminhão. |

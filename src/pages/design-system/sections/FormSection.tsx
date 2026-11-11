@@ -110,7 +110,7 @@ export function ChoiceSection() {
           </RadioGroup>
         </Specimen>
         <Specimen title="Switch">
-          <Switch label="Avisar cliente pelo WhatsApp" description="Mensagem ao concluir cada serviço." defaultChecked />
+          <Switch label="Avisar cliente por e-mail" description="E-mail ao concluir cada serviço." defaultChecked />
           <Switch label="Cobrar extra automaticamente" />
           <Switch label="Hover forçado" forceState="hover" />
           <Switch label="Foco forçado" forceState="focus" defaultChecked />
