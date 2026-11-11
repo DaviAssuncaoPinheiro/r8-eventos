@@ -11,7 +11,7 @@ export const firstWord = (s: string) => s.replace(/^(Eng\.|Pe\.|Pr\.|Mestre|Sr\.
 /** Telefone para link do WhatsApp: (61) 99812-3306 → 5561998123306 */
 export const waNumber = (phone: string) => `55${phone.replace(/\D/g, '')}`
 
-export const reportUrl = (rentalId: string) => `${window.location.origin}${window.location.pathname}#/relatorio/${rentalId}`
+export const reportUrl = (rentalId: string) => `${window.location.origin}/relatorio/${rentalId}`
 
 export async function copyText(text: string) {
   try {

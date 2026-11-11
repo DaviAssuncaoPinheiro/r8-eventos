@@ -13,8 +13,8 @@ const AVISO_OF: Record<Job['type'], AvisoKind> = { Limpeza: 'limpeza', Montagem:
 
 /** Link público do relatório do cliente */
 export function reportLink(rentalId: string, jobId?: string) {
-  const base = typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : ''
-  return `${base}#/relatorio/${rentalId}${jobId ? `?s=${jobId}` : ''}`
+  const base = typeof window !== 'undefined' ? window.location.origin : ''
+  return `${base}/relatorio/${rentalId}${jobId ? `?s=${jobId}` : ''}`
 }
 
 /** "8 banheiros", "1 unidade" */

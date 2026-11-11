@@ -74,7 +74,7 @@ export const dm = (d: Date | string) => {
 /** "Eng. Paulo Mendes" → "Paulo" */
 export const contactFirst = (name: string) => name.replace(/^(Eng\.|Pe\.|Pr\.|Dra?\.|Sr\.|Sra\.|Mestre|Seu|Dona)\s+/i, '').split(' ')[0]
 
-export const reportLink = (rentalId: string) => `${window.location.origin}${window.location.pathname}#/relatorio/${rentalId}`
+export const reportLink = (rentalId: string) => `${window.location.origin}/relatorio/${rentalId}`
 
 export const VARIABLES = ['contato', 'empresa', 'local', 'data', 'hora', 'unidades', 'link', 'equipe', 'caminhao', 'unidade', 'problema'] as const
 

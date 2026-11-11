@@ -195,7 +195,7 @@ export const STATE_LABEL: Record<UnitState, { label: string; dot: string }> = {
 export const clientOf = (r: Rental) => CLIENT[r.clientId]
 
 /** Link público da página do QR */
-export const qrUrl = (unitId: string) => `${window.location.origin}${window.location.pathname}#/u/${unitId}`
+export const qrUrl = (unitId: string) => `${window.location.origin}/u/${unitId}`
 
 /** "há 2 h", "há 3 dias" */
 export function ago(iso: string) {

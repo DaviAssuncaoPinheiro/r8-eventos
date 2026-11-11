@@ -1,4 +1,4 @@
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { AppShell } from './components/AppShell'
 import { TooltipProvider } from './components/ui'
@@ -14,13 +14,20 @@ const Avisos = lazy(() => import('./pages/Avisos'))
 const Campo = lazy(() => import('./pages/campo/Campo'))
 const Relatorio = lazy(() => import('./pages/public/Relatorio'))
 const Unidade = lazy(() => import('./pages/public/Unidade'))
+const DesignSystem = lazy(() => import('./pages/design-system/DesignSystem'))
+
+/* Links antigos do HashRouter (/#/locacoes/12) viram /locacoes/12 antes do primeiro render */
+if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
+  window.history.replaceState(null, '', window.location.hash.slice(1))
+}
 
 export default function App() {
   return (
     <TooltipProvider>
-      <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Suspense fallback={<div className="h-dvh bg-surface" />}>
           <Routes>
+            <Route path="/design-system" element={<DesignSystem />} />
             <Route path="/campo/*" element={<Campo />} />
             <Route path="/relatorio/:rentalId" element={<Relatorio />} />
             <Route path="/u/:unitId" element={<Unidade />} />
@@ -36,7 +43,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
-      </HashRouter>
+      </BrowserRouter>
       <Toaster
         position="top-center"
         toastOptions={{

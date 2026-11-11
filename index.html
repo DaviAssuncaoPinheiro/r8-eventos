@@ -6,6 +6,20 @@
     <meta name="theme-color" content="#E8E9EC" />
     <title>R8 Eventos · Operação</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      /* tema e marca antes da primeira pintura (ver src/lib/theme.ts e src/lib/brand.ts) */
+      (function () {
+        var d = document.documentElement, p = 'system';
+        try { p = localStorage.getItem('r8.theme') || 'system'; } catch (e) {}
+        var dark = p === 'dark' || (p === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        d.dataset.theme = dark ? 'dark' : 'light';
+        d.dataset.themePref = p;
+        try {
+          var b = JSON.parse(localStorage.getItem('r8.brand') || 'null');
+          if (b && b.vars) { for (var k in b.vars) d.style.setProperty(k, b.vars[k]); d.dataset.brand = b.hex; }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
