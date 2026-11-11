@@ -33,7 +33,7 @@ export default function App() {
       <Suspense fallback={<Blank />}>
         <Routes>
           <Route path="/design-system" element={<DesignSystem />} />
-          {/* fora da casca do escritório: app de campo e páginas públicas com a marca da locadora */}
+          {/* fora da casca do escritório: app da equipe de rua e páginas públicas com a marca da locadora */}
           <Route path="/campo/*" element={<Campo />} />
           <Route path="/portal/:token/*" element={<Portal />} />
           <Route path="/u/:code" element={<Unidade />} />

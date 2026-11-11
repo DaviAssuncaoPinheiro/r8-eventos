@@ -12,7 +12,7 @@ export interface FieldActionTileProps extends Omit<React.ButtonHTMLAttributes<HT
   forceState?: 'hover' | 'active' | 'focus'
 }
 
-/** Ação de etapa do app de campo: 96 px de altura, ícone 24 em cima, rótulo 16/600 embaixo. Use dentro de `FieldActionGrid`. */
+/** Ação de etapa do app da equipe de rua: 96 px de altura, ícone 24 em cima, rótulo 16/600 embaixo. Use dentro de `FieldActionGrid`. */
 export const FieldActionTile = React.forwardRef<HTMLButtonElement, FieldActionTileProps>(function FieldActionTile(
   { icon: Icon, label, done = false, forceState, disabled, className, type = 'button', ...rest },
   ref,

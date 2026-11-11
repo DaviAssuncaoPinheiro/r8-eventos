@@ -124,7 +124,7 @@ export function OfficeFrame({
   )
 }
 
-/* ───────── App de campo ───────── */
+/* ───────── App da equipe de rua ───────── */
 
 /** "Sincronizado" (ok) ou "3 aguardando sinal" (aviso). */
 export function SyncIndicator({ pending = 0, className }: { pending?: number; className?: string }) {

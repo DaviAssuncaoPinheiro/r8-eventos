@@ -44,7 +44,7 @@ export interface ServiceRowProps {
   className?: string
 }
 
-/** Item de lista da agenda e do app de campo. Use dentro de um `<ul>`. */
+/** Item de lista da agenda e do app da equipe de rua. Use dentro de um `<ul>`. */
 export const ServiceRow = React.forwardRef<HTMLLIElement, ServiceRowProps>(function ServiceRow(
   { time, duration, type, title, client, address, status, badges, variant = 'office', onOpen, forceHover, className },
   ref,

@@ -172,7 +172,7 @@ export interface AddPhotoProps {
   className?: string
 }
 
-/** Quadrado tracejado do app de campo: alvo de pelo menos 96 px, abre a câmera no celular. */
+/** Quadrado tracejado do app da equipe de rua: alvo de pelo menos 96 px, abre a câmera no celular. */
 export const AddPhoto = React.forwardRef<HTMLButtonElement, AddPhotoProps>(function AddPhoto({ onFiles, label = 'Foto', loading, disabled, className }, ref) {
   const input = React.useRef<HTMLInputElement>(null)
   return (

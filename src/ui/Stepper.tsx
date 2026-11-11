@@ -116,7 +116,7 @@ export interface StepperFooterProps {
   backDisabled?: boolean
   nextDisabled?: boolean
   nextLoading?: boolean
-  /** field: botões grandes de 56px do app de campo. */
+  /** field: botões grandes de 56px do app da equipe de rua. */
   size?: 'md' | 'field'
   className?: string
 }
