@@ -1,13 +1,18 @@
 import * as React from 'react'
 import { motion } from 'motion/react'
 import { ChevronRight, Plus, type LucideIcon } from 'lucide-react'
-import { AUTOMATION_ACTIONS, AUTOMATION_TRIGGERS } from '@/services'
+import { AUTOMATION_ACTIONS, AUTOMATION_TRIGGERS, useLabels, type SegmentLabels } from '@/services'
 import { cn } from '@/ui'
 import { reduced } from '@/ui/Motion'
 import { iconFor } from './icons'
 
 export const triggerIcon = (kind?: string) => iconFor(AUTOMATION_TRIGGERS.find((t) => t.kind === kind)?.icon)
 export const actionIcon = (kind?: string) => iconFor(AUTOMATION_ACTIONS.find((a) => a.kind === kind)?.icon)
+
+/** Troca "limpeza(s)" do catálogo pelo nome do pacote de segmento (higienização, revisão técnica...). */
+export function segText(text: string, l: Pick<SegmentLabels, 'cleaning' | 'cleaningPlural'>): string {
+  return text.replace(/\blimpezas\b/g, l.cleaningPlural).replace(/\blimpeza\b/g, l.cleaning)
+}
 
 function Node({ icon: Icon, label, tone, size, empty }: { icon: LucideIcon; label: string; tone: 'trigger' | 'action'; size: number; empty?: boolean }) {
   return (
@@ -33,6 +38,8 @@ function Node({ icon: Icon, label, tone, size, empty }: { icon: LucideIcon; labe
  */
 export function Flow({ triggerKind, triggerLabel, actionKind, actionLabel, active = true, size = 56, className }: { triggerKind?: string; triggerLabel?: string; actionKind?: string; actionLabel?: string; active?: boolean; size?: number; className?: string }) {
   const still = reduced()
+  const labels = useLabels()
+  if (actionLabel) actionLabel = segText(actionLabel, labels)
   return (
     <div role="img" aria-label={`${triggerLabel ?? 'Escolha o gatilho'}, depois ${actionLabel ?? 'escolha a ação'}`} className={cn('flex items-start justify-between gap-1', className)}>
       <Node icon={triggerKind ? triggerIcon(triggerKind) : Plus} label={triggerLabel ?? 'Quando'} tone="trigger" size={size} empty={!triggerKind} />

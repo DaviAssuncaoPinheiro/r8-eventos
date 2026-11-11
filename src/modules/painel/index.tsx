@@ -335,7 +335,7 @@ export default function Painel() {
           onOpen={() => navigate('/equipamentos?status=disponivel')}
         />
         <MoneyCard
-          title="Avarias não cobradas"
+          title={l.damage === 'avaria' ? 'Avarias não cobradas' : `${l.damagePlural.charAt(0).toUpperCase()}${l.damagePlural.slice(1)} sem cobrança`}
           value={uncollectedDamages.value}
           formula={`${uncollectedDamages.count} ${uncollectedDamages.count === 1 ? `${l.damage} registrada` : `${l.damagePlural} registradas`} em campo que ainda não ${uncollectedDamages.count === 1 ? 'virou cobrança' : 'viraram cobrança'}.`}
           onOpen={() => navigate('/avarias?status=registrada')}

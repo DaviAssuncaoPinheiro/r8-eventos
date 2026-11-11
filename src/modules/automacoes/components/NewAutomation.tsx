@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { AUTOMATION_ACTIONS, AUTOMATION_CHANNELS, AUTOMATION_TRIGGERS, createAutomation, useMutation } from '@/services'
+import { AUTOMATION_ACTIONS, AUTOMATION_CHANNELS, AUTOMATION_TRIGGERS, createAutomation, useLabels, useMutation } from '@/services'
 import type { AutomationChannel } from '@/domain/types'
 import { Button, Drawer, Field, Input, Segmented, cn, notify } from '@/ui'
-import { Flow } from './Flow'
+import { Flow, segText } from './Flow'
 import { iconFor } from './icons'
 
 function Choice({ icon, label, selected, onClick }: { icon: string; label: string; selected: boolean; onClick: () => void }) {
@@ -36,6 +36,7 @@ export function NewAutomation({ open, onOpenChange, onCreated }: { open: boolean
   const [name, setName] = React.useState('')
   const [touched, setTouched] = React.useState(false)
   const create = useMutation(createAutomation)
+  const labels = useLabels()
 
   const t = AUTOMATION_TRIGGERS.find((x) => x.kind === trigger)
   const a = AUTOMATION_ACTIONS.find((x) => x.kind === action)
@@ -49,8 +50,8 @@ export function NewAutomation({ open, onOpenChange, onCreated }: { open: boolean
     setTouched(false)
   }, [open])
   React.useEffect(() => {
-    if (!touched) setName(t && a ? `${t.label}: ${lowerFirst(a.label)}` : '')
-  }, [t, a, touched])
+    if (!touched) setName(t && a ? `${t.label}: ${lowerFirst(segText(a.label, labels))}` : '')
+  }, [t, a, touched, labels])
 
   const save = async () => {
     try {
@@ -92,7 +93,7 @@ export function NewAutomation({ open, onOpenChange, onCreated }: { open: boolean
       <h3 className="mt-6 mb-2 text-title-card">Fazer</h3>
       <div role="radiogroup" aria-label="Fazer" className={group}>
         {AUTOMATION_ACTIONS.map((x) => (
-          <Choice key={x.kind} icon={x.icon} label={x.label} selected={x.kind === action} onClick={() => setAction(x.kind)} />
+          <Choice key={x.kind} icon={x.icon} label={segText(x.label, labels)} selected={x.kind === action} onClick={() => setAction(x.kind)} />
         ))}
       </div>
 
