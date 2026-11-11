@@ -450,6 +450,101 @@
     from { stroke-dashoffset: 1; }
     to { stroke-dashoffset: 0; }
   }
+  /* ───── mapa real: marcadores em HTML sobre o MapLibre ───── */
+  .ds-mappin,
+  .ds-maptruck {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--pin-bg);
+    color: var(--pin-fg);
+    font: 700 12px/1 var(--font-sans);
+    box-shadow: 0 0 0 3px var(--raised), 0 6px 14px -4px rgba(16, 18, 22, 0.35);
+    cursor: default;
+    transition: opacity var(--dur-base) var(--ease-ui), transform var(--dur-fast) var(--ease-ui);
+    animation: ds-pin-drop 420ms var(--ease-ui) both;
+  }
+  button.ds-mappin,
+  button.ds-maptruck {
+    cursor: pointer;
+  }
+  button.ds-mappin:hover,
+  button.ds-maptruck:hover {
+    transform: scale(1.12);
+  }
+  .ds-mappin:focus-visible,
+  .ds-maptruck:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 4px;
+  }
+  .ds-mappin[data-pulse='true']::before,
+  .ds-maptruck::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--pin-bg);
+    animation: ds-pulse 1.8s var(--ease-ui) infinite;
+  }
+  .ds-maptruck::before {
+    animation-name: ds-pulse-soft;
+  }
+  @keyframes ds-pulse-soft {
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(1.45, 1.7); opacity: 0; }
+  }
+  .ds-maptruck {
+    grid-auto-flow: column;
+    gap: 5px;
+    height: 34px;
+    padding: 0 10px 0 8px;
+  }
+  .ds-mapbase {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    background: var(--fg);
+    box-shadow: 0 0 0 3px var(--raised), inset 0 0 0 6px var(--fg), inset 0 0 0 22px var(--raised);
+  }
+  @keyframes ds-pin-drop {
+    from { opacity: 0; translate: 0 -14px; }
+    60% { opacity: 1; translate: 0 2px; }
+    to { translate: 0 0; }
+  }
+  /* crédito do mapa discreto, no canto, com as cores do tema */
+  .ds-mapreal .maplibregl-ctrl-attrib {
+    background: color-mix(in oklab, var(--raised) 82%, transparent);
+    color: var(--fg-3);
+    font: 500 11px/1.4 var(--font-sans);
+    border-radius: 8px;
+  }
+  .ds-mapreal .maplibregl-ctrl-attrib a {
+    color: var(--fg-2);
+  }
+  .ds-mapreal .maplibregl-ctrl-attrib-button {
+    border-radius: 999px;
+  }
+  /* números que rolam (NumberFlow): "R$" e centavos menores na variante de indicador */
+  .ds-roll {
+    --number-flow-char-height: 1em;
+    font-variant-numeric: tabular-nums;
+    line-height: inherit;
+  }
+  .ds-roll-kpi::part(left) {
+    font-size: 0.5em;
+    font-weight: 600;
+    margin-right: 0.12em;
+  }
+  .ds-roll-kpi::part(fraction) {
+    font-size: 0.6em;
+    font-weight: 600;
+  }
   .ds-pin-focus { opacity: 0; }
   .ds-pin:focus-visible .ds-pin-focus { opacity: 1; }
   .ds-grow-y {

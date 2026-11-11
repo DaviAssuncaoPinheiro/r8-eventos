@@ -1,10 +1,10 @@
-import { Boxes, CalendarCheck, ChartColumn, ClipboardList, Landmark, TriangleAlert, Users, Wallet, type LucideIcon } from 'lucide-react'
+import { Boxes, CalendarCheck, ChartColumn, ClipboardList, Landmark, Lightbulb, TriangleAlert, Users, Wallet, Zap, type LucideIcon } from 'lucide-react'
 
 export interface NavItem {
   to: string
   icon: LucideIcon
   label: string
-  group: 'hoje' | 'gestao'
+  group: 'hoje' | 'gestao' | 'crescer'
   /** `true` só casa a rota exata (o Painel fica em "/"). */
   end?: boolean
 }
@@ -19,4 +19,6 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/financeiro', icon: Landmark, label: 'Financeiro', group: 'gestao' },
   { to: '/clientes', icon: Users, label: 'Clientes', group: 'gestao' },
   { to: '/relatorios', icon: ChartColumn, label: 'Relatórios', group: 'gestao' },
+  { to: '/inteligencia', icon: Lightbulb, label: 'Inteligência', group: 'crescer' },
+  { to: '/automacoes', icon: Zap, label: 'Automações', group: 'crescer' },
 ]

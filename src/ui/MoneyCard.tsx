@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { ArrowUpRight, Info, TrendingDown, TrendingUp } from 'lucide-react'
 import { cn } from './cn'
-import { Money } from './Money'
+import { RollingMoney } from './Motion'
 import { Tooltip } from './Tooltip'
-import { useCountUp } from './useCountUp'
 
 export interface MoneyCardProps {
   title: string
@@ -37,7 +36,6 @@ const sizes = {
  * O número sobe de zero ao aparecer. No destaque, um foco de luz acompanha o ponteiro.
  */
 export function MoneyCard({ title, value, display, hero, tag, formula, onOpen, openLabel, size = 'lg', children, className }: MoneyCardProps) {
-  const shown = useCountUp(value ?? 0)
   const TagIcon = tag?.dir === 'down' ? TrendingDown : tag?.dir === 'up' ? TrendingUp : null
   const onMove = hero
     ? (e: React.PointerEvent<HTMLElement>) => {
@@ -82,7 +80,7 @@ export function MoneyCard({ title, value, display, hero, tag, formula, onOpen, o
             {tag.label}
           </span>
         ) : null}
-        <div className={sizes[size]}>{display ?? <Money value={shown} variant="kpi" toneNegative={false} />}</div>
+        <div className={sizes[size]}>{display ?? <RollingMoney kpi value={value ?? 0} />}</div>
       </div>
       {formula ? (
         <Tooltip content={formula} toggleOnClick>

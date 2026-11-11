@@ -1,11 +1,12 @@
 // Atividade da semente: serviços (com relatórios), avarias, cobranças e avisos.
 import { addDays, atTime, dayOf, diffDays, minutesOf, monthKey, monthStart, addMonths } from '@/domain/dates'
+import { idleReRentedItems } from '@/domain/recovery'
 import { SEGMENTS } from '@/domain/segments'
 import { billingCycles, createScheduler, cycleAmount, planRentalServices, renumberOrders, serviceDuration, teamIdForBairro } from '@/domain/planning'
 import type { Charge, Client, Damage, EquipmentType, ISODate, Notification, PayMethod, Rental, Service, ServicePhoto, ServiceReport, Team, Unit } from '@/domain/types'
 import { DAMAGE_DESCRIPTIONS } from './names'
 import type { Meta } from './rentals'
-import { oddMoney, round2, signatureDataUrl, type Rng } from './util'
+import { createRng, oddMoney, round2, signatureDataUrl, type Rng } from './util'
 
 export interface ActivityEnv {
   rng: Rng
@@ -27,7 +28,7 @@ export interface Activity {
   seq: number
 }
 
-const NOTES = ['Cliente pediu reforço no papel higiênico na próxima visita.', 'Acesso liberado pelo vigia, sem espera.', 'Chuva no local. Serviço feito com cobertura.', 'Uso intenso no fim de semana. Lavagem reforçada.', 'Responsável pediu para avisar por WhatsApp antes de chegar.', 'Local com lama na entrada. Caminhão estacionou na rua.']
+const NOTES = ['Cliente pediu reforço no papel higiênico na próxima visita.', 'Acesso liberado pelo vigia, sem espera.', 'Chuva no local. Serviço feito com cobertura.', 'Uso intenso no fim de semana. Lavagem reforçada.', 'Responsável pediu para avisar por e-mail antes de chegar.', 'Local com lama na entrada. Caminhão estacionou na rua.']
 
 export function buildActivity(env: ActivityEnv): Activity {
   const { rng, today, types, units, clients, teams, rentals, meta, tags } = env
@@ -46,18 +47,18 @@ export function buildActivity(env: ActivityEnv): Activity {
     const t = u ? typeById.get(u.typeId) : typeById.get(r.items[0].typeId)
     return { id: uid('ph'), src: t!.photo, label: u ? `${label} · ${u.code}` : label, moment }
   }
-  const makeReport = (s: Service, startDelay?: number): ServiceReport => {
+  const makeReport = (s: Service, startDelay?: number, R: Rng = rng): ServiceReport => {
     const r = rentalById.get(s.rentalId)!
-    const delay = startDelay ?? (rng.chance(0.14) ? rng.int(12, 35) : rng.int(0, 8))
+    const delay = startDelay ?? (R.chance(0.14) ? R.int(12, 35) : R.int(0, 8))
     const startedAt = new Date(new Date(s.start).getTime() + delay * 60000)
-    const finishedAt = new Date(startedAt.getTime() + Math.round(s.durationMin * rng.float(0.85, 1.15)) * 60000)
+    const finishedAt = new Date(startedAt.getTime() + Math.round(s.durationMin * R.float(0.85, 1.15)) * 60000)
     const checklist = checklists[s.type].map((label) => ({ label, ok: true }))
-    if (s.type === 'limpeza' && rng.chance(0.05)) checklist[3].ok = false
+    if (s.type === 'limpeza' && R.chance(0.05)) checklist[3].ok = false
     const photos: ServicePhoto[] = []
     if (s.type === 'limpeza' || s.type === 'manutencao') {
       photos.push(photoFor(r, s.unitIds, 'antes', s.type === 'limpeza' ? 'Antes' : 'Antes do reparo', 0))
       photos.push(photoFor(r, s.unitIds, 'depois', s.type === 'limpeza' ? 'Depois' : 'Depois do reparo', 0))
-      if (rng.chance(0.4)) photos.push(photoFor(r, s.unitIds, 'depois', 'Depois', 1))
+      if (R.chance(0.4)) photos.push(photoFor(r, s.unitIds, 'depois', 'Depois', 1))
     } else if (s.type === 'retirada') {
       photos.push(photoFor(r, s.unitIds, 'antes', 'Estado na retirada', 0))
       photos.push(photoFor(r, s.unitIds, 'depois', 'Carregado no caminhão', 1))
@@ -78,7 +79,7 @@ export function buildActivity(env: ActivityEnv): Activity {
       checklist,
       photos,
       signature: { name: r.contact.name, role: r.contact.role, dataUrl: signatureDataUrl(`${r.contact.name}${dayOf(s.start)}`) },
-      notes: rng.chance(0.12) ? rng.pick(NOTES) : undefined,
+      notes: R.chance(0.12) ? R.pick(NOTES) : undefined,
       damageIds: [],
     }
   }
@@ -154,6 +155,19 @@ export function buildActivity(env: ActivityEnv): Activity {
   addToday('eq-4', pickFor('eq-4'), 'limpeza', hhmm(13, 30), 'agendado')
   addToday('eq-5', pickFor('eq-5'), 'limpeza', hhmm(8, 30), 'concluido')
   addToday('eq-6', pickFor('eq-6'), 'limpeza', hhmm(11, 30), 'agendado')
+  // encaixes de última hora: serviços de bairros espalhados na mesma equipe, na ordem em que o cliente pediu.
+  // É daí que a otimização de rotas (optimizeRoutes) tira quilômetros.
+  const pickIn = (bairro: string): Rental | undefined => cleaners.find((r) => r.bairroId === bairro && !usedToday.has(r.id))
+  const lateFit: [string, string, number][] = [
+    ['eq-4', 'ceilandia', hhmm(11, 5)],
+    ['eq-4', 'vicente-pires', hhmm(12, 20)],
+    ['eq-3', 'setor-clubes', hhmm(11, 10)],
+    ['eq-3', 'guara', hhmm(13, 40)],
+  ]
+  for (const [team, bairro, at] of lateFit) {
+    const r = pickIn(bairro)
+    if (r) addToday(team, r, 'limpeza', at, 'agendado')
+  }
   // entregas e retiradas de hoje que vêm das locações
   const setTodayService = (pred: (s: Service) => boolean, startMin: number, status: Service['status'], team?: string) => {
     const s = services.find((x) => dayOf(x.start) === today && pred(x))
@@ -186,12 +200,12 @@ export function buildActivity(env: ActivityEnv): Activity {
   /* ───────── extras: concluídos, uns faturados, 5 por faturar em 3 locações ───────── */
   const extraRentals = emCampo.filter((r) => !meta.get(r.id)?.tag && cleanableIds(r).length >= 1 && r.kind === 'obra')
   const pickExtra = (i: number) => extraRentals[(i * 5 + 2) % extraRentals.length]
-  const addExtra = (r: Rental, daysAgo: number, type: 'limpeza' | 'manutencao', billed: boolean, note: string): Service => {
+  const addExtra = (r: Rental, daysAgo: number, type: 'limpeza' | 'manutencao', billed: boolean, note: string, R: Rng = rng): Service => {
     const ids = type === 'limpeza' ? cleanableIds(r).slice(0, 3) : [r.items.flatMap((i) => i.unitIds)[0]]
     const dur = type === 'limpeza' ? serviceDuration('limpeza', ids.length) : 50
     const team = teamIdForBairro(r.bairroId)
     const slot = sched.place(team, D(-daysAgo), dur, { earliest: 13 * 60, bairroId: r.bairroId })
-    const unit = type === 'limpeza' ? round2((rng.int(60, 90) + rng.pick([0.5, 0.9, 0.0])) * ids.length) : round2(rng.int(120, 185) + 0.4)
+    const unit = type === 'limpeza' ? round2((R.int(60, 90) + R.pick([0.5, 0.9, 0.0])) * ids.length) : round2(R.int(120, 185) + 0.4)
     const s: Service = {
       id: uid('svc'),
       rentalId: r.id,
@@ -208,7 +222,7 @@ export function buildActivity(env: ActivityEnv): Activity {
       extraBilled: billed,
       note,
     }
-    s.report = makeReport(s)
+    s.report = makeReport(s, undefined, R)
     services.push(s)
     return s
   }
@@ -227,12 +241,33 @@ export function buildActivity(env: ActivityEnv): Activity {
     addExtra(pickExtra(4), 33, 'manutencao', true, 'Troca de unidade com defeito, fora do contrato'),
     addExtra(pickExtra(5), 21, 'limpeza', true, 'Limpeza extra para vistoria'),
   ]
+  // extras faturados no mês anterior e neste mês (dinheiro que o sistema recupera). Sorteio próprio: não mexe na semente das demais regras.
+  const rng2 = createRng(0x2b7e1516)
+  const curKey = monthKey(today)
+  const prevKey = addMonths(curKey, -1)
+  const dayIn = (key: string, dd: number) => `${key}-${String(dd).padStart(2, '0')}`
+  const recExtras: { services: Service[]; issue: ISODate; paid: ISODate; month: 'prev' | 'cur' }[] = []
+  const addRecExtra = (month: 'prev' | 'cur', date: ISODate, type: 'limpeza' | 'manutencao', note: string, issue: ISODate, paid: ISODate) => {
+    if (date >= today || issue > today) return
+    const r = extraRentals.find((x, i) => x.start <= date && x.end >= date && i >= 3) ?? extraRentals.find((x) => x.start <= date && x.end >= date)
+    if (!r) return
+    const svc = addExtra(r, diffDays(date, today), type, true, note, rng2)
+    if (dayOf(svc.start) >= today) return
+    recExtras.push({ services: [svc], issue, paid: paid > addDays(today, -1) ? addDays(today, -1) : paid, month })
+  }
+  addRecExtra('prev', dayIn(prevKey, 6), 'limpeza', 'Limpeza extra pedida pelo cliente', dayIn(prevKey, 9), dayIn(prevKey, 17))
+  addRecExtra('prev', dayIn(prevKey, 17), 'manutencao', 'Troca de unidade com defeito, fora do contrato', dayIn(prevKey, 20), dayIn(prevKey, 27))
+  {
+    const d = monthStart(curKey) > addDays(today, -6) ? monthStart(curKey) : addDays(today, -6)
+    const issue = addDays(d, 2) > today ? today : addDays(d, 2)
+    addRecExtra('cur', d, 'limpeza', 'Limpeza extra para vistoria', issue, addDays(issue, 3))
+  }
   services = renumberOrders(services).sort((a, b) => a.start.localeCompare(b.start))
 
   /* ───────── avarias ───────── */
   const damages: Damage[] = []
   const svcByRentalDay = (rentalId: string, day: ISODate, type?: Service['type']) => services.find((s) => s.rentalId === rentalId && dayOf(s.start) === day && s.status === 'concluido' && (!type || s.type === type))
-  const addDamage = (o: { unitId: string; rentalId: string; date: ISODate; kind: string; value: number; status: Damage['status']; serviceType?: Service['type'] }): Damage => {
+  const addDamage = (o: { unitId: string; rentalId: string; date: ISODate; kind: string; value: number; status: Damage['status']; serviceType?: Service['type'] }, R: Rng = rng): Damage => {
     const r = rentalById.get(o.rentalId)!
     const u = unitById.get(o.unitId)!
     const t = typeById.get(u.typeId)!
@@ -248,7 +283,7 @@ export function buildActivity(env: ActivityEnv): Activity {
       description: DAMAGE_DESCRIPTIONS[o.kind] ?? o.kind,
       photos: [
         { id: uid('ph'), src: t.photo, label: `${o.kind} · ${u.code}`, moment: 'avaria' },
-        ...(rng.chance(0.5) ? [{ id: uid('ph'), src: t.photo, label: `Detalhe · ${u.code}`, moment: 'avaria' as const }] : []),
+        ...(R.chance(0.5) ? [{ id: uid('ph'), src: t.photo, label: `Detalhe · ${u.code}`, moment: 'avaria' as const }] : []),
       ],
       value: o.value,
       status: o.status,
@@ -285,11 +320,11 @@ export function buildActivity(env: ActivityEnv): Activity {
   const f4 = fieldPick('bq', 2)
   addDamage({ unitId: f4.unitId, rentalId: f4.r.id, date: lastClean(f4.r, 11, 8), kind: 'Mictório trincado', value: 268.5, status: 'registrada', serviceType: 'limpeza' })
   // histórico: cobradas, pagas e dispensadas
-  const hist = (type: string, i: number, ago: number, kind: string, value: number, status: Damage['status']) => {
+  const hist = (type: string, i: number, ago: number, kind: string, value: number, status: Damage['status'], R: Rng = rng) => {
     const pool = rentals.filter((r) => (r.status === 'faturada' || r.status === 'em_campo') && r.items.some((it) => it.typeId === type && it.unitIds.length) && diffDays(r.start, D(-ago)) >= 0 && diffDays(D(-ago), r.end) >= 0)
     const r = pool[(i * 2) % Math.max(1, pool.length)] ?? rentals.find((x) => x.items.some((it) => it.typeId === type && it.unitIds.length) && x.status === 'faturada')!
     const date = D(-ago) >= r.start && D(-ago) <= r.end ? D(-ago) : r.end
-    return addDamage({ unitId: r.items.find((it) => it.typeId === type && it.unitIds.length)!.unitIds[0], rentalId: r.id, date, kind, value, status })
+    return addDamage({ unitId: r.items.find((it) => it.typeId === type && it.unitIds.length)!.unitIds[0], rentalId: r.id, date, kind, value, status }, R)
   }
   const dCob1 = hist('bq', 0, 14, 'Mictório trincado', 301.7, 'cobrada')
   const dCob2 = hist('pcd', 0, 21, 'Trinco ou fechadura', 164.9, 'cobrada')
@@ -301,17 +336,17 @@ export function buildActivity(env: ActivityEnv): Activity {
   /* ───────── cobranças ───────── */
   const charges: Charge[] = []
   const MET: PayMethod[] = ['pix', 'boleto']
-  const newCharge = (o: Partial<Charge> & Pick<Charge, 'clientId' | 'kind' | 'description' | 'value' | 'issuedAt' | 'dueAt' | 'status'>): Charge => {
+  const newCharge = (o: Partial<Charge> & Pick<Charge, 'clientId' | 'kind' | 'description' | 'value' | 'issuedAt' | 'dueAt' | 'status'>, R: Rng = rng): Charge => {
     const c: Charge = {
       id: uid('chg'),
       code: '',
-      method: o.method ?? (clientById.get(o.clientId)!.kind === 'Construtora' ? (rng.chance(0.55) ? 'boleto' : 'pix') : rng.pick(MET)),
+      method: o.method ?? (clientById.get(o.clientId)!.kind === 'Construtora' ? (R.chance(0.55) ? 'boleto' : 'pix') : R.pick(MET)),
       reminders: [],
       ...o,
     }
     if (c.status !== 'rascunho') {
-      c.sentAt = atTime(c.issuedAt, 9 * 60 + rng.int(0, 120))
-      c.sentVia = rng.chance(0.7) ? 'whatsapp' : 'email'
+      c.sentAt = atTime(c.issuedAt, 9 * 60 + R.int(0, 120))
+      c.sentVia = R.chance(0.7) ? 'email' : 'portal'
     }
     charges.push(c)
     return c
@@ -353,10 +388,10 @@ export function buildActivity(env: ActivityEnv): Activity {
     })
   }
   // avarias com cobrança
-  const damageCharge = (d: Damage, status: Charge['status'], paid?: ISODate) => {
+  const damageCharge = (d: Damage, status: Charge['status'], paid?: ISODate, R: Rng = rng, issueAt?: ISODate) => {
     const r = rentalById.get(d.rentalId)!
     // cobrança em aberto foi enviada há poucos dias e ainda está no prazo; rascunho nasce hoje
-    const issue = status === 'aberta' ? D(-rng.int(2, 5)) : status === 'rascunho' ? today : addDays(d.date, 2)
+    const issue = issueAt ?? (status === 'aberta' ? D(-R.int(2, 5)) : status === 'rascunho' ? today : addDays(d.date, 2))
     const c = newCharge({
       clientId: d.clientId,
       rentalId: d.rentalId,
@@ -369,7 +404,7 @@ export function buildActivity(env: ActivityEnv): Activity {
       status,
       method: 'pix',
       damageId: d.id,
-    })
+    }, R)
     d.chargeId = c.id
     return c
   }
@@ -397,6 +432,23 @@ export function buildActivity(env: ActivityEnv): Activity {
     })
     for (const s of g) extraChargeOf.set(s.id, c.id)
   }
+  // extras faturados do histórico recente (mês anterior e atual)
+  for (const g of recExtras) {
+    const r = rentalById.get(g.services[0].rentalId)!
+    const c = newCharge({
+      clientId: r.clientId,
+      rentalId: r.id,
+      kind: 'extra',
+      description: `Serviços extras · ${r.code}`,
+      value: round2(g.services.reduce((a, s) => a + (s.extraValue ?? 0), 0)),
+      issuedAt: g.issue,
+      dueAt: addDays(g.issue, 10),
+      paidAt: g.paid < g.issue ? g.issue : g.paid,
+      status: 'paga',
+      serviceIds: g.services.map((s) => s.id),
+    }, rng2)
+    for (const s of g.services) extraChargeOf.set(s.id, c.id)
+  }
   const dueByCharge = (c: Charge) => c.dueAt
 
   // 6 atrasadas de 4 clientes
@@ -413,7 +465,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     const n = 1 + (i % 3)
     for (let k = 0; k < n; k++) {
       const at = addDays(c.dueAt, 3 + k * 5)
-      if (at < today) c.reminders.push({ at: atTime(at, 10 * 60 + 5 * k), channel: k % 2 ? 'email' : 'whatsapp' })
+      if (at < today) c.reminders.push({ at: atTime(at, 10 * 60 + 5 * k), channel: k % 2 ? 'portal' : 'email' })
     }
   })
 
@@ -423,6 +475,75 @@ export function buildActivity(env: ActivityEnv): Activity {
     c.status = 'paga'
     c.paidAt = c.issuedAt < D(-1) ? addDays(c.issuedAt, rng.int(1, 3)) : D(-1)
     if (c.paidAt > D(-1)) c.paidAt = D(-1)
+  }
+
+  /* ───────── dinheiro recuperado: avarias e atrasados do mês anterior e do atual ───────── */
+  // O total do mês anterior fica na casa de R$ 7,4 mil: o que vem das unidades paradas que voltaram a alugar sai das locações,
+  // e as avarias cobradas absorvem a diferença (valores quebrados). Sorteio próprio (rng2).
+  {
+    const TARGET_PREV = 7418.4
+    const sumValues = (l: { value: number }[]) => round2(l.reduce((a, x) => a + x.value, 0))
+    const idlePrev = sumValues(idleReRentedItems({ rentals, units, clients }, prevKey, today))
+    const extrasPrev = round2(recExtras.filter((g) => g.month === 'prev').reduce((a, g) => a + g.services.reduce((b, x) => b + (x.extraValue ?? 0), 0), 0))
+    const rest = Math.max(2400, round2(TARGET_PREV - idlePrev - extrasPrev))
+    // atrasados que pagaram depois de um lembrete: escolhe, entre as cobranças pagas com atraso, as que chegam mais perto de 30% do restante
+    const lateCands = (key: string) =>
+      charges
+        .filter((c) => c.status === 'paga' && (c.kind === 'mensalidade' || c.kind === 'locacao') && c.paidAt && c.paidAt > c.dueAt && c.paidAt <= today && monthKey(c.paidAt) === key && c.value >= 150 && c.value <= 2600 && !c.reminders.length)
+        .sort((a, b) => a.paidAt!.localeCompare(b.paidAt!) || a.code.localeCompare(b.code))
+        .slice(0, 12)
+    const remind = (c: Charge, i: number) => {
+      const day = addDays(c.dueAt, 1) > addDays(c.paidAt!, -1) ? addDays(c.dueAt, 1) : addDays(c.paidAt!, -1)
+      c.reminders.push({ at: atTime(day, 9 * 60 + 10 + 5 * i), channel: i % 2 ? 'portal' : 'email' })
+    }
+    const prevC = lateCands(prevKey)
+    let best: Charge[] = []
+    let bestGap = Infinity
+    const want = rest * 0.3
+    for (let a = 0; a < prevC.length; a++) for (let b = a + 1; b < prevC.length; b++) for (let c = b; c < prevC.length; c++) {
+      const pick = c === b ? [prevC[a], prevC[b]] : [prevC[a], prevC[b], prevC[c]]
+      const gap = Math.abs(sumValues(pick) - want)
+      if (gap < bestGap) {
+        bestGap = gap
+        best = pick
+      }
+    }
+    best.forEach(remind)
+    const overduePrev = sumValues(best)
+    for (const c of lateCands(curKey).slice(0, 2)) remind(c, 1)
+    // avarias cobradas (e pagas) no mês anterior: três, com o valor que falta para fechar o total
+    const dmgTotal = Math.max(900, round2(rest - overduePrev))
+    const v1 = oddMoney(dmgTotal * 0.46, rng2)
+    const v2 = oddMoney(dmgTotal * 0.31, rng2)
+    const values = [v1, v2, round2(dmgTotal - v1 - v2)]
+    const kinds: [string, string[]][] = [
+      ['Porta quebrada', ['bq', 'pcd']],
+      ['Tanque danificado', ['bq']],
+      ['Grade empenada', ['ala', 'fec']],
+    ]
+    const target = (types: string[], date: ISODate, k: number): { r: Rental; unitId: string } | undefined => {
+      const cands = rentals
+        .filter((r) => ['faturada', 'em_campo', 'retirada'].includes(r.status) && r.start <= date && r.end >= date && r.items.some((it) => types.includes(it.typeId) && it.unitIds.length))
+        .sort((a, b) => a.code.localeCompare(b.code))
+      if (!cands.length) return undefined
+      const r = cands[(k * 3 + 1) % cands.length]
+      const it = r.items.find((x) => types.includes(x.typeId) && x.unitIds.length)!
+      return { r, unitId: it.unitIds[k % it.unitIds.length] }
+    }
+    const addRec = (kindIdx: number, date: ISODate, value: number, issue: ISODate, paid: ISODate, k: number) => {
+      const [kind, tys] = kinds[kindIdx]
+      const t = target(tys, date, k)
+      if (!t || issue > today) return
+      const d = addDamage({ unitId: t.unitId, rentalId: t.r.id, date, kind, value, status: 'paga' }, rng2)
+      damageCharge(d, 'paga', paid > addDays(today, -1) ? addDays(today, -1) : paid < issue ? issue : paid, rng2, issue)
+    }
+    addRec(0, dayIn(prevKey, 5), values[0], dayIn(prevKey, 7), dayIn(prevKey, 13), 0)
+    addRec(1, dayIn(prevKey, 12), values[1], dayIn(prevKey, 14), dayIn(prevKey, 21), 1)
+    addRec(2, dayIn(prevKey, 19), values[2], dayIn(prevKey, 22), dayIn(prevKey, 27), 2)
+    // neste mês: uma avaria cobrada e paga
+    const cd = monthStart(curKey) > addDays(today, -6) ? monthStart(curKey) : addDays(today, -6)
+    const ci = addDays(cd, 2) > today ? today : addDays(cd, 2)
+    addRec(1, cd, oddMoney(520 + rng2.int(0, 220), rng2), ci, addDays(ci, 3), 4)
   }
 
   // ajusta para ~30 abertas

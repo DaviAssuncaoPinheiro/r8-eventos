@@ -9,6 +9,7 @@ import { SideNav, SideNavGroup, SideNavItem } from '@/ui/SideNav'
 import { AppToaster, notify } from '@/ui/Toast'
 import { TopBar } from '@/ui/TopBar'
 import { useReturnFocus } from '@/ui/returnFocus'
+import { PageTransition } from '@/ui/Motion'
 import { applyBrand } from '@/lib/brand'
 import { useTheme } from '@/lib/theme'
 import { formatDateTime } from '@/lib/format'
@@ -104,7 +105,7 @@ export default function AppLayout() {
                 onUserClick={() => navigate('/configuracoes/usuarios')}
                 footer={
                   <>
-                    <SideNavItem icon={Smartphone} label="App de campo" render={(p) => <NavLink to="/campo" {...p} />} />
+                    <SideNavItem icon={Smartphone} label="App da equipe de rua" render={(p) => <NavLink to="/campo" {...p} />} />
                     <SideNavItem icon={Settings} label="Configurações" active={isActive('/configuracoes')} render={(p) => <NavLink to="/configuracoes" {...p} />} />
                                         <SideNavItem icon={CircleHelp} label="Ajuda" onClick={() => window.dispatchEvent(new CustomEvent('app:tour'))} />
                   </>
@@ -112,6 +113,7 @@ export default function AppLayout() {
               >
                 <SideNavGroup label="Hoje">{NAV_ITEMS.filter((n) => n.group === 'hoje').map(link)}</SideNavGroup>
                 <SideNavGroup label="Gestão">{NAV_ITEMS.filter((n) => n.group === 'gestao').map(link)}</SideNavGroup>
+                <SideNavGroup label="Crescer">{NAV_ITEMS.filter((n) => n.group === 'crescer').map(link)}</SideNavGroup>
               </SideNav>
             }
             topbar={
@@ -186,7 +188,9 @@ export default function AppLayout() {
               </Popover.Root>
             }
           >
-            <Outlet />
+            <PageTransition routeKey={pathname.split('/')[1] ?? ''}>
+              <Outlet />
+            </PageTransition>
           </OfficeFrame>
         </div>
         <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />

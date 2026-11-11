@@ -6,15 +6,15 @@ import { CLIENT_DEFS, FIRST, LAST, ROLES_BY_KIND, streetFor } from './names'
 import { cnpj, phone, type Rng } from './util'
 
 export const TYPES: EquipmentType[] = [
-  { id: 'bq', name: 'Banheiro químico padrão', short: 'Banheiro padrão', group: 'Banheiros', prefix: 'BQ', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 18.4, monthlyRate: 289.9, cleanable: true },
-  { id: 'pcd', name: 'Cabine PcD acessível', short: 'Cabine PcD', group: 'Banheiros', prefix: 'PCD', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 34.9, monthlyRate: 419.9, cleanable: true },
-  { id: 'pia', name: 'Pia e lavatório portátil', short: 'Pia portátil', group: 'Banheiros', prefix: 'PIA', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 22.6, monthlyRate: 168.9, cleanable: true },
-  { id: 'trailer', name: 'Trailer sanitário 4 boxes', short: 'Trailer sanitário', group: 'Banheiros', prefix: 'TRL', photo: '/produtos/trailer.jpg', dailyRate: 1090.9, monthlyRate: 4290.9, cleanable: true },
-  { id: 'tnd5', name: 'Tenda 5 x 5', short: 'Tenda 5 x 5', group: 'Estruturas', prefix: 'TND', photo: '/produtos/tenda.jpg', dailyRate: 284.5, monthlyRate: 1190.5, cleanable: false },
-  { id: 'tnd10', name: 'Tenda 10 x 10', short: 'Tenda 10 x 10', group: 'Estruturas', prefix: 'TND', photo: '/produtos/tenda.jpg', dailyRate: 648.5, monthlyRate: 2690.9, cleanable: false },
-  { id: 'ala', name: 'Alambrado (lote de 10 grades)', short: 'Alambrado', group: 'Estruturas', prefix: 'ALA', photo: '/produtos/alambrado.jpg', dailyRate: 94.5, monthlyRate: 318.9, cleanable: false },
-  { id: 'fec', name: 'Fechamento metálico (lote de 10 painéis)', short: 'Fechamento', group: 'Estruturas', prefix: 'FEC', photo: '/produtos/fechamento.jpg', dailyRate: 108.9, monthlyRate: 372.5, cleanable: false },
-  { id: 'bal', name: 'Balcão de bar 2 m', short: 'Balcão de bar', group: 'Estruturas', prefix: 'BAL', photo: '/produtos/balcao.jpg', dailyRate: 148.9, monthlyRate: 489.9, cleanable: false },
+  { id: 'bq', name: 'Banheiro químico padrão', short: 'Banheiro padrão', group: 'Banheiros', prefix: 'BQ', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 18.4, monthlyRate: 289.9, cleanable: true, purchasePrice: 3180, usefulLifeMonths: 96 },
+  { id: 'pcd', name: 'Cabine PcD acessível', short: 'Cabine PcD', group: 'Banheiros', prefix: 'PCD', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 34.9, monthlyRate: 419.9, cleanable: true, purchasePrice: 5940, usefulLifeMonths: 96 },
+  { id: 'pia', name: 'Pia e lavatório portátil', short: 'Pia portátil', group: 'Banheiros', prefix: 'PIA', photo: '/produtos/banheiro-quimico.jpg', dailyRate: 22.6, monthlyRate: 168.9, cleanable: true, purchasePrice: 2260, usefulLifeMonths: 84 },
+  { id: 'trailer', name: 'Trailer sanitário 4 boxes', short: 'Trailer sanitário', group: 'Banheiros', prefix: 'TRL', photo: '/produtos/trailer.jpg', dailyRate: 1090.9, monthlyRate: 4290.9, cleanable: true, purchasePrice: 86400, usefulLifeMonths: 180 },
+  { id: 'tnd5', name: 'Tenda 5 x 5', short: 'Tenda 5 x 5', group: 'Estruturas', prefix: 'TND', photo: '/produtos/tenda.jpg', dailyRate: 284.5, monthlyRate: 1190.5, cleanable: false, purchasePrice: 4870, usefulLifeMonths: 96 },
+  { id: 'tnd10', name: 'Tenda 10 x 10', short: 'Tenda 10 x 10', group: 'Estruturas', prefix: 'TND', photo: '/produtos/tenda.jpg', dailyRate: 648.5, monthlyRate: 2690.9, cleanable: false, purchasePrice: 14650, usefulLifeMonths: 120 },
+  { id: 'ala', name: 'Alambrado (lote de 10 grades)', short: 'Alambrado', group: 'Estruturas', prefix: 'ALA', photo: '/produtos/alambrado.jpg', dailyRate: 94.5, monthlyRate: 318.9, cleanable: false, purchasePrice: 2940, usefulLifeMonths: 180 },
+  { id: 'fec', name: 'Fechamento metálico (lote de 10 painéis)', short: 'Fechamento', group: 'Estruturas', prefix: 'FEC', photo: '/produtos/fechamento.jpg', dailyRate: 108.9, monthlyRate: 372.5, cleanable: false, purchasePrice: 3720, usefulLifeMonths: 180 },
+  { id: 'bal', name: 'Balcão de bar 2 m', short: 'Balcão de bar', group: 'Estruturas', prefix: 'BAL', photo: '/produtos/balcao.jpg', dailyRate: 148.9, monthlyRate: 489.9, cleanable: false, purchasePrice: 1980, usefulLifeMonths: 120 },
 ]
 
 /** Unidades por tipo e como ficam hoje: em campo, em limpeza, em manutenção, disponíveis (soma 180; 44 disponíveis) */
@@ -72,9 +72,9 @@ export function buildTeams(): Team[] {
 }
 
 const DUNNING: DunningStep[] = [
-  { id: 'dun-1', dayOffset: -3, channel: 'whatsapp', enabled: true, template: 'Olá, {cliente}! Passando para lembrar que a cobrança {codigo} de {valor} vence em {vencimento}. Pagamento por Pix: {link}' },
-  { id: 'dun-2', dayOffset: 0, channel: 'whatsapp', enabled: true, template: 'Olá, {cliente}. A cobrança {codigo} de {valor} vence hoje. Se já pagou, desconsidere. Pix: {link}' },
-  { id: 'dun-3', dayOffset: 3, channel: 'whatsapp', enabled: true, template: 'Olá, {cliente}. Não encontramos o pagamento da cobrança {codigo} ({valor}), vencida em {vencimento}. Podemos ajudar? Pix: {link}' },
+  { id: 'dun-1', dayOffset: -3, channel: 'email', enabled: true, template: 'Olá, {cliente}! Passando para lembrar que a cobrança {codigo} de {valor} vence em {vencimento}. Link de pagamento: {link}' },
+  { id: 'dun-2', dayOffset: 0, channel: 'email', enabled: true, template: 'Olá, {cliente}. A cobrança {codigo} de {valor} vence hoje. Se já pagou, desconsidere. Link de pagamento: {link}' },
+  { id: 'dun-3', dayOffset: 3, channel: 'portal', enabled: true, template: 'Olá, {cliente}. Não encontramos o pagamento da cobrança {codigo} ({valor}), vencida em {vencimento}. Podemos ajudar? Pague pelo portal: {link}' },
   { id: 'dun-4', dayOffset: 7, channel: 'email', enabled: false, template: 'Prezado(a) {cliente}, a cobrança {codigo} no valor de {valor} está vencida desde {vencimento}. Segue o link para pagamento: {link}' },
 ]
 
@@ -86,7 +86,6 @@ export function buildSettings(rng: Rng, today: ISODate): Settings {
       legalName: 'Cerrado Locações de Equipamentos Ltda',
       cnpj: cnpj(rng),
       phone: '(61) 3399-4410',
-      whatsapp: '(61) 99641-0087',
       email: 'contato@cerradolocacoes.com.br',
       address: 'SIA Trecho 3, lote 140',
       city: 'Brasília · DF',
@@ -100,7 +99,7 @@ export function buildSettings(rng: Rng, today: ISODate): Settings {
       { id: 'usr-3', name: 'Fábio Cardoso', email: 'fabio@cerradolocacoes.com.br', phone: '(61) 99641-2207', role: 'campo', initials: 'FC' },
     ],
     integrations: {
-      whatsapp: { connected: true, account: '(61) 99641-0087', connectedAt: stamp },
+      email: { connected: true, account: 'cobranca@cerradolocacoes.com.br', connectedAt: stamp },
       pix: { connected: true, account: 'Chave CNPJ cadastrada', connectedAt: stamp },
       boleto: { connected: true, account: 'Conta 4410-7 · Banco Cooperativo', connectedAt: stamp },
       nfse: { connected: true, account: 'Prefeitura de Brasília, inscrição 07.441.209', connectedAt: stamp },

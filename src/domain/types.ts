@@ -31,13 +31,13 @@ export interface Company {
   legalName: string
   cnpj: string
   phone: string
-  whatsapp: string
   email: string
   address: string
   city: string
 }
 
-export type IntegrationKey = 'whatsapp' | 'pix' | 'boleto' | 'nfse' | 'contaAzul'
+/** 'email' = envio de e-mails de cobrança e avisos ao cliente */
+export type IntegrationKey = 'email' | 'pix' | 'boleto' | 'nfse' | 'contaAzul'
 
 export interface Integration {
   connected: boolean
@@ -49,7 +49,7 @@ export interface Integration {
 export interface DunningStep {
   id: string
   dayOffset: number
-  channel: 'whatsapp' | 'email'
+  channel: Channel
   enabled: boolean
   template: string
 }
@@ -114,6 +114,12 @@ export interface EquipmentType {
   monthlyRate: number
   /** recebe limpeza (higienização, revisão... conforme o segmento) */
   cleanable: boolean
+  /** custo de aquisição por unidade (R$) */
+  purchasePrice: number
+  /** vida útil estimada, em meses */
+  usefulLifeMonths: number
+  /** último ajuste de preço aplicado pela sugestão de preços (guarda o preço anterior) */
+  priceChange?: { at: ISODate; fromMonthly: number; fromDaily: number }
 }
 
 export type UnitStatus = 'disponivel' | 'em_campo' | 'limpeza' | 'manutencao'
@@ -272,7 +278,8 @@ export interface Damage {
 export type ChargeKind = 'mensalidade' | 'locacao' | 'avaria' | 'extra'
 export type ChargeStatus = 'rascunho' | 'aberta' | 'paga' | 'atrasada' | 'cancelada'
 export type PayMethod = 'pix' | 'boleto'
-export type Channel = 'whatsapp' | 'email'
+/** Canal de envio ao cliente: e-mail ou mensagem no portal do cliente */
+export type Channel = 'email' | 'portal'
 
 export interface Charge {
   id: string
@@ -326,6 +333,50 @@ export interface CopilotSuggestion {
   status: SuggestionStatus
 }
 
+/* ───────────────────────── Automações ───────────────────────── */
+
+export type AutomationChannel = Channel | 'app' | 'sistema'
+
+export interface AutomationStats {
+  /** execuções, dinheiro e tempo poupado nos últimos 30 dias (derivado do histórico) */
+  runsMonth: number
+  moneyMonth: number
+  minutesSavedMonth: number
+}
+
+/** Automação como fica gravada no banco (as estatísticas são derivadas do histórico) */
+export interface AutomationRecord {
+  id: string
+  /** nome curto, ex.: 'Cobrar avaria registrada' */
+  name: string
+  trigger: { kind: string; label: string }
+  action: { kind: string; label: string }
+  channel: AutomationChannel
+  enabled: boolean
+  /** de fábrica (não pode ser removida) */
+  builtIn: boolean
+  params?: Record<string, string | number | boolean>
+}
+
+export interface Automation extends AutomationRecord {
+  stats: AutomationStats
+  lastRunAt?: ISODateTime
+}
+
+export interface AutomationRun {
+  id: string
+  /** id da automação; 'sys-preco' e 'sys-rotas' são ações aplicadas pelo sistema (preço sugerido, rota otimizada) */
+  automationId: string
+  automationName: string
+  at: ISODateTime
+  /** frase curta com o nome do cliente ou o código */
+  text: string
+  /** dinheiro envolvido, quando houver */
+  value?: number
+  minutesSaved: number
+  ref?: { type: 'rental' | 'service' | 'charge' | 'damage' | 'client' | 'unit' | 'type'; id: string }
+}
+
 /* ───────────────────────── Estado completo ───────────────────────── */
 
 export interface DbData {
@@ -341,6 +392,9 @@ export interface DbData {
   notifications: Notification[]
   /** sugestões já resolvidas (aprovadas ou dispensadas); as pendentes são geradas dos dados */
   suggestions: CopilotSuggestion[]
+  automations: AutomationRecord[]
+  /** histórico de execuções das automações (mais antigas primeiro) */
+  automationLog: AutomationRun[]
   /** contador de ids */
   seq: number
 }

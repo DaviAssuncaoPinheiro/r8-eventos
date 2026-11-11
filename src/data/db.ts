@@ -12,7 +12,8 @@ import type { DbData } from '@/domain/types'
 import { buildSeed } from './seed'
 
 export const STORAGE_KEY = 'locadora.db.v1'
-const SCHEMA = 1
+// 2: automações, custo dos equipamentos e novos canais de envio (estado salvo no formato antigo é descartado)
+const SCHEMA = 2
 
 export interface DbState extends DbData {
   /** contador que sobe a cada mutação */
@@ -21,7 +22,7 @@ export interface DbState extends DbData {
   seededOn: string
 }
 
-const DATA_KEYS: (keyof DbData)[] = ['settings', 'clients', 'types', 'units', 'teams', 'rentals', 'services', 'damages', 'charges', 'notifications', 'suggestions', 'seq']
+const DATA_KEYS: (keyof DbData)[] = ['settings', 'clients', 'types', 'units', 'teams', 'rentals', 'services', 'damages', 'charges', 'notifications', 'suggestions', 'automations', 'automationLog', 'seq']
 
 function pickData(s: DbData): DbData {
   const out = {} as Record<string, unknown>

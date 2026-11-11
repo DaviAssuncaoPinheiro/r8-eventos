@@ -175,7 +175,8 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
   /* ───────── orçamentos ───────── */
   const orc = (start: number, kind: RentalKind, dur: number, bairro: string, qty: Record<string, number>, extra: Partial<Spec> = {}) =>
     specs.push({ cat: 'orcamento', kind, clientId: rng.pick(kind === 'obra' ? obraClients : eventClients).id, bairroId: bairro, start, end: start + dur - 1, qty, cpw: kind === 'obra' ? 2 : dur >= 2 ? 7 : 0, createdAgo: rng.int(0, 6), ...extra })
-  orc(5, 'evento', 2, 'mane-garrincha', { bq: 12, pcd: 1, trailer: 1, tnd10: 2 })
+  // show grande: a demanda ponderada deste orçamento estoura o estoque de banheiros nos dias do evento
+  orc(5, 'evento', 2, 'mane-garrincha', { bq: 60, pcd: 4, trailer: 2, tnd10: 2 })
   orc(8, 'obra', 100, 'aguas-claras', { bq: 3, fec: 2 })
   orc(12, 'obra', 150, 'jardim-botanico', { bq: 3, pia: 1 }, { clientId: 'cli-001', tag: 'aurora-orc', contact: { name: 'Roberta Quintela', role: 'Engenheira residente', phone: '(61) 99731-4402' } })
   orc(19, 'evento', 1, 'lago-sul', { bq: 3, tnd10: 1, bal: 1 })
@@ -414,7 +415,7 @@ export function buildRentals(env: { rng: Rng; today: ISODate; types: EquipmentTy
       h.push({ at: confirmAt, text: 'Orçamento aprovado pelo cliente. Locação confirmada.' })
       const signedAt = atTime(dayOfISO(confirmAt), 17 * 60 + rng.int(0, 120))
       r.contract = { generatedAt: confirmAt }
-      h.push({ at: confirmAt, text: 'Contrato gerado e enviado por WhatsApp' })
+      h.push({ at: confirmAt, text: 'Contrato gerado e enviado por e-mail' })
       if (!sp.unsigned) {
         r.contract = { generatedAt: confirmAt, signedAt, signedBy: r.contact.name, signatureDataUrl: signatureDataUrl(r.contact.name) }
         h.push({ at: signedAt, text: `Contrato assinado por ${r.contact.name}` })
