@@ -558,7 +558,8 @@
   /* números que rolam (NumberFlow): "R$" e centavos menores na variante de indicador */
   .ds-roll {
     --number-flow-char-height: 1em;
-    font-variant-numeric: tabular-nums;
+    /* algarismos proporcionais: em número grande, o tabular abre buracos entre os dígitos */
+    font-variant-numeric: normal;
     line-height: inherit;
   }
   .ds-roll-kpi::part(left) {
