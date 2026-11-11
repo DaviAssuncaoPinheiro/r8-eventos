@@ -11,7 +11,7 @@ import { notify } from '@/ui/Toast'
 import { DamageFields, parseValue } from './components/DamageForm'
 import { CampoScreen, LoadFailed } from './components/Screen'
 import { Sheet } from './components/Sheet'
-import { useCampoDay, useUnits } from './lib'
+import { suggestDamageValue, useCampoDay, useUnits } from './lib'
 import { submitDamage } from './sync'
 import { useCampo, type DraftPhoto } from './store'
 
@@ -41,6 +41,11 @@ export default function Avarias() {
   const [photo, setPhoto] = React.useState<DraftPhoto | undefined>()
   const [saving, setSaving] = React.useState(false)
   const unit = units.find(code)
+  /** o valor sugerido acompanha unidade e tipo, até a pessoa digitar o seu */
+  const touched = React.useRef(false)
+  React.useEffect(() => {
+    if (!touched.current && unit && kind) setValueText(suggestDamageValue(kind, segment.damageKinds, unit.monthlyValue).toFixed(2).replace('.', ','))
+  }, [unit, kind, segment.damageKinds])
   const valid = !!unit && !!kind && parseValue(valueText) > 0
   const close = () => {
     const p = new URLSearchParams(params)
@@ -61,6 +66,7 @@ export default function Avarias() {
       notify.success(res === 'fila' ? 'Avaria guardada, aguardando sinal' : 'Avaria registrada')
       setKind('')
       setValueText('')
+      touched.current = false
       setPhoto(undefined)
       setCode('')
       close()
@@ -162,12 +168,12 @@ export default function Avarias() {
             unitId={unit?.id ?? ''}
             onUnitId={() => undefined}
             kind={kind}
-            onKind={(k) => {
-              setKind(k)
-              if (unit && k) setValueText(String(Math.max(60, Math.round(unit.monthlyValue * (0.18 + 0.04 * (segment.damageKinds.indexOf(k) % 8))))))
-            }}
+            onKind={setKind}
             valueText={valueText}
-            onValueText={setValueText}
+            onValueText={(v) => {
+              touched.current = true
+              setValueText(v)
+            }}
             photo={photo}
             onPhoto={setPhoto}
             unitField={

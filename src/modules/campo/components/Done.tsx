@@ -51,7 +51,7 @@ export function Done({ service, summary }: { service: ServiceDetail; summary: Su
       </div>
       <dl className="mt-8 grid grid-cols-3 gap-3">
         {nums.map((x) => (
-          <div key={x.label} className="flex flex-col-reverse rounded-card bg-raised p-4">
+          <div key={x.label} className="flex min-h-28 flex-col-reverse justify-between rounded-card bg-raised p-4">
             <dt className="text-caption font-semibold text-fg-2">{x.label}</dt>
             <dd className="tnum text-kpi font-semibold">{x.n}</dd>
           </div>

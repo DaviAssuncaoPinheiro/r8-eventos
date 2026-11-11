@@ -12,7 +12,7 @@ import { AddDamageButton, DamageFields, parseValue } from './components/DamageFo
 import { PhotoPicker } from './components/Photos'
 import { CampoScreen, LoadFailed } from './components/Screen'
 import { Done, type Summary } from './components/Done'
-import { newId, useBack, useCampoDay } from './lib'
+import { newId, suggestDamageValue, useBack } from './lib'
 import { submitCompletion, type LocalDamage } from './sync'
 import { useCampo, type Draft, type DraftDamage, type DraftPhoto } from './store'
 
@@ -98,6 +98,11 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
   const [kind, setKind] = React.useState('')
   const [valueText, setValueText] = React.useState('')
   const [dPhoto, setDPhoto] = React.useState<DraftPhoto | undefined>()
+  const touched = React.useRef(false)
+  const unitRate = damageUnits.find((x) => x.id === unitId)?.monthlyRate
+  React.useEffect(() => {
+    if (!touched.current && unitRate !== undefined && kind) setValueText(suggestDamageValue(kind, segment.damageKinds, unitRate).toFixed(2).replace('.', ','))
+  }, [unitRate, kind, segment.damageKinds])
   const formValid = !!unitId && !!kind && parseValue(valueText) > 0
   const unitFixed = damageUnits.length === 1 ? damageUnits[0].id : ''
   React.useEffect(() => {
@@ -111,6 +116,7 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
     patch({ damages: next })
     setKind('')
     setValueText('')
+    touched.current = false
     setDPhoto(undefined)
     if (!unitFixed) setUnitId('')
     return next
@@ -239,7 +245,7 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
                 { value: 'antes', label: 'Antes' },
                 { value: 'depois', label: 'Depois' },
               ]}
-              className="h-12"
+              className="h-14"
             />
             <PhotoPicker photos={d.photos} onChange={(photos) => patch({ photos })} label={d.moment === 'antes' ? 'Antes' : 'Depois'} moment={d.moment} />
           </div>
@@ -296,15 +302,14 @@ function Wizard({ service: s, back, onDone }: { service: ServiceDetail; back: ()
                     units={damageUnits}
                     kinds={segment.damageKinds}
                     unitId={unitId}
-                    onUnitId={(v) => {
-                      setUnitId(v)
-                      const u = damageUnits.find((x) => x.id === v)
-                      if (kind && u) setValueText(String(Math.max(60, Math.round(u.monthlyRate * 0.3))))
-                    }}
+                    onUnitId={setUnitId}
                     kind={kind}
                     onKind={setKind}
                     valueText={valueText}
-                    onValueText={setValueText}
+                    onValueText={(v) => {
+                      touched.current = true
+                      setValueText(v)
+                    }}
                     photo={dPhoto}
                     onPhoto={setDPhoto}
                   />

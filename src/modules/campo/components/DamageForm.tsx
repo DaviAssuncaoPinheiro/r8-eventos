@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Plus } from 'lucide-react'
 import { formatMoney, parseMoney } from '@/lib/format'
 import { Button, Field, Input, Select } from '@/ui'
-import { suggestDamageValue } from '../lib'
 import type { DraftPhoto } from '../store'
 import { newPhoto, PhotoPicker } from './Photos'
 
@@ -47,11 +46,6 @@ export function DamageFields({
   /** Substitui o seletor de unidade (avaria avulsa: digitar o código). */
   unitField?: React.ReactNode
 }) {
-  const unit = units.find((u) => u.id === unitId)
-  const pick = (k: string) => {
-    onKind(k)
-    if (unit && k) onValueText(String(suggestDamageValue(k, kinds, unit.monthlyRate)).replace('.', ','))
-  }
   return (
     <div className="flex flex-col gap-4">
       {unitField ?? (
@@ -66,7 +60,7 @@ export function DamageFields({
         </Field>
       )}
       <Field label="Tipo de avaria">
-        <Select size="lg" value={kind} onChange={(e) => pick(e.target.value)} placeholder="Escolha o tipo">
+        <Select size="lg" value={kind} onChange={(e) => onKind(e.target.value)} placeholder="Escolha o tipo">
           {kinds.map((k) => (
             <option key={k} value={k}>
               {k}

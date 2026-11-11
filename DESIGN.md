@@ -3,7 +3,7 @@
 Especificação de design do sistema de operação para locadoras (banheiros químicos, estruturas para eventos, som e luz, equipamentos). A primeira versão da v2 seguiu à risca um piso de raios e de números contidos e saiu seca, com cara de painel administrativo genérico; foi reprovada pelo dono do produto. Esta é a direção atual, calibrada nas referências: cartões bem arredondados, pílulas, degradê da marca no destaque, números grandes, gráficos e mapa em vez de tabela. O código manda: se este arquivo e `src/ui` divergirem, o arquivo está errado. Quem constrói tela lê este arquivo e usa `src/ui` e `src/styles/tokens.css`. Valores aqui são exatos; se algo não estiver aqui, pergunte antes de inventar.
 
 - Página viva: `/design-system` (alternador de tema e de cor da marca no topo; laranja, verde, azul, grafite).
-- Telas de referência do padrão aprovado: `src/pages/previa/Painel.tsx` (escritório) e `src/pages/previa/Campo.tsx` (celular). A seção 7 descreve a composição delas.
+- Telas de referência do padrão aprovado: `src/modules/painel/index.tsx` (escritório) e `src/modules/campo/Hoje.tsx` (celular). A seção 7 descreve a composição delas.
 - Código: tokens em `src/styles/tokens.css`, marca em `src/lib/brand.ts`, tema em `src/lib/theme.ts`, formatos em `src/lib/format.ts`, primitivos em `src/ui/`.
 - Telas novas usam a classe `ds-root` no contêiner raiz (aplica fonte, cor de texto, seleção, cursor, barra de rolagem e anel de foco do v2). Os tokens antigos (`canvas`, `card`, `ink`, `brand`…) continuam em `src/index.css` só para as telas antigas; não use em tela nova.
 
@@ -594,7 +594,7 @@ Fixa no topo de tudo (z 95), altura 32, largura total, `bg-inverse` `text-on-inv
 
 ## 7. Padrão de tela
 
-As duas telas de `src/pages/previa/` são o modelo. Tela nova segue a composição, troca o conteúdo e mantém as medidas. Em toda tela: um bloco de destaque, título curto em cada bloco, o dado, a ação; nenhuma linha de apoio.
+As telas `src/modules/painel/index.tsx` e `src/modules/campo/Hoje.tsx` são o modelo. Tela nova segue a composição, troca o conteúdo e mantém as medidas. Em toda tela: um bloco de destaque, título curto em cada bloco, o dado, a ação; nenhuma linha de apoio.
 
 ### 7.1 Painel (escritório): `Painel.tsx`
 

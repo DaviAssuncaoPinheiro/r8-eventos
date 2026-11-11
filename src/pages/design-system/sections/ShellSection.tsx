@@ -32,7 +32,7 @@ import { DsSection, Specimen, StateCell } from '../kit'
 
 /* ───────── dados de exemplo ───────── */
 
-const BRAND = { name: 'R8 Eventos', initials: 'R8' }
+const BRAND = { name: 'Cerrado Locações', initials: 'CL' }
 const USER = { name: 'Paula Ramos', role: 'Operação' }
 
 type NavId = 'dinheiro' | 'operacao' | 'locacoes' | 'equipamentos' | 'avarias' | 'financeiro' | 'clientes' | 'relatorios'
@@ -55,7 +55,7 @@ const SERVICES: { time: string; title: string; meta: string; tone: StatusTone; s
   { time: '09:30', title: 'Entrega, 24 unidades', meta: 'Feira Agro Centro-Oeste, Parque de Exposições', tone: 'accent', status: 'Em andamento' },
   { time: '11:00', title: 'Retirada, 8 unidades', meta: 'Condomínio Vila Verde, Quadra 4', tone: 'info', status: 'A caminho' },
   { time: '13:30', title: 'Limpeza, 6 unidades', meta: 'Obra Residencial Aurora, Lote 12', tone: 'warn', status: 'Aguardando assinatura' },
-  { time: '15:00', title: 'Manutenção, BQ-0142', meta: 'Pátio R8, Galpão 2', tone: 'danger', status: 'Atrasado' },
+  { time: '15:00', title: 'Manutenção, BQ-0142', meta: 'Pátio, Galpão 2', tone: 'danger', status: 'Atrasado' },
 ]
 
 /* ───────── peças locais da demonstração ───────── */
@@ -236,7 +236,7 @@ function PhoneFrame() {
       <div className="h-[720px] w-full max-w-[390px] overflow-hidden rounded-[32px] ring-[6px] ring-edge">
         <FieldFrame
           embedded
-          title="R8 Eventos"
+          title="Cerrado Locações"
           pending={3}
           actionBar={
             <FieldActionBar>

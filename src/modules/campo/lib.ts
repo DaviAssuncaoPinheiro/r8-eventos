@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { demoNow, today } from '@/domain/dates'
 import { formatTime } from '@/lib/format'
-import { listServices, listTeams, listUnits, useLabels, useQuery, type ServiceView, type UnitView } from '@/services'
+import { listServices, listTeams, listUnits, useLabels, useQuery, type ServiceView, type Team, type UnitView } from '@/services'
 import type { ServiceStatus as DomainStatus } from '@/services'
 import type { ServiceStatus as RowStatus } from '@/ui/ServiceRow'
 import { useCampo } from './store'
@@ -60,10 +60,18 @@ export function useBack(fallback: string) {
  * Dia da equipe ativa. Serviços já concluídos na fila sem sinal aparecem como concluídos.
  * A equipe ativa padrão é a primeira com serviço em andamento hoje.
  */
+/** Último resultado de cada busca: trocar de aba mostra o que já se sabe e atualiza por cima, sem piscar o esqueleto. */
+const memo: { teams?: Team[]; day?: { key: string; list: ServiceView[] } } = {}
+
 export function useCampoDay() {
   const day = today()
-  const teams = useQuery(listTeams, [])
-  const all = useQuery(() => listServices({ date: day }), [day])
+  const teamsQ = useQuery(listTeams, [])
+  const allQ = useQuery(() => listServices({ date: day }), [day])
+  if (teamsQ.data) memo.teams = teamsQ.data
+  if (allQ.data) memo.day = { key: day, list: allQ.data }
+  const teams = { ...teamsQ, data: teamsQ.data ?? memo.teams, initialLoading: teamsQ.data === undefined && memo.teams === undefined && teamsQ.initialLoading }
+  const cachedDay = memo.day?.key === day ? memo.day.list : undefined
+  const all = { ...allQ, data: allQ.data ?? cachedDay, initialLoading: allQ.data === undefined && cachedDay === undefined && allQ.initialLoading }
   const teamId = useCampo((s) => s.teamId)
   const queue = useCampo((s) => s.queue)
   const setTeam = useCampo((s) => s.setTeam)

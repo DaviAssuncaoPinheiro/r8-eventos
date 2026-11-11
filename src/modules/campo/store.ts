@@ -120,8 +120,20 @@ export const useCampo = create<CampoState>((set) => ({
   addMyDamage: (teamId, damageId) => set((s) => ({ myDamages: { ...s.myDamages, [teamId]: [...(s.myDamages[teamId] ?? []), damageId] } })),
 }))
 
+const snapshot = (): Persisted => {
+  const s = useCampo.getState()
+  return { teamId: s.teamId, offline: s.offline, queue: s.queue, drafts: s.drafts, myDamages: s.myDamages }
+}
+
 let timer: ReturnType<typeof setTimeout> | undefined
-useCampo.subscribe((s) => {
+useCampo.subscribe(() => {
   clearTimeout(timer)
-  timer = setTimeout(() => save({ teamId: s.teamId, offline: s.offline, queue: s.queue, drafts: s.drafts, myDamages: s.myDamages }), 150)
+  timer = setTimeout(() => save(snapshot()), 150)
 })
+/* saindo da página: grava já, sem esperar o intervalo */
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => save(snapshot()))
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') save(snapshot())
+  })
+}

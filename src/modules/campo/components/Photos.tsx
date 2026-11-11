@@ -93,9 +93,11 @@ export function PhotoPicker({ photos, onChange, label, moment, max = 12 }: { pho
               type="button"
               aria-label={`Remover foto ${i + 1}`}
               onClick={() => onChange(photos.filter((x) => x.id !== p.id))}
-              className="ds-hit absolute top-1 right-1 inline-flex size-9 items-center justify-center rounded-pill bg-inverse/80 text-on-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="group absolute top-0 right-0 inline-flex size-12 items-start justify-end p-1 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
             >
-              <X size={18} strokeWidth={2} aria-hidden />
+              <span className="grid size-8 place-items-center rounded-pill bg-inverse/80 text-on-inverse">
+                <X size={18} strokeWidth={2} aria-hidden />
+              </span>
             </button>
           </li>
         ))}

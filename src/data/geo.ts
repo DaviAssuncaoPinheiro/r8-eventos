@@ -121,8 +121,8 @@ export const BAIRROS: Bairro[] = [
 
 export const BAIRRO = Object.fromEntries(BAIRROS.map((b) => [b.id, b])) as Record<string, Bairro>
 
-/** Base da R8 Eventos no SIA (ponto de saída dos caminhões) */
-export const BASE = { name: 'Base R8 · SIA', bairro: 'SIA', x: 452, y: 410 }
+/** Base da locadora no SIA (ponto de saída dos caminhões) */
+export const BASE = { name: 'Base, SIA', bairro: 'SIA', x: 452, y: 410 }
 
 /** Lago Paranoá: braço norte, corpo central e braço sul (Ponte JK) */
 export const LAKE_PATH =

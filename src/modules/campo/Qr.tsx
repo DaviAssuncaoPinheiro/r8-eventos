@@ -23,12 +23,12 @@ export default function Qr() {
 
   const open = (raw: string) => {
     const u = units.find(raw)
-    if (!u) {
+    if (!u && !units.initialLoading) {
       setError('Código não encontrado')
       return
     }
     setError('')
-    setCode(u.code)
+    setCode(u?.code ?? raw.trim())
   }
 
   return (
@@ -51,7 +51,7 @@ export default function Qr() {
           aria-hidden
           className="absolute inset-x-8 h-0.5 rounded-pill bg-accent shadow-[0_0_14px_2px_var(--accent)]"
           initial={{ top: '18%' }}
-          animate={reduced ? { top: '50%' } : { top: ['18%', '82%'] }}
+          animate={reduced ? { top: '45%' } : { top: ['16%', '68%'] }}
           transition={reduced ? undefined : { duration: 1.8, ease: 'easeInOut', repeat: Infinity, repeatType: 'reverse' }}
         />
         <span className="absolute inset-x-0 bottom-3 flex justify-center">

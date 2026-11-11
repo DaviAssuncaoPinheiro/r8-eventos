@@ -1,7 +1,7 @@
 /*
-  R8 · tokens do design system (v2)
+  Tokens do design system (v2)
   Fonte da verdade: DESIGN.md. Os tokens antigos (canvas, card, ink, brand…) continuam em
-  src/index.css até as telas antigas serem reescritas; nada aqui colide com eles.
+  src/index.css só traz a fonte e o reset; todos os tokens estão aqui.
 
   Camadas:
   1. --brand-l-* / --brand-d-*: cor da marca derivada por src/lib/brand.ts (padrão: laranja #f04e0a)

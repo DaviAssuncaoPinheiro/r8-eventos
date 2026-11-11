@@ -34,7 +34,7 @@ export function UnitSheet({ code, onClose }: { code: string | null; onClose: () 
     <Sheet
       open={!!code}
       onOpenChange={(o) => !o && onClose()}
-      title={code ?? 'Unidade'}
+      title="Ficha da unidade"
       footer={
         <>
           <Button
@@ -84,7 +84,7 @@ export function UnitSheet({ code, onClose }: { code: string | null; onClose: () 
             {rows.map((r) => (
               <div key={r.k} className="flex items-baseline justify-between gap-4 border-b border-hairline px-4 py-3 last:border-b-0">
                 <dt className="shrink-0 text-body text-fg-2">{r.k}</dt>
-                <dd className="min-w-0 truncate text-right text-body-lg font-semibold">{r.v}</dd>
+                <dd className="min-w-0 text-right text-body-lg font-semibold">{r.v}</dd>
               </div>
             ))}
           </dl>

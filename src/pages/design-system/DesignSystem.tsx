@@ -78,7 +78,7 @@ export default function DesignSystem() {
   const bump = React.useCallback(() => setVersion((v) => v + 1), [])
 
   React.useEffect(() => {
-    document.title = 'Design system · R8'
+    document.title = 'Design system'
     applyBrand(getStoredBrand(), false)
   }, [])
   React.useEffect(bump, [pref, bump])
@@ -97,7 +97,7 @@ export default function DesignSystem() {
             {/* índice lateral fixo */}
             <aside className="sticky top-3 hidden h-[calc(100dvh-24px)] w-[232px] shrink-0 flex-col rounded-panel bg-panel lg:flex">
               <div className="flex h-16 items-center gap-2.5 px-5">
-                <span className="grid size-8 place-items-center rounded-control bg-accent text-body font-bold text-on-accent">R8</span>
+                <span className="grid size-8 place-items-center rounded-control bg-accent text-body font-bold text-on-accent">DS</span>
                 <span className="text-title-card">Design system</span>
               </div>
               <nav aria-label="Índice" className="flex-1 overflow-y-auto px-3 pb-4">

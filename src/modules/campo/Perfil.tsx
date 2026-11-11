@@ -79,7 +79,7 @@ export default function Perfil() {
               label="Tema"
               value={pref}
               onChange={setPref}
-              className="h-12"
+              className="h-14"
               options={[
                 { value: 'light', label: 'Claro' },
                 { value: 'dark', label: 'Escuro' },
