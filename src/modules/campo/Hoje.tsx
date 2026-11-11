@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { today } from '@/domain/dates'
 import { formatDate } from '@/lib/format'
 import { startService, useMutation } from '@/services'
-import { useCountUp } from '@/ui'
+import { reduced, RollingNumber, Stagger } from '@/ui/Motion'
+import { motion } from 'motion/react'
 import { FieldActionGrid, FieldActionTile } from '@/ui/FieldAction'
 import { notify } from '@/ui/Toast'
 import { CheckMark } from './components/CheckMark'
@@ -34,7 +35,6 @@ export default function Hoje() {
   const d = new Date()
   const first = team?.members[0]?.split(' ')[0]
   const closed = !!services.length && !open.length
-  const doneCount = Math.round(useCountUp(done.length))
   const later = open.filter((s) => s.id !== next?.id)
   const stateTag = next && (next.status === 'atrasado' ? { label: 'Atrasado', tone: 'danger' as const } : next.status === 'a_caminho' ? { label: 'A caminho', tone: 'info' as const } : next.status === 'em_andamento' ? { label: 'Em andamento', tone: 'accent' as const } : null)
 
@@ -45,11 +45,13 @@ export default function Hoje() {
       ) : day.error && !team ? (
         <LoadFailed onRetry={() => void day.refetch()} />
       ) : (
-        <>
-          <h1 className="text-title-field">{first ? `${greeting()}, ${first}` : greeting()}</h1>
-          <p className="mt-0.5 text-body-lg text-fg-2">
-            {WEEKDAYS[d.getDay()]}, {formatDate(today()).slice(0, 5)}. {team?.truck.split(' · ')[0]}.
-          </p>
+        <Stagger gap={0.07}>
+          <div>
+            <h1 className="text-title-field">{first ? `${greeting()}, ${first}` : greeting()}</h1>
+            <p className="mt-0.5 text-body-lg text-fg-2">
+              {WEEKDAYS[d.getDay()]}, {formatDate(today()).slice(0, 5)}. {team?.truck.split(' · ')[0]}.
+            </p>
+          </div>
 
           {next ? (
             <section aria-label="Próximo serviço" className="ds-hero mt-4 rounded-card p-5">
@@ -98,7 +100,8 @@ export default function Hoje() {
                 <h2 className="text-[26px] leading-8 font-semibold tracking-[-0.02em]">Dia fechado</h2>
               </div>
               <p className="mt-4 flex items-baseline gap-3">
-                <strong className="tnum text-[64px] leading-[64px] font-semibold tracking-[-0.03em] text-on-accent">{doneCount}</strong>
+                <strong className="tnum text-[64px] leading-[64px] font-semibold tracking-[-0.03em] text-on-accent"><RollingNumber value={done.length} />
+                </strong>
                 <span className="text-body-lg font-semibold text-on-accent-2">{done.length === 1 ? 'serviço' : 'serviços'}</span>
               </p>
             </section>
@@ -114,12 +117,22 @@ export default function Hoje() {
               <div className="flex items-baseline justify-between gap-3">
                 <h2 className="text-title-sub">Seu dia</h2>
                 <p className="text-body text-fg-2">
-                  <strong className="tnum text-title-sub text-fg">{done.length}</strong> de {services.length} {services.length === 1 ? 'serviço' : 'serviços'}
+                  <strong className="tnum text-title-sub text-fg">
+                    <RollingNumber value={done.length} />
+                  </strong>{' '}
+                  de {services.length} {services.length === 1 ? 'serviço' : 'serviços'}
                 </p>
               </div>
               <div className={`mt-3 flex ${services.length > 10 ? 'gap-1' : 'gap-1.5'}`} role="img" aria-label={`${done.length} de ${services.length} serviços concluídos`}>
                 {services.map((s, i) => (
-                  <span key={s.id} className={i < done.length ? 'h-3 flex-1 rounded-pill bg-accent' : i === done.length ? 'h-3 flex-1 rounded-pill bg-accent-soft ring-2 ring-accent ring-inset' : 'ds-hatch h-3 flex-1 rounded-pill bg-sunken'} />
+                  <motion.span
+                    key={s.id}
+                    style={{ transformOrigin: 'left center' }}
+                    initial={reduced() ? false : { scaleX: 0, opacity: 0 }}
+                    animate={{ scaleX: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.35 + i * 0.07 }}
+                    className={i < done.length ? 'h-3 flex-1 rounded-pill bg-accent' : i === done.length ? 'h-3 flex-1 rounded-pill bg-accent-soft ring-2 ring-accent ring-inset' : 'ds-hatch h-3 flex-1 rounded-pill bg-sunken'}
+                  />
                 ))}
               </div>
             </section>
@@ -142,7 +155,7 @@ export default function Hoje() {
               <ServiceList services={done} label="Serviços feitos" />
             </>
           ) : null}
-        </>
+        </Stagger>
       )}
     </CampoScreen>
   )
