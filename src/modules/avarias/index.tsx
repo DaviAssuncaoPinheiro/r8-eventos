@@ -2,7 +2,8 @@
 import * as React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Check, Info, Plus, ReceiptText, TriangleAlert } from 'lucide-react'
-import { Banner, Button, Dialog, EmptyState, Money, MoneyCard, PhotoViewer, Segmented, Skeleton, Tooltip, cn, notify, useCountUp } from '@/ui'
+import { Banner, Button, Dialog, EmptyState, MoneyCard, PhotoViewer, Segmented, Skeleton, Tooltip, cn, notify } from '@/ui'
+import { RollingMoney, Stagger, celebrate } from '@/ui/Motion'
 import { PageHeader } from '@/app/PageHeader'
 import { DAMAGE_STATUS, SERVICE_ICON } from '@/app/status'
 import { today, monthKey } from '@/domain/dates'
@@ -30,7 +31,7 @@ interface ExtraGroup {
   total: number
 }
 
-function ExtraCard({ g, busy, onBill }: { g: ExtraGroup; busy: boolean; onBill: () => void }) {
+function ExtraCard({ g, busy, onBill }: { g: ExtraGroup; busy: boolean; onBill: (el: HTMLElement) => void }) {
   const types = [...new Set(g.services.map((s) => s.type))]
   return (
     <li className="flex min-w-0 flex-col gap-4 rounded-card bg-raised p-5 sm:p-6">
@@ -60,7 +61,7 @@ function ExtraCard({ g, busy, onBill }: { g: ExtraGroup; busy: boolean; onBill: 
       <p className="text-kpi">{formatMoney(g.total)}</p>
       <div className="mt-auto flex items-center justify-between gap-3">
         <span className="text-body font-semibold text-fg-2">{g.services.length === 1 ? '1 serviço' : `${g.services.length} serviços`}</span>
-        <Button variant="primary" size="md" icon={ReceiptText} loading={busy} onClick={onBill}>
+        <Button variant="primary" size="md" icon={ReceiptText} loading={busy} onClick={(e) => onBill(e.currentTarget)}>
           Faturar
         </Button>
       </div>
@@ -69,7 +70,6 @@ function ExtraCard({ g, busy, onBill }: { g: ExtraGroup; busy: boolean; onBill: 
 }
 
 function SideNumber({ title, value, formula, tone }: { title: string; value: number; formula: string; tone?: 'ok' }) {
-  const shown = useCountUp(value)
   return (
     <div className="flex min-w-0 flex-col gap-1">
       <div className="flex items-center gap-1.5">
@@ -81,7 +81,7 @@ function SideNumber({ title, value, formula, tone }: { title: string; value: num
         </Tooltip>
       </div>
       <div className={cn('text-kpi', tone === 'ok' && value > 0 && 'text-ok-ink')}>
-        <Money value={shown} variant="kpi" toneNegative={false} />
+        <RollingMoney value={value} kpi />
       </div>
     </div>
   )
@@ -204,10 +204,12 @@ export default function Avarias() {
     }
   }
 
-  const bill = async (g: ExtraGroup) => {
+  const bill = async (g: ExtraGroup, origin: HTMLElement) => {
     setBusy(g.rentalId)
+    const r = origin.getBoundingClientRect()
     try {
       const c = await billExtras(g.rentalId)
+      celebrate({ x: r.left + r.width / 2, y: r.top + r.height / 2 })
       notify.success(`Extras faturados na cobrança ${c.code}`)
       setChargeId(c.id)
     } catch (e) {
@@ -269,25 +271,24 @@ export default function Avarias() {
       {/* sem dados, só a faixa de erro: "R$ 0,00 sem cobrança" enganaria */}
       {loadError ? null : tab === 'avarias' ? (
         <>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
-            {damages.initialLoading ? (
-              <>
+          {damages.initialLoading ? (
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
                 {[0, 1].map((i) => (
                   <div key={i} role="status" aria-busy="true" aria-label="Carregando indicador" className={cn('flex h-[196px] flex-col justify-between rounded-card bg-raised p-6', i === 0 ? 'sm:col-span-2 @min-[1180px]/frame:col-span-8' : 'sm:col-span-2 @min-[1180px]/frame:col-span-4')}>
                     <Skeleton className="h-4 w-1/3" />
                     <Skeleton className="h-10 w-2/3" />
                   </div>
                 ))}
-              </>
-            ) : (
-              <>
+            </div>
+          ) : (
+              <Stagger className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
                 <MoneyCard
                   hero
                   size="xl"
                   title="Sem cobrança"
                   value={unchargedTotal}
                   tag={{ label: uncharged.length === 1 ? '1 avaria' : `${uncharged.length} avarias` }}
-                  formula="Avarias registradas em campo que ainda não viraram cobrança."
+                  formula="Avarias registradas pela equipe de rua que ainda não viraram cobrança."
                   className="sm:col-span-2 @min-[1180px]/frame:col-span-8"
                 >
                   <button
@@ -300,9 +301,8 @@ export default function Avarias() {
                   </button>
                 </MoneyCard>
                 <SideNumbers awaiting={awaiting} paid={paidTotal} className="sm:col-span-2 @min-[1180px]/frame:col-span-4" />
-              </>
-            )}
-          </div>
+              </Stagger>
+          )}
 
           <FilterPills<StatusParam>
             className="mt-6"
@@ -319,7 +319,7 @@ export default function Avarias() {
               <div className="rounded-card bg-raised">
                 <EmptyState
                   icon={TriangleAlert}
-                  title={list.length === 0 ? 'As avarias registradas em campo aparecem aqui' : 'Nenhuma avaria com este filtro'}
+                  title={list.length === 0 ? 'As avarias registradas pela equipe de rua aparecem aqui' : 'Nenhuma avaria com este filtro'}
                   action={
                     list.length === 0 ? (
                       <Button variant="primary" icon={Plus} onClick={() => setRegisterOpen(true)}>
@@ -334,7 +334,7 @@ export default function Avarias() {
                 />
               </div>
             ) : (
-              <ul aria-label="Avarias" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
+              <Stagger role="list" aria-label="Avarias" gap={0.04} className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
                 {visible.map((d) => (
                   <DamageCard
                     key={d.id}
@@ -348,7 +348,7 @@ export default function Avarias() {
                     onOpenRental={() => navigate(`/locacoes/${d.rentalId}`)}
                   />
                 ))}
-              </ul>
+              </Stagger>
             )}
           </div>
         </>
@@ -372,11 +372,11 @@ export default function Avarias() {
                 <EmptyState icon={Check} title="Nenhum extra para faturar" />
               </div>
             ) : (
-              <ul aria-label="Extras por locação" className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
+              <Stagger role="list" aria-label="Extras por locação" gap={0.04} className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1000px]/frame:grid-cols-3 @min-[1280px]/frame:grid-cols-4">
                 {groups.map((g) => (
-                  <ExtraCard key={g.rentalId} g={g} busy={busy === g.rentalId} onBill={() => void bill(g)} />
+                  <ExtraCard key={g.rentalId} g={g} busy={busy === g.rentalId} onBill={(el) => void bill(g, el)} />
                 ))}
-              </ul>
+              </Stagger>
             )}
           </div>
         </>
