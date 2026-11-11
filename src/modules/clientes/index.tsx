@@ -1,4 +1,13 @@
-/* Ponto de entrada do módulo "clientes". O construtor do módulo substitui este arquivo. */
-export default function Modulo() {
-  return <p className="p-6 text-body text-fg-2">Módulo clientes em construção.</p>
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Lista from './Lista'
+import Ficha from './Ficha'
+
+export default function Clientes() {
+  return (
+    <Routes>
+      <Route index element={<Lista />} />
+      <Route path=":id" element={<Ficha />} />
+      <Route path="*" element={<Navigate to="/clientes" replace />} />
+    </Routes>
+  )
 }

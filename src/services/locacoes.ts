@@ -516,3 +516,16 @@ export function generateContractText(id: string): Promise<string> {
 
 void diffDays
 void demoNow
+
+/** Gera o contrato de uma locação confirmada que ainda não tem um (sem assinatura) */
+export function generateContract(id: string): Promise<Rental> {
+  return call(() => {
+    const data = getData()
+    const r = lookup(data).rental(id)
+    if (r.status === 'orcamento' || r.status === 'cancelada') throw new ServiceError('Confirme o orçamento antes de gerar o contrato.')
+    if (r.contract) return r
+    const rental = pushHistory({ ...r, contract: { generatedAt: demoNowISO() } }, 'Contrato gerado')
+    commit({ rentals: data.rentals.map((x) => (x.id === id ? rental : x)) })
+    return rental
+  })
+}

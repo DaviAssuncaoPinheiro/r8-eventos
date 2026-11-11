@@ -12,6 +12,7 @@ import { applyBrand } from '@/lib/brand'
 import { useTheme } from '@/lib/theme'
 import { formatDateTime } from '@/lib/format'
 import { getMoneyPanel, listNotifications, markAllRead, resetDemo, useQuery, useSettings } from '@/services'
+import { Copiloto, CopilotoButton } from '@/modules/copiloto'
 import { CommandPalette } from './CommandPalette'
 import { NAV_ITEMS } from './nav'
 
@@ -135,8 +136,7 @@ export default function AppLayout() {
                       }}
                       actions={
                         <>
-                          {/* EXTENSÃO: botão do Copiloto entra aqui quando o Pacote IA está ligado */}
-                          <span id="topbar-extensao" className="contents" />
+                          <CopilotoButton />
                           <Tooltip content={resolved === 'dark' ? 'Tema claro' : 'Tema escuro'}>
                             <button type="button" aria-label={resolved === 'dark' ? 'Usar tema claro' : 'Usar tema escuro'} onClick={() => setPref(resolved === 'dark' ? 'light' : 'dark')} className={topBtn}>
                               {resolved === 'dark' ? <Sun size={20} strokeWidth={2} aria-hidden /> : <Moon size={20} strokeWidth={2} aria-hidden />}
@@ -192,8 +192,8 @@ export default function AppLayout() {
           </OfficeFrame>
         </div>
         <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
-        {/* EXTENSÃO: <Copilot /> e <Tour /> são montados aqui */}
-        <div id="app-extensoes" />
+        <Copiloto />
+        {/* EXTENSÃO: <Tour /> é montado aqui */}
         <AppToaster />
       </div>
     </TooltipProvider>

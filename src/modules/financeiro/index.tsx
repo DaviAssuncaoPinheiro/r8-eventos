@@ -1,4 +1,11 @@
-/* Ponto de entrada do módulo "financeiro". O construtor do módulo substitui este arquivo. */
-export default function Modulo() {
-  return <p className="p-6 text-body text-fg-2">Módulo financeiro em construção.</p>
+/* Módulo financeiro: /financeiro e /financeiro/cobranca/:id (a gaveta abre pela URL). */
+import { Route, Routes } from 'react-router-dom'
+import Financeiro from './Financeiro'
+
+export default function FinanceiroModule() {
+  return (
+    <Routes>
+      <Route path="*" element={<Financeiro />} />
+    </Routes>
+  )
 }

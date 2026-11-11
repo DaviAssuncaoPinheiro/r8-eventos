@@ -1,4 +1,15 @@
-/* Ponto de entrada do módulo "locacoes". O construtor do módulo substitui este arquivo. */
-export default function Modulo() {
-  return <p className="p-6 text-body text-fg-2">Módulo locacoes em construção.</p>
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Lista from './Lista'
+import Nova from './Nova'
+import Detalhe from './Detalhe'
+
+export default function Locacoes() {
+  return (
+    <Routes>
+      <Route index element={<Lista />} />
+      <Route path="nova" element={<Nova />} />
+      <Route path=":id" element={<Detalhe />} />
+      <Route path="*" element={<Navigate to="/locacoes" replace />} />
+    </Routes>
+  )
 }

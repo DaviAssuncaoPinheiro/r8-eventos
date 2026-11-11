@@ -1,7 +1,7 @@
 /* Portal do cliente (link público por token): limpezas com foto e assinatura, locações, faturas e relatório do mês. */
 import { commit, getData, newIds } from '@/data/db'
-import { monthKey, today as todayFn } from '@/domain/dates'
-import type { Charge, Client, ISODateTime, Unit } from '@/domain/types'
+import { dayOf, monthKey, today as todayFn } from '@/domain/dates'
+import type { Charge, Client, ISODateTime, ServicePhoto, Unit } from '@/domain/types'
 import { call, ServiceError } from './config'
 import { formatMoney, mkNotification } from './common'
 import { filterChargesSync, pixFor, type ChargeView, type PixPayload } from './financeiro'
@@ -11,6 +11,8 @@ import { computeMonthlyClientReport, type MonthlyClientReport } from './relatori
 
 export interface PortalRental extends RentalListItem {
   units: (Pick<Unit, 'id' | 'code' | 'status'> & { typeName: string; photo: string })[]
+  /** próxima limpeza agendada desta locação */
+  nextCleaningAt?: ISODateTime
 }
 
 export interface PortalCleaning extends ServiceReceipt {
@@ -57,6 +59,10 @@ export function computePortal(token: string, month?: string): PortalData {
     client: { id: c.id, name: c.name, kind: c.kind, cnpj: c.cnpj, address: c.address, contacts: c.contacts, portalToken: c.portalToken },
     activeRentals: rentals.map((r) => ({
       ...r,
+      nextCleaningAt: data.services
+        .filter((s) => s.rentalId === r.id && s.type === 'limpeza' && s.status !== 'concluido' && s.status !== 'cancelado' && dayOf(s.start) >= todayFn())
+        .map((s) => s.start)
+        .sort()[0],
       units: r.items
         .flatMap((i) => i.unitIds)
         .map((id) => data.units.find((u) => u.id === id)!)
@@ -117,3 +123,55 @@ export function getPortalLink(clientId: string): Promise<string> {
   })
 }
 
+
+/* ───────────── Página pública do QR da unidade (/u/:code) ───────────── */
+
+export interface UnitPage {
+  company: PortalData['company']
+  unit: Pick<Unit, 'id' | 'code' | 'status'> & { typeName: string; photo: string }
+  /** última limpeza concluída desta unidade, com as fotos */
+  lastCleaning?: { at: ISODateTime; photos: ServicePhoto[] }
+}
+
+/** Dados da página que abre ao ler o QR colado no equipamento. Aceita código ('BQ-0142') ou id. */
+export function getUnitPage(idOrCode: string): Promise<UnitPage> {
+  return call(() => {
+    const data = getData()
+    const key = idOrCode.trim().toLowerCase()
+    const u = data.units.find((x) => x.code.toLowerCase() === key || x.id.toLowerCase() === key)
+    if (!u) throw new ServiceError('Equipamento não encontrado.')
+    const type = data.types.find((t) => t.id === u.typeId)
+    const co = data.settings.company
+    const last = data.services
+      .filter((s) => s.type === 'limpeza' && s.status === 'concluido' && s.report && s.unitIds.includes(u.id))
+      .sort((a, b) => b.report!.finishedAt.localeCompare(a.report!.finishedAt))[0]
+    return {
+      company: { name: co.name, logoDataUrl: data.settings.logoDataUrl, brandHex: data.settings.brandHex, phone: co.phone, whatsapp: co.whatsapp, email: co.email },
+      unit: { id: u.id, code: u.code, status: u.status, typeName: type?.name ?? '', photo: type?.photo ?? '' },
+      lastCleaning: last ? { at: last.report!.finishedAt, photos: last.report!.photos } : undefined,
+    }
+  })
+}
+
+export type ProblemKind = 'papel' | 'limpeza' | 'porta' | 'outro'
+
+const PROBLEM_LABEL: Record<ProblemKind, string> = {
+  papel: 'Falta papel',
+  limpeza: 'Precisa de limpeza',
+  porta: 'Problema na porta ou trava',
+  outro: 'Outro problema',
+}
+
+/** Aviso de quem leu o QR: vira uma notificação do tipo `portal` no sino do escritório */
+export function reportProblem(code: string, kind: ProblemKind, note?: string): Promise<void> {
+  return call(() => {
+    const data = getData()
+    const key = code.trim().toLowerCase()
+    const u = data.units.find((x) => x.code.toLowerCase() === key || x.id.toLowerCase() === key)
+    if (!u) throw new ServiceError('Equipamento não encontrado.')
+    const ids = newIds()
+    const text = `${PROBLEM_LABEL[kind]} em ${u.code}.${note?.trim() ? ` Observação: ${note.trim()}` : ''}`
+    const n = mkNotification(ids, { kind: 'portal', title: `Aviso pelo QR de ${u.code}`, text, ref: { type: 'unit', id: u.id } })
+    commit({ notifications: [n, ...data.notifications], seq: ids.seq() })
+  })
+}
