@@ -46,7 +46,7 @@ export default function Hoje() {
         <>
           <h1 className="text-title-field">{first ? `${greeting()}, ${first}` : greeting()}</h1>
           <p className="mt-0.5 text-body-lg text-fg-2">
-            {WEEKDAYS[d.getDay()]}, {formatDate(today()).slice(0, 5)}. {team?.truck}.
+            {WEEKDAYS[d.getDay()]}, {formatDate(today()).slice(0, 5)}. {team?.truck.split(' · ')[0]}.
           </p>
 
           {next ? (
@@ -124,7 +124,7 @@ export default function Hoje() {
 
           <FieldActionGrid className="mt-3">
             <FieldActionTile icon={QrCode} label="Escanear QR" onClick={() => navigate('/campo/qr')} />
-            <FieldActionTile icon={AlertTriangle} label="Registrar avaria" onClick={() => navigate('/campo/avarias')} />
+            <FieldActionTile icon={AlertTriangle} label="Registrar avaria" onClick={() => navigate('/campo/avarias?nova=1')} />
           </FieldActionGrid>
 
           {later.length ? (

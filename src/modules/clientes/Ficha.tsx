@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import { Check, ClipboardList, Copy, ExternalLink, Info, Link2, MessageCircle, PenLine, Phone, Plus, ReceiptText, ShieldCheck, Users } from 'lucide-react'
-import { getClient, getPortalLink, useLabels, useQuery, type ChargeView, type ClientDetail, type RentalListItem, type ServiceReceipt } from '@/services'
+import { getClient, getPortalLink, useQuery, type ChargeView, type ClientDetail, type RentalListItem, type ServiceReceipt } from '@/services'
 import { Badge, Banner, Button, Card, EmptyState, Money, PhotoGrid, Segmented, Skeleton, StatusDot, Tooltip, cn, notify, useCountUp } from '@/ui'
 import { PageHeader } from '@/app/PageHeader'
 import { CHARGE_STATUS, RENTAL_STATUS, SERVICE_ICON, TONE_SOFT } from '@/app/status'
@@ -317,7 +317,6 @@ export default function Ficha() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const [sp, setSp] = useSearchParams()
-  useLabels()
   const q = useQuery(() => getClient(id), [id])
   const portal = useQuery(() => getPortalLink(id), [id])
   const [editando, setEditando] = React.useState(false)

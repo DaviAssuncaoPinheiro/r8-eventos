@@ -125,7 +125,7 @@ export function NewChargeDrawer({ open, onClose, onCreated }: { open: boolean; o
               ]}
             />
           </div>
-          <button type="submit" className="sr-only" tabIndex={-1}>
+          <button type="submit" className="sr-only" tabIndex={-1} aria-hidden>
             Criar cobrança
           </button>
         </form>

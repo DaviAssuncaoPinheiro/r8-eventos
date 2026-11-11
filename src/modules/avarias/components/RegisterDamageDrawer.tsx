@@ -260,7 +260,7 @@ export function RegisterDamageDrawer({ open, onClose, onRegistered }: { open: bo
             })}
           </ul>
         </div>
-        <button type="submit" className="sr-only" tabIndex={-1}>
+        <button type="submit" className="sr-only" tabIndex={-1} aria-hidden>
           Registrar avaria
         </button>
       </form>

@@ -1,8 +1,9 @@
 import * as React from 'react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/ui'
 
 /** Link com a cara de botão de campo (56 px): para ligar, WhatsApp e rota. */
-export function LinkButton({ icon: Icon, className, children, ...rest }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { icon?: React.ComponentType<{ size?: number; strokeWidth?: number; 'aria-hidden'?: boolean }> }) {
+export function LinkButton({ icon: Icon, className, children, ...rest }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { icon?: LucideIcon }) {
   return (
     <a
       className={cn(

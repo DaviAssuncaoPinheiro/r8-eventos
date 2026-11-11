@@ -117,9 +117,9 @@ export function printHtml(html: string): Promise<void> {
         Promise.all(imgs.map((i) => (i.complete ? null : new Promise((res) => ((i.onload = res), (i.onerror = res)))))),
         new Promise((res) => window.setTimeout(res, 5000)),
       ])
-      win.addEventListener('afterprint', () => frame.remove())
       win.focus()
       win.print()
+      frame.dataset.printed = 'true'
       resolve()
     }
     frame.srcdoc = html
