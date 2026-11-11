@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Check, Search, X } from 'lucide-react'
 import { AddPhoto, Button, Drawer, Field, Input, Select, Skeleton, StatusDot, cn, notify } from '@/ui'
-import { UNIT_STATUS } from '@/app/status'
+import { useUnitStatus } from '@/app/status'
 import { parseMoney } from '@/lib/format'
 import { listUnits, registerDamage, useMutation, useQuery, useSegment } from '@/services'
 import type { UnitView } from '@/services'
@@ -48,6 +48,7 @@ interface Photo {
 
 /** Gaveta "Registrar avaria": unidade (busca por código), tipo, valor, descrição curta e foto. */
 export function RegisterDamageDrawer({ open, onClose, onRegistered }: { open: boolean; onClose: () => void; onRegistered: () => void }) {
+  const UNIT_STATUS = useUnitStatus()
   const kinds = useSegment().damageKinds
   const register = useMutation(registerDamage)
   const [term, setTerm] = React.useState('')

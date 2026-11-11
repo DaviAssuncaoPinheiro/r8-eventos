@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { Drawer as Vaul } from 'vaul'
+import { useReturnFocus } from './returnFocus'
 import { X } from 'lucide-react'
 import { Button } from './Button'
 import { cn } from './cn'
@@ -37,6 +38,7 @@ const sideWidth = { 480: 'w-[480px]', 640: 'w-[640px]' } as const
  */
 export function Drawer({ open, defaultOpen, onOpenChange, trigger, side, width = 480, title, description, children, footer, className }: DrawerProps) {
   const wide = useMediaQuery('(min-width: 640px)')
+  const rf = useReturnFocus()
   const mode: DrawerSide = side ?? (wide ? 'right' : 'bottom')
 
   if (mode === 'bottom') {
@@ -46,6 +48,8 @@ export function Drawer({ open, defaultOpen, onOpenChange, trigger, side, width =
         <Vaul.Portal>
           <Vaul.Overlay className="ds-vaul-scrim ds-root fixed inset-0 z-[60] bg-scrim" />
           <Vaul.Content
+            onOpenAutoFocus={rf.capture}
+            onCloseAutoFocus={rf.restore}
             {...(description ? {} : { 'aria-describedby': undefined })}
             className={cn(
               'ds-vaul ds-root fixed inset-x-0 bottom-0 z-[60] mx-auto flex max-h-[90dvh] max-w-[640px] flex-col rounded-t-panel bg-overlay text-fg shadow-overlay outline-none',
@@ -71,6 +75,8 @@ export function Drawer({ open, defaultOpen, onOpenChange, trigger, side, width =
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="ds-scrim ds-root fixed inset-0 z-[60] bg-scrim" />
         <DialogPrimitive.Content
+          onOpenAutoFocus={rf.capture}
+          onCloseAutoFocus={rf.restore}
           {...(description ? {} : { 'aria-describedby': undefined })}
           className={cn(
             'ds-drawer-side ds-root fixed top-[calc(12px+var(--demo-strip-h,0px))] right-3 bottom-3 z-[60] flex max-w-[calc(100vw-24px)] flex-col rounded-panel bg-overlay text-fg shadow-overlay outline-none',

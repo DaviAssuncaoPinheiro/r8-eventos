@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Boxes, LayoutGrid, List, Printer, Search, X } from 'lucide-react'
 import { Banner, Button, EmptyState, Input, Money, Segmented, Skeleton, StatusDot, Table, cn, type TableColumn } from '@/ui'
 import { PageHeader } from '@/app/PageHeader'
-import { UNIT_STATUS } from '@/app/status'
+import { useUnitStatus } from '@/app/status'
 import { getStockSummary, listUnits, useLabels, useQuery, type UnitStatus, type UnitView } from '@/services'
 import { AvailabilityCalendar } from './components/AvailabilityCalendar'
 import { TypeStrip } from './components/TypeStrip'
@@ -21,6 +21,7 @@ type Aba = 'unidades' | 'disponibilidade'
 type Visao = 'grade' | 'lista'
 
 export default function Estoque() {
+  const UNIT_STATUS = useUnitStatus()
   const l = useLabels()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()

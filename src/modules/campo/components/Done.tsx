@@ -37,7 +37,7 @@ export function Done({ service, summary }: { service: ServiceDetail; summary: Su
       }
     >
       <div className="flex flex-col items-center pt-8 text-center">
-        <CheckMark size={128} label="Serviço concluído" className="text-accent" />
+        <CheckMark size={128} label="Serviço concluído" className="text-ok" />
         <h2 className="mt-6 text-title-field">Serviço concluído</h2>
       </div>
       <dl className="mt-8 grid grid-cols-3 gap-3">

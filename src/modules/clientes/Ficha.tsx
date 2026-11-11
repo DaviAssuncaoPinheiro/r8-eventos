@@ -23,7 +23,7 @@ function Num({ label, formula, value, money, danger }: { label: string; formula:
     <div className="flex min-w-0 flex-col gap-1">
       <div className="flex min-h-6 items-center gap-1">
         <span className="truncate text-body font-semibold text-fg-2">{label}</span>
-        <Tooltip content={formula}>
+        <Tooltip content={formula} toggleOnClick>
           <button
             type="button"
             aria-label={`Como é calculado: ${label}`}
@@ -87,7 +87,7 @@ function PortalCard({ link, loading }: { link?: string; loading: boolean }) {
           <ShieldCheck size={20} strokeWidth={2} aria-hidden />
           Portal do cliente
         </h2>
-        <div className="mt-4 flex min-h-12 min-w-0 items-center gap-2.5 rounded-pill bg-on-accent/20 px-4">
+        <div className="mt-4 flex min-h-12 min-w-0 items-center gap-2.5 rounded-pill bg-accent-active px-4 ring-1 ring-on-accent/30 ring-inset">
           <Link2 size={18} strokeWidth={2} aria-hidden className="shrink-0" />
           {loading || !link ? <Skeleton className="h-4 w-64 bg-on-accent/20" /> : <span className="tnum truncate text-body-lg font-medium">{link}</span>}
         </div>
@@ -96,7 +96,7 @@ function PortalCard({ link, loading }: { link?: string; loading: boolean }) {
             {copied ? <Check size={18} strokeWidth={2} aria-hidden /> : <Copy size={18} strokeWidth={2} aria-hidden />}
             {copied ? 'Link copiado' : 'Copiar link'}
           </button>
-          <a href={link} target="_blank" rel="noopener noreferrer" aria-disabled={!link} className={cn(pill, 'bg-on-accent/20 text-on-accent hover:bg-on-accent/30', !link && 'pointer-events-none opacity-60')}>
+          <a href={link} target="_blank" rel="noopener noreferrer" aria-disabled={!link} className={cn(pill, 'bg-accent-active text-on-accent ring-1 ring-on-accent/30 ring-inset hover:ring-on-accent/70', !link && 'pointer-events-none opacity-60')}>
             <ExternalLink size={18} strokeWidth={2} aria-hidden />
             Abrir portal
           </a>

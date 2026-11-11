@@ -1,6 +1,6 @@
 import { AlertTriangle, Play } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { UNIT_STATUS } from '@/app/status'
+import { useUnitStatus } from '@/app/status'
 import { today } from '@/domain/dates'
 import { formatDate } from '@/lib/format'
 import { getUnit, listServices, useLabels, useQuery } from '@/services'
@@ -10,6 +10,7 @@ import { Sheet } from './Sheet'
 
 /** Ficha rápida da unidade, em gaveta inferior: o que a equipe precisa saber com a unidade na mão. */
 export function UnitSheet({ code, onClose }: { code: string | null; onClose: () => void }) {
+  const UNIT_STATUS = useUnitStatus()
   const navigate = useNavigate()
   const l = useLabels()
   const { team } = useCampoDay()

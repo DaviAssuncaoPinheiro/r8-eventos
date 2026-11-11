@@ -31,9 +31,15 @@ export async function submitCompletion(teamId: string, serviceId: string, report
   }
   const ids: string[] = []
   for (const d of damages) {
-    const saved = await registerDamage({ ...d.input, serviceId })
-    ids.push(saved.id)
-    st.addMyDamage(teamId, saved.id)
+    // se a conclusão falhar depois da avaria já gravada, a nova tentativa não grava a avaria de novo
+    let id = realIds.get(d.localId)
+    if (!id) {
+      const saved = await registerDamage({ ...d.input, serviceId })
+      id = saved.id
+      realIds.set(d.localId, id)
+      st.addMyDamage(teamId, id)
+    }
+    ids.push(id)
   }
   await completeService(serviceId, { ...report, damageIds: ids })
   return 'enviado'

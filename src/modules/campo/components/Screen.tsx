@@ -33,6 +33,7 @@ export function CampoScreen({ title, onBack, actionBar, nav = true, children }: 
   return (
     <FieldFrame
       title={title ?? company}
+      titleAs={title ? 'h1' : 'p'}
       onBack={onBack}
       pending={pending}
       actionBar={actionBar}

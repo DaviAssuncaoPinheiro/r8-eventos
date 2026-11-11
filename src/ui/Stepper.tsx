@@ -51,7 +51,7 @@ export function Stepper({ steps, current, onStepClick, variant = 'office', title
         <p className="text-caption font-semibold text-fg-3 tnum">
           Passo {current + 1} de {total}
         </p>
-        <h3 className="text-title-field text-fg">{title ?? step?.label}</h3>
+        <h2 className="text-title-field text-fg">{title ?? step?.label}</h2>
         <div
           role="progressbar"
           aria-label="Progresso"

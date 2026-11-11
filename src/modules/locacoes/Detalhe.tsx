@@ -4,7 +4,7 @@ import { Ban, Check, ChevronRight, FastForward, FileSignature, FileText, MoreHor
 import { PageHeader } from '@/app/PageHeader'
 import { RENTAL_STATUS, SERVICE_ICON } from '@/app/status'
 import { Badge, Banner, Button, Dialog, EmptyState, Field, Input, Menu, MoneyCard, ServiceRow, SignaturePad, Skeleton, notify, type MenuEntry } from '@/ui'
-import { advanceRental, cancelRental, confirmRental, generateContract, generateContractText, getRental, getSettings, signContract, useLabels, useMutation, useQuery, type RentalDetail, type Service } from '@/services'
+import { ServiceError, advanceRental, cancelRental, confirmRental, generateContract, generateContractText, getRental, getSettings, signContract, useLabels, useMutation, useQuery, type RentalDetail, type Service } from '@/services'
 import { formatDate, formatTime } from '@/lib/format'
 import { TrilhaEtapas } from './components/TrilhaEtapas'
 import { Dossie } from './components/Dossie'
@@ -67,7 +67,8 @@ function Conteudo({ detail }: { detail: RentalDetail }) {
       await m.run(...a)
       notify.success(ok)
     } catch (e) {
-      notify.error(e instanceof Error && e.message ? e.message : fail)
+      // falha de conexão (mensagem genérica) usa o texto da ação; regra de negócio mostra o motivo
+      notify.error(e instanceof Error && e.message && e.message !== new ServiceError().message ? e.message : fail)
     }
   }
 
@@ -154,7 +155,7 @@ function Conteudo({ detail }: { detail: RentalDetail }) {
         <MoneyCard title={`${labels.damagePlural.charAt(0).toUpperCase()}${labels.damagePlural.slice(1)}`} value={damagesTotal} onOpen={detail.damages.length ? () => navigate('/avarias') : undefined} formula={`Soma das ${labels.damagePlural} registradas nesta locação.`} />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
+      <div className="mt-4 grid grid-cols-1 items-start gap-4 @min-[1180px]/frame:grid-cols-12">
         <ItensUnidades detail={detail} className="@min-[1180px]/frame:col-span-7" />
         <Servicos detail={detail} className="@min-[1180px]/frame:col-span-5" />
       </div>

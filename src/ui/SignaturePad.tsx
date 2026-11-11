@@ -92,7 +92,7 @@ export function SignaturePad({ onChange, height = 180, label = 'Assine aqui', cl
         <button
           type="button"
           onClick={clear}
-          className="absolute top-2 right-2 inline-flex h-9 items-center gap-1.5 rounded-pill bg-[#f0f0f2] px-3 text-caption font-semibold text-[#14171b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#14171b]"
+          className="absolute top-2 right-2 inline-flex h-11 items-center gap-1.5 rounded-pill bg-[#f0f0f2] px-4 text-caption font-semibold text-[#14171b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#14171b]"
         >
           <Eraser size={14} strokeWidth={2} aria-hidden />
           Limpar

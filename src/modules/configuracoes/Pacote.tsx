@@ -44,7 +44,7 @@ export default function Pacote() {
           const on = p.id === picked
           const isActive = p.id === active.id
           return (
-            <li key={p.id}>
+            <li role="none" key={p.id}>
               <button
                 type="button"
                 role="radio"

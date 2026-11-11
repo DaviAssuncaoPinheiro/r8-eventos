@@ -1,6 +1,7 @@
 import { Hammer, Sparkles, Truck, Undo2, Wrench, type LucideIcon } from 'lucide-react'
 import type { ChargeKind, ChargeStatus, DamageStatus, RentalStatus, ServiceStatus, ServiceType, UnitStatus } from '@/domain/types'
 import type { StatusTone } from '@/ui'
+import { useLabels } from '@/services'
 
 /*
   Rótulo e cor de cada situação, em um lugar só. Toda tela usa estes mapas com <StatusDot> ou <Badge>,
@@ -41,6 +42,12 @@ export const UNIT_STATUS: Record<UnitStatus, { label: string; tone: StatusTone }
   em_campo: { label: 'Em campo', tone: 'accent' },
   limpeza: { label: 'Em limpeza', tone: 'info' },
   manutencao: { label: 'Manutenção', tone: 'warn' },
+}
+
+/** UNIT_STATUS com o nome da limpeza do pacote de segmento ativo ("Em higienização", "Em revisão"...). */
+export function useUnitStatus(): Record<UnitStatus, { label: string; tone: StatusTone }> {
+  const cleaning = useLabels().cleaning
+  return { ...UNIT_STATUS, limpeza: { ...UNIT_STATUS.limpeza, label: `Em ${cleaning}` } }
 }
 
 export const CHARGE_STATUS: Record<ChargeStatus, { label: string; tone: StatusTone }> = {

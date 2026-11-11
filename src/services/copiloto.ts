@@ -60,7 +60,7 @@ export function getDailySummary(): Promise<DailySummary> {
 /* ───────────────────────── Sugestões ───────────────────────── */
 
 function whatsDamage(clientName: string, contact: string, items: string[], total: number) {
-  return `Olá, ${contact}! Aqui é da ${getData().settings.company.name}. Na retirada encontramos ${items.length === 1 ? 'uma avaria' : items.length + ' avarias'} nos equipamentos da locação, registrada${items.length === 1 ? '' : 's'} com foto: ${items.join('; ')}. O valor de reparo é ${formatMoney(total)}. Posso enviar a cobrança por Pix? As fotos ficam no portal do cliente.`.replace(clientName, clientName)
+  return `Olá, ${contact}! Aqui é da ${getData().settings.company.name}. Encontramos ${items.length === 1 ? 'uma avaria' : items.length + ' avarias'} nos equipamentos da locação, registrada${items.length === 1 ? '' : 's'} com foto: ${items.join('; ')}. O valor de reparo é ${formatMoney(total)}. Posso enviar a cobrança por Pix? As fotos ficam no portal do cliente.`.replace(clientName, clientName)
 }
 
 function generate(data: DbData, today = todayFn()): CopilotSuggestion[] {

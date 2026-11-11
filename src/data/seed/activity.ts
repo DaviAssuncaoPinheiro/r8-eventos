@@ -55,9 +55,9 @@ export function buildActivity(env: ActivityEnv): Activity {
     if (s.type === 'limpeza' && rng.chance(0.05)) checklist[3].ok = false
     const photos: ServicePhoto[] = []
     if (s.type === 'limpeza' || s.type === 'manutencao') {
-      photos.push(photoFor(r, s.unitIds, 'antes', s.type === 'limpeza' ? 'Antes da limpeza' : 'Antes do reparo', 0))
-      photos.push(photoFor(r, s.unitIds, 'depois', s.type === 'limpeza' ? 'Depois da limpeza' : 'Depois do reparo', 0))
-      if (rng.chance(0.4)) photos.push(photoFor(r, s.unitIds, 'depois', 'Depois da limpeza', 1))
+      photos.push(photoFor(r, s.unitIds, 'antes', s.type === 'limpeza' ? 'Antes' : 'Antes do reparo', 0))
+      photos.push(photoFor(r, s.unitIds, 'depois', s.type === 'limpeza' ? 'Depois' : 'Depois do reparo', 0))
+      if (rng.chance(0.4)) photos.push(photoFor(r, s.unitIds, 'depois', 'Depois', 1))
     } else if (s.type === 'retirada') {
       photos.push(photoFor(r, s.unitIds, 'antes', 'Estado na retirada', 0))
       photos.push(photoFor(r, s.unitIds, 'depois', 'Carregado no caminhão', 1))

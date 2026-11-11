@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { Button } from './Button'
+import { useReturnFocus } from './returnFocus'
 import { cn } from './cn'
 
 /* ───────── utilitários compartilhados por Dialog, Drawer e Menu ───────── */
@@ -114,7 +115,9 @@ export function Dialog({
   footer,
   className,
 }: DialogProps) {
+  const rf = useReturnFocus()
   const onOpenAutoFocus = (e: Event) => {
+    rf.capture()
     const root = e.currentTarget as HTMLElement | null
     if (!root) return
     e.preventDefault()
@@ -131,6 +134,7 @@ export function Dialog({
         <DialogPrimitive.Overlay className="ds-scrim ds-root fixed inset-0 z-[70] bg-scrim" />
         <DialogPrimitive.Content
           onOpenAutoFocus={onOpenAutoFocus}
+          onCloseAutoFocus={rf.restore}
           {...(description ? {} : { 'aria-describedby': undefined })}
           className={cn(
             'ds-dialog ds-root fixed z-[70] flex flex-col bg-overlay text-fg shadow-overlay outline-none',

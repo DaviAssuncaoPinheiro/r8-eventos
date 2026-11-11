@@ -353,7 +353,7 @@ export function ChartCard({ title, summary, period, ariaLabel, state = 'ready', 
   return (
     <Card className={className} aria-busy={state === 'loading' || undefined}>
       <div className="mb-4 flex min-h-8 flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <h3 className="text-title-card">{title}</h3>
+        <h2 className="text-title-card">{title}</h2>
         <div className="flex flex-wrap items-center gap-3">
           {summary ? <div className="text-title-card tnum">{summary}</div> : null}
           {period ? <Segmented size="sm" label={period.label ?? 'Período'} options={period.options} value={period.value} onChange={period.onChange} /> : null}

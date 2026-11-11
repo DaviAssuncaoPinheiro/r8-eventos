@@ -323,6 +323,9 @@ export default function Financeiro() {
         />
       ) : null}
 
+      {/* sem dados, a tela mostra só a faixa de erro: zeros e listas vazias enganariam */}
+      {loadError ? null : (
+      <>
       {/* 1. os três números */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
         {rec.initialLoading ? (
@@ -725,6 +728,8 @@ export default function Financeiro() {
       <div className="mt-4">
         <Dunning sample={sample} />
       </div>
+      </>
+      )}
 
       <ChargeDrawer chargeId={openId} onClose={closeCharge} />
       <NewChargeDrawer

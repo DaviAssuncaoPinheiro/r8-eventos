@@ -372,9 +372,9 @@
     z-index: -1;
     pointer-events: none;
     background-image:
-      radial-gradient(220px circle at var(--mx, 120%) var(--my, -20%), color-mix(in oklab, var(--accent-glow) 16%, transparent), transparent 70%),
-      repeating-radial-gradient(circle at 108% -12%, transparent 0 26px, color-mix(in oklab, var(--accent-glow) 22%, transparent) 26px 27.5px),
-      radial-gradient(circle at 105% -10%, color-mix(in oklab, var(--accent-glow) 46%, transparent) 0%, transparent 48%);
+      radial-gradient(220px circle at var(--mx, 120%) var(--my, -20%), color-mix(in oklab, var(--accent-glow) 10%, transparent), transparent 70%),
+      repeating-radial-gradient(circle at 108% -12%, transparent 0 26px, color-mix(in oklab, var(--accent-glow) 14%, transparent) 26px 27.5px),
+      radial-gradient(circle at 105% -10%, color-mix(in oklab, var(--accent-glow) 28%, transparent) 0%, transparent 48%);
   }
   /* cartão escuro do Copiloto: fixo nos dois temas, com anéis concêntricos na cor da marca */
   .ds-copilot {

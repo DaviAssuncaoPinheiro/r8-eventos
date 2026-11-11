@@ -6,7 +6,7 @@ const STATE: Record<UnitDay['state'], { label: string; cls: string }> = {
   em_campo: { label: 'Alugado, em campo', cls: 'bg-accent text-on-accent' },
   reservado: { label: 'Reservado', cls: 'bg-accent/35 text-fg' },
   livre: { label: 'Livre', cls: 'bg-sunken text-fg-2' },
-  indisponivel: { label: 'Manutenção ou limpeza', cls: 'bg-warn text-fg' },
+  indisponivel: { label: 'Indisponível', cls: 'bg-warn text-fg' },
 }
 
 /** 60 dias em células coloridas por situação; a locação aparece no tooltip. */

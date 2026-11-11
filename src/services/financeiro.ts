@@ -334,7 +334,7 @@ export function buildWhatsAppMessage(chargeId: string): Promise<string> {
       return `Olá, ${first}! Aqui é da ${co}. Não encontramos o pagamento da cobrança ${c.code}, de ${formatMoney(c.value)}, que venceu em ${formatDate(c.dueAt)} (${c.description}). Se já pagou, é só enviar o comprovante por aqui. Se precisar de ajuda para regularizar, estamos à disposição.\n\n${pay}`
     }
     if (c.kind === 'avaria') {
-      return `Olá, ${first}! Aqui é da ${co}. Na retirada encontramos uma avaria em equipamento da locação, registrada com foto: ${c.description}. O valor de reparo é ${formatMoney(c.value)}, com vencimento em ${formatDate(c.dueAt)}. As fotos estão no portal do cliente.\n\n${pay}`
+      return `Olá, ${first}! Aqui é da ${co}. Encontramos uma avaria em equipamento da locação, registrada com foto: ${c.description}. O valor de reparo é ${formatMoney(c.value)}, com vencimento em ${formatDate(c.dueAt)}. As fotos estão no portal do cliente.\n\n${pay}`
     }
     return `Olá, ${first}! Aqui é da ${co}. Segue a cobrança ${c.code}: ${c.description}. Valor ${formatMoney(c.value)}, vencimento em ${formatDate(c.dueAt)}.\n\n${pay}`
   })

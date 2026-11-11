@@ -249,8 +249,8 @@ export default function Nova() {
               <p className="text-body-lg font-medium">Total do orçamento</p>
               <p className="mt-2 text-kpi-lg text-[clamp(36px,9vw,56px)]">{quote.data ? <Money value={quote.data.total} variant="kpi" /> : <Skeleton className="h-12 w-64 bg-on-accent/20" />}</p>
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex h-7 items-center rounded-pill bg-on-accent/15 px-3 text-caption font-semibold tnum">{periodTag(form.start, form.end)}</span>
-                <span className="inline-flex h-7 items-center rounded-pill bg-on-accent/15 px-3 text-caption font-semibold tnum">{days} {days === 1 ? 'dia' : 'dias'}</span>
+                <span className="inline-flex h-7 items-center rounded-pill bg-accent-active px-3 text-caption font-semibold tnum">{periodTag(form.start, form.end)}</span>
+                <span className="inline-flex h-7 items-center rounded-pill bg-accent-active px-3 text-caption font-semibold tnum">{days} {days === 1 ? 'dia' : 'dias'}</span>
               </div>
             </section>
             <section aria-label="Resumo" className="rounded-card bg-raised p-5 sm:p-6">

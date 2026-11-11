@@ -74,7 +74,7 @@ function SideNumber({ title, value, formula, tone }: { title: string; value: num
     <div className="flex min-w-0 flex-col gap-1">
       <div className="flex items-center gap-1.5">
         <h3 className="text-body-lg font-medium">{title}</h3>
-        <Tooltip content={formula}>
+        <Tooltip content={formula} toggleOnClick>
           <button type="button" aria-label={`Como é calculado: ${title}`} className="ds-hit inline-flex size-6 items-center justify-center rounded-pill text-fg-3 transition-colors duration-150 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
             <Info size={16} strokeWidth={2} aria-hidden />
           </button>
@@ -266,7 +266,8 @@ export default function Avarias() {
         />
       ) : null}
 
-      {tab === 'avarias' ? (
+      {/* sem dados, só a faixa de erro: "R$ 0,00 sem cobrança" enganaria */}
+      {loadError ? null : tab === 'avarias' ? (
         <>
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
             {damages.initialLoading ? (

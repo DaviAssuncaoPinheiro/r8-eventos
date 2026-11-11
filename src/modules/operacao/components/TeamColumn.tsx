@@ -82,7 +82,7 @@ export function TeamColumn({
         service={s}
         teams={teams}
         dragging={isDragged}
-        className={lane ? 'w-[248px] shrink-0 [&:not(:first-child)]:before:absolute [&:not(:first-child)]:before:top-3 [&:not(:first-child)]:before:-left-[5px] [&:not(:first-child)]:before:bottom-3 [&:not(:first-child)]:before:w-px [&:not(:first-child)]:before:bg-edge' : 'border-t border-edge first:border-t-0'}
+        className={lane ? 'w-[248px] min-w-[200px] shrink [&:not(:first-child)]:before:absolute [&:not(:first-child)]:before:top-3 [&:not(:first-child)]:before:-left-[5px] [&:not(:first-child)]:before:bottom-3 [&:not(:first-child)]:before:w-px [&:not(:first-child)]:before:bg-edge' : 'border-t border-edge first:border-t-0'}
         onOpen={onOpen}
         onMoveTo={onMoveTo}
         onDragStart={onDragStart}

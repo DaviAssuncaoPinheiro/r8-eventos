@@ -53,7 +53,7 @@ export function MoneyCard({ title, value, display, hero, tag, formula, onOpen, o
       className={cn('group/card @container relative flex min-w-0 flex-col rounded-card p-5 sm:p-6', hero ? 'ds-hero ds-hero-card' : 'bg-raised text-fg', className)}
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="min-w-0 pt-2 text-[15px] leading-5 font-medium @min-[250px]:text-body-lg">{title}</h3>
+        <h2 className="min-w-0 pt-2 text-[15px] leading-5 font-medium @min-[250px]:text-body-lg">{title}</h2>
         {onOpen ? (
           <button
             type="button"
@@ -85,7 +85,7 @@ export function MoneyCard({ title, value, display, hero, tag, formula, onOpen, o
         <div className={sizes[size]}>{display ?? <Money value={shown} variant="kpi" toneNegative={false} />}</div>
       </div>
       {formula ? (
-        <Tooltip content={formula}>
+        <Tooltip content={formula} toggleOnClick>
           <button
             type="button"
             aria-label={`Como é calculado: ${title}`}

@@ -49,7 +49,7 @@ export default function Perfil() {
               {teams.map((t) => {
                 const on = t.id === team?.id
                 return (
-                  <li key={t.id} className="border-b border-hairline last:border-b-0">
+                  <li role="none" key={t.id} className="border-b border-hairline last:border-b-0">
                     <button
                       type="button"
                       role="radio"

@@ -10,14 +10,31 @@ export interface TooltipProps {
   side?: 'top' | 'right' | 'bottom' | 'left'
   /** Abre sem interação (documentação e capturas). */
   open?: boolean
+  /** Toque ou clique também abre e fecha (botão "como é calculado", que no celular não tem hover). */
+  toggleOnClick?: boolean
   className?: string
 }
 
 /* fundo --inverse, texto 12/16 peso 500, raio 8, padding 8×10, largura máx. 260, atraso 300ms */
-export function Tooltip({ content, children, side = 'top', open, className }: TooltipProps) {
+export function Tooltip({ content, children, side = 'top', open, toggleOnClick, className }: TooltipProps) {
+  const [clicked, setClicked] = React.useState(false)
+  const [hovered, setHovered] = React.useState(false)
+  const pressing = React.useRef(false)
+  const controlled = open !== undefined ? open : toggleOnClick ? clicked || hovered : undefined
+  const onOpenChange = (o: boolean) => {
+    setHovered(o)
+    // fechar por Esc ou ao sair; o pointerdown no próprio gatilho não conta (o clique decide)
+    if (!o && !pressing.current) setClicked(false)
+  }
   return (
-    <TooltipPrimitive.Root delayDuration={300} open={open}>
-      <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
+    <TooltipPrimitive.Root delayDuration={300} open={controlled} onOpenChange={toggleOnClick ? onOpenChange : undefined}>
+      <TooltipPrimitive.Trigger
+        asChild
+        onPointerDown={toggleOnClick ? () => (pressing.current = true) : undefined}
+        onClick={toggleOnClick ? () => ((pressing.current = false), setClicked((c) => !c)) : undefined}
+      >
+        {children}
+      </TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Content
           side={side}

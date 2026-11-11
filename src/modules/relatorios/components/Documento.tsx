@@ -31,7 +31,7 @@ export function Documento({ report, settings, labels }: { report: MonthlyClientR
             {settings.logoDataUrl ? (
               <img src={settings.logoDataUrl} alt="" className="size-11 rounded-control bg-white object-contain p-1" />
             ) : (
-              <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-pill bg-on-accent/20 text-body font-semibold">
+              <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-pill bg-accent-active text-body font-semibold">
                 {company.name.slice(0, 2).toUpperCase()}
               </span>
             )}

@@ -257,9 +257,8 @@ export function Equipes({ range, onData }: { range: DateRange; onData?: (d: Team
                 {r.team.initials}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-body-lg font-semibold">{r.team.name}</p>
-                <p className="tnum text-caption text-fg-3">
-                  <span className="font-semibold text-fg">{r.completed}</span> serviços feitos
+                <p className="truncate text-body-lg font-semibold" title={`${r.completed} serviços feitos`}>
+                  {r.team.name}
                 </p>
               </div>
               <div className="flex items-center gap-2">

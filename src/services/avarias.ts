@@ -96,7 +96,8 @@ export function registerDamage(input: NewDamageInput): Promise<Damage> {
     const L = lookup(data)
     const u = L.unit(input.unitId)
     if (!(input.value > 0)) throw new ServiceError('Informe o valor da avaria.')
-    let rentalId = input.rentalId ?? u.rentalId
+    // avaria registrada num serviço é da locação desse serviço (a entrega ainda não concluída não liga a unidade à locação)
+    let rentalId = input.rentalId ?? (input.serviceId ? data.services.find((s) => s.id === input.serviceId)?.rentalId : undefined) ?? u.rentalId
     if (!rentalId) {
       const last = data.rentals.filter((r) => (r.status === 'em_campo' || r.status === 'retirada' || r.status === 'faturada') && r.items.some((i) => i.unitIds.includes(u.id))).sort((a, b) => b.end.localeCompare(a.end))[0]
       rentalId = last?.id

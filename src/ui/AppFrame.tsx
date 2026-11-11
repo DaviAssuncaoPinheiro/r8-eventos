@@ -142,6 +142,8 @@ export function SyncIndicator({ pending = 0, className }: { pending?: number; cl
 export interface FieldFrameProps {
   /** Título do cabeçalho (`text-title-sub`, truncado). */
   title: string
+  /** `h1` quando a tela não tem outro título principal no conteúdo. */
+  titleAs?: 'h1' | 'p'
   /** Mostra o botão voltar (44 px, ícone 24). */
   onBack?: () => void
   /** Itens aguardando sinal; 0 mostra "Sincronizado". */
@@ -160,9 +162,9 @@ export interface FieldFrameProps {
   className?: string
 }
 
-export function FieldFrame({ title, onBack, pending = 0, action, actionBar, nav, children, viewport, embedded, className }: FieldFrameProps) {
-  // o título do quadro é rótulo de contexto; o h1 é o título que cada tela põe no conteúdo
-  const Title = 'p'
+export function FieldFrame({ title, titleAs = 'p', onBack, pending = 0, action, actionBar, nav, children, viewport, embedded, className }: FieldFrameProps) {
+  // sem h1 no conteúdo (telas com título no cabeçalho), o título do quadro é o h1 da tela
+  const Title = titleAs
   void embedded
   const [scrolled, setScrolled] = React.useState(false)
   return (

@@ -44,7 +44,7 @@ const ACAO_ROTA: Record<RecommendedAction['kind'], string> = {
 /** Botão (i) discreto com o "como é calculado" de um indicador. */
 function InfoTip({ label, text }: { label: string; text: string }) {
   return (
-    <Tooltip content={text}>
+    <Tooltip content={text} toggleOnClick>
       <button type="button" aria-label={`Como é calculado: ${label}`} className="ds-hit inline-flex size-6 shrink-0 items-center justify-center rounded-pill text-fg-3 transition-colors duration-150 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
         <Info size={16} strokeWidth={2} aria-hidden />
       </button>
@@ -112,11 +112,11 @@ function fitBox(pins: MapPin[], ratio: number): [number, number, number, number]
   const maxX = Math.max(...xs) + pad
   const minY = Math.min(...ys) - pad
   const maxY = Math.max(...ys) + pad
-  let w = Math.max(maxX - minX, (maxY - minY) * ratio, 420)
+  // sem teto na largura: com o recorte em "slice", limitar só a largura cortava os pinos de cima e de baixo
+  const w = Math.max(maxX - minX, (maxY - minY) * ratio, 420)
   const h = w / ratio
   const cx = (minX + maxX) / 2
   const cy = (minY + maxY) / 2
-  w = Math.min(w, 940)
   return [cx - w / 2, cy - h / 2, w, h]
 }
 
@@ -384,7 +384,7 @@ export default function Painel() {
       : { label: formatPercent(rentedToday.deltaPct / 100, { sign: true }), dir: rentedToday.deltaPct > 0 ? ('up' as const) : ('down' as const) }
   const agingTotal = aging.reduce((a, f) => a + f.value, 0)
   const maint = occupancy.maintenance
-  const cleaningLabel = maint ? 'Limpeza e manutenção' : cap(l.cleaning)
+  const cleaningLabel = maint ? `${cap(l.cleaning)} e manutenção` : cap(l.cleaning)
   const gaugeLimpeza = occupancy.cleaning + maint
 
   return (

@@ -8,6 +8,7 @@ import { DemoStrip } from '@/ui/DemoStrip'
 import { SideNav, SideNavGroup, SideNavItem } from '@/ui/SideNav'
 import { AppToaster, notify } from '@/ui/Toast'
 import { TopBar } from '@/ui/TopBar'
+import { useReturnFocus } from '@/ui/returnFocus'
 import { applyBrand } from '@/lib/brand'
 import { useTheme } from '@/lib/theme'
 import { formatDateTime } from '@/lib/format'
@@ -53,6 +54,7 @@ export default function AppLayout() {
   const [navOpen, setNavOpen] = React.useState(false)
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [bellOpen, setBellOpen] = React.useState(false)
+  const bellFocus = useReturnFocus()
 
   const panel = useQuery(getMoneyPanel, [])
   const notifs = useQuery(listNotifications, [])
@@ -143,6 +145,8 @@ export default function AppLayout() {
                 </Popover.Anchor>
                 <Popover.Portal>
                   <Popover.Content
+                    onOpenAutoFocus={bellFocus.capture}
+                    onCloseAutoFocus={bellFocus.restore}
                     align="end"
                     sideOffset={8}
                     collisionPadding={12}

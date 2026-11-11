@@ -23,11 +23,11 @@ export function Money({ value, variant = 'inline', sign, toneNegative = true, cl
       <span className={cn('inline-flex items-baseline whitespace-nowrap', neg && 'text-danger-ink', className)}>
         <span className="sr-only">{full}</span>
         {/* prefixo e centavos a 80%; no cartão destaque ficam inteiros (o acento já reduz o contraste) */}
-        <span aria-hidden className="mr-1 text-[0.5em] font-semibold opacity-80 group-data-[variant=highlight]/card:opacity-100">
+        <span aria-hidden className="mr-1 text-[0.5em] font-semibold opacity-80 group-data-[variant=highlight]/card:opacity-100 in-[.ds-hero]:opacity-100">
           {s}R$
         </span>
         <span aria-hidden>{int}</span>
-        <span aria-hidden className="text-[0.6em] font-semibold opacity-80 group-data-[variant=highlight]/card:opacity-100">
+        <span aria-hidden className="text-[0.6em] font-semibold opacity-80 group-data-[variant=highlight]/card:opacity-100 in-[.ds-hero]:opacity-100">
           ,{cents}
         </span>
       </span>

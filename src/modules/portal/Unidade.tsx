@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { DoorClosed, Eraser, MessageSquareMore, PackageX, QrCode, Send, Sparkles, TriangleAlert, type LucideIcon } from 'lucide-react'
 import { Banner, Button, Drawer, EmptyState, Field, PhotoViewer, Skeleton, StatusDot, Textarea, cn, notify, type PhotoItem } from '@/ui'
-import { UNIT_STATUS } from '@/app/status'
+import { useUnitStatus } from '@/app/status'
 import { formatDate, formatTime } from '@/lib/format'
 import { getUnitPage, reportProblem, useLabels, useMutation, useQuery, type ProblemKind } from '@/services'
 import { PublicShell } from './components/PublicShell'
@@ -11,6 +11,7 @@ const CROPS = ['center', '15% 60%', '85% 40%', '50% 15%']
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export default function Unidade() {
+  const UNIT_STATUS = useUnitStatus()
   const { code = '' } = useParams()
   const l = useLabels()
   const q = useQuery(() => getUnitPage(code), [code])

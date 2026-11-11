@@ -5,6 +5,7 @@ import { Boxes, ClipboardList, Search, Users, type LucideIcon } from 'lucide-rea
 import { useNavigate } from 'react-router-dom'
 import { search, type SearchResult } from '@/services'
 import { NAV_ITEMS } from './nav'
+import { useReturnFocus } from '@/ui/returnFocus'
 
 const group = '[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-caption [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-fg-3'
 const item =
@@ -22,6 +23,7 @@ function Row({ icon: Icon, title, hint, onSelect, value }: { icon: LucideIcon; t
 
 /** Busca global (Ctrl K): clientes, locações, equipamentos e atalhos para as telas. */
 export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const rf = useReturnFocus()
   const navigate = useNavigate()
   const [q, setQ] = React.useState('')
   const [res, setRes] = React.useState<SearchResult | null>(null)
@@ -55,6 +57,8 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
       <RD.Portal>
         <RD.Overlay className="fixed inset-0 z-[70] bg-scrim data-[state=open]:animate-[ds-fade-in_200ms_var(--ease-ui)]" />
         <RD.Content
+          onOpenAutoFocus={rf.capture}
+          onCloseAutoFocus={rf.restore}
           aria-describedby={undefined}
           className="ds-root fixed top-[12vh] left-1/2 z-[71] w-[min(640px,calc(100vw-24px))] -translate-x-1/2 overflow-hidden rounded-card bg-overlay text-fg shadow-overlay outline-none data-[state=open]:animate-[ds-menu-in_200ms_var(--ease-ui)]"
         >

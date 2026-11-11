@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowUpRight, Boxes, ChevronDown, ClipboardList, Wrench } from 'lucide-react'
 import { Badge, Banner, Button, Card, EmptyState, Menu, Money, QrTile, Skeleton, Tooltip, notify, type MenuEntry } from '@/ui'
 import { PageHeader } from '@/app/PageHeader'
-import { DAMAGE_STATUS, UNIT_STATUS } from '@/app/status'
+import { DAMAGE_STATUS, useUnitStatus } from '@/app/status'
 import { addDays, diffDays, today } from '@/domain/dates'
 import { formatDate, formatDateTime, formatNumber } from '@/lib/format'
 import { getUnit, listRentals, listServices, setUnitStatus, useMutation, useQuery, useSegment, type UnitStatus } from '@/services'
@@ -15,9 +15,11 @@ import { IDLE_LIMIT } from './components/UnitCard'
 import { unitUrl, useLabelPrinter } from './components/useLabelPrinter'
 
 const SETTABLE: UnitStatus[] = ['disponivel', 'limpeza', 'manutencao']
-const MENU_LABEL: Record<UnitStatus, string> = { disponivel: 'Disponível', em_campo: 'Em campo', limpeza: 'Em limpeza', manutencao: 'Manutenção' }
+const BASE_MENU_LABEL: Record<UnitStatus, string> = { disponivel: 'Disponível', em_campo: 'Em campo', limpeza: 'Em limpeza', manutencao: 'Manutenção' }
 
 export default function Ficha() {
+  const UNIT_STATUS = useUnitStatus()
+  const MENU_LABEL: Record<UnitStatus, string> = { ...BASE_MENU_LABEL, limpeza: UNIT_STATUS.limpeza.label }
   const { code = '' } = useParams()
   const navigate = useNavigate()
   const seg = useSegment()

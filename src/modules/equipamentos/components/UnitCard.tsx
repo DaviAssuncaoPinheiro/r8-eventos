@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { cn, StatusDot } from '@/ui'
-import { UNIT_STATUS } from '@/app/status'
+import { useUnitStatus } from '@/app/status'
 import type { UnitView } from '@/services'
 import { TypeThumb } from './TypeThumb'
 
@@ -8,6 +8,7 @@ export const IDLE_LIMIT = 30
 
 /** Cartão compacto da unidade: código, miniatura, situação e uma única informação conforme a situação. */
 export function UnitCard({ unit }: { unit: UnitView }) {
+  const UNIT_STATUS = useUnitStatus()
   const st = UNIT_STATUS[unit.status]
   const idleLong = unit.status === 'disponivel' && (unit.idleDays ?? 0) > IDLE_LIMIT
   return (

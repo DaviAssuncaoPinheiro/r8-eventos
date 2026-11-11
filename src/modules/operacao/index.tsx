@@ -189,14 +189,14 @@ export default function Operacao() {
     <>
       {header}
 
-      {sug && sugFrom && sugTo ? (
+      {settings.aiEnabled && sug && sugFrom && sugTo ? (
         <Banner
           tone="warn"
           title={`${sugFrom.name} atrasada.`}
           className="mb-3"
           action={
             <div className="flex items-center gap-2">
-              {settings.aiEnabled ? <AiTag /> : null}
+              <AiTag />
               <Button
                 size="sm"
                 variant="primary"

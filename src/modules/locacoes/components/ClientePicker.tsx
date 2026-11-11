@@ -63,17 +63,17 @@ export function ClientePicker({ clients, value, onChange, invalid, inputId }: { 
       <ul id={`${inputId}-list`} role="listbox" aria-label="Clientes" className="mt-2 flex flex-col gap-0.5 rounded-control bg-sunken p-1">
         {results.length === 0 ? <li className="px-3 py-3 text-body text-fg-3">Nenhum cliente com esse nome</li> : null}
         {results.map((c, i) => (
-          <li key={c.id} id={`${inputId}-o${i}`} role="option" aria-selected={i === active}>
-            <button
-              type="button"
-              tabIndex={-1}
-              onClick={() => pick(c)}
-              onMouseEnter={() => setActive(i)}
-              className={cn('ds-touch flex w-full items-center justify-between gap-3 rounded-tip px-3 py-2 text-left transition-colors duration-150', i === active ? 'bg-raised' : 'hover:bg-raised')}
-            >
-              <span className="min-w-0 truncate text-body font-semibold">{c.name}</span>
-              <span className="shrink-0 text-caption text-fg-3">{c.kind}</span>
-            </button>
+          <li
+            key={c.id}
+            id={`${inputId}-o${i}`}
+            role="option"
+            aria-selected={i === active}
+            onClick={() => pick(c)}
+            onMouseEnter={() => setActive(i)}
+            className={cn('ds-touch flex w-full cursor-pointer items-center justify-between gap-3 rounded-tip px-3 py-2 text-left transition-colors duration-150', i === active ? 'bg-raised' : 'hover:bg-raised')}
+          >
+            <span className="min-w-0 truncate text-body font-semibold">{c.name}</span>
+            <span className="shrink-0 text-caption text-fg-3">{c.kind}</span>
           </li>
         ))}
       </ul>

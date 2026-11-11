@@ -210,7 +210,7 @@ export default function Marca() {
             {BRAND_PRESETS.map((p) => {
               const on = current === p.hex
               return (
-                <li key={p.id}>
+                <li role="none" key={p.id}>
                   <button
                     type="button"
                     role="radio"

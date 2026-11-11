@@ -14,14 +14,6 @@ const typeIcon: Record<ServiceType, LucideIcon> = {
   montagem: Hammer,
 }
 
-const typeName: Record<ServiceType, string> = {
-  limpeza: 'Limpeza',
-  entrega: 'Entrega',
-  retirada: 'Retirada',
-  manutencao: 'Manutenção',
-  montagem: 'Montagem',
-}
-
 const statusInfo: Record<ServiceStatus, { tone: StatusTone; label: string }> = {
   agendado: { tone: 'info', label: 'Agendado' },
   'a-caminho': { tone: 'info', label: 'A caminho' },
@@ -77,7 +69,6 @@ export const ServiceRow = React.forwardRef<HTMLLIElement, ServiceRowProps>(funct
       </span>
       <div className="min-w-0 flex-1">
         <div className={cn('truncate font-semibold', field ? 'text-body-lg' : 'text-body')}>
-          <span className="sr-only">{typeName[type]}: </span>
           {title}
         </div>
         <div className={cn('truncate text-fg-3', field ? 'text-body' : 'text-caption')}>
