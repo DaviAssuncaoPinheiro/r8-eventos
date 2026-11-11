@@ -15,8 +15,8 @@ import {
   Tooltip,
   cn,
   notify,
-  useCountUp,
 } from "@/ui";
+import { Reveal, RollingMoney, Stagger } from "@/ui/Motion";
 import { PageHeader } from "@/app/PageHeader";
 import { CHARGE_KIND, CHARGE_STATUS } from "@/app/status";
 import { addDays, today } from "@/domain/dates";
@@ -118,10 +118,9 @@ const bandRange = (
 
 /** Número em vermelho que sobe de zero, como o MoneyCard. */
 function DangerNumber({ value }: { value: number }) {
-  const shown = useCountUp(value);
   return (
     <span className="text-danger-ink">
-      <Money value={shown} variant="kpi" toneNegative={false} />
+      <RollingMoney value={value} kpi />
     </span>
   );
 }
@@ -206,10 +205,10 @@ export default function Financeiro() {
     setBusy(c.id);
     try {
       if (c.status === "rascunho") {
-        await sendCharge(c.id, { via: "whatsapp", method: c.method });
+        await sendCharge(c.id, { via: "email", method: c.method });
         notify.success("Cobrança enviada");
       } else {
-        await sendReminder(c.id, "whatsapp");
+        await sendReminder(c.id, "email");
         notify.success(
           c.status === "atrasada"
             ? `Cobrança enviada a ${c.clientName}`
@@ -327,9 +326,9 @@ export default function Financeiro() {
       {loadError ? null : (
       <>
       {/* 1. os três números */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
-        {rec.initialLoading ? (
-          [0, 1, 2].map((i) => (
+      {rec.initialLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
               role="status"
@@ -343,9 +342,10 @@ export default function Financeiro() {
               <Skeleton className="h-4 w-1/3" />
               <Skeleton className="h-10 w-2/3" />
             </div>
-          ))
-        ) : rec.data ? (
-          <>
+          ))}
+        </div>
+      ) : rec.data ? (
+        <Stagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-12">
             <MoneyCard
               hero
               title="A receber"
@@ -369,12 +369,11 @@ export default function Financeiro() {
               openLabel="Ver cobranças atrasadas"
               className="sm:col-span-2 @min-[1180px]/frame:col-span-4"
             />
-          </>
-        ) : null}
-      </div>
+        </Stagger>
+      ) : null}
 
       {/* 2. idade, recebido por mês, Conta Azul */}
-      <div className="mt-4 grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
+      <Stagger className="mt-4 grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12" delay={0.15}>
         <section
           aria-label="A receber por idade"
           className="min-w-0 rounded-card bg-raised p-5 sm:p-6 @min-[1180px]/frame:col-span-4"
@@ -518,13 +517,14 @@ export default function Financeiro() {
         <div className="min-w-0 sm:col-span-1 @min-[1180px]/frame:col-span-3 [&>section]:h-full">
           <ContaAzul paidThisMonth={rec.data?.receivedThisMonth.count ?? 0} />
         </div>
-      </div>
+      </Stagger>
 
       {/* 3. cobranças */}
+      <Reveal delay={0.3} className="mt-4">
       <section
         ref={listRef}
         aria-label="Cobranças"
-        className="mt-4 min-w-0 rounded-card bg-raised p-5 sm:p-6"
+        className="min-w-0 rounded-card bg-raised p-5 sm:p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
           <h2 className="text-title-sub">Cobranças</h2>
@@ -723,6 +723,7 @@ export default function Financeiro() {
           </>
         )}
       </section>
+      </Reveal>
 
       {/* 4. régua */}
       <div className="mt-4">

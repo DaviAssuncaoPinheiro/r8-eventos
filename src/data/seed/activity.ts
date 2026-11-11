@@ -499,7 +499,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     const sumValues = (l: { value: number }[]) => round2(l.reduce((a, x) => a + x.value, 0))
     const idlePrev = sumValues(idleReRentedItems({ rentals, units, clients }, prevKey, today))
     const extrasPrev = round2(recExtras.filter((g) => g.month === 'prev').reduce((a, g) => a + g.services.reduce((b, x) => b + (x.extraValue ?? 0), 0), 0))
-    const rest = Math.max(2400, round2(TARGET_PREV - idlePrev - extrasPrev))
+    const rest = Math.max(1800, round2(TARGET_PREV - idlePrev - extrasPrev))
     // atrasados que pagaram depois de um lembrete: escolhe, entre as cobranças pagas com atraso, as que chegam mais perto de 30% do restante
     const lateCands = (key: string) =>
       charges
@@ -526,7 +526,7 @@ export function buildActivity(env: ActivityEnv): Activity {
     const overduePrev = sumValues(best)
     for (const c of lateCands(curKey).slice(0, 1)) remind(c, 1)
     // avarias cobradas (e pagas) no mês anterior: três, com o valor que falta para fechar o total
-    const dmgTotal = Math.max(900, round2(rest - overduePrev))
+    const dmgTotal = Math.max(600, round2(rest - overduePrev))
     const v1 = oddMoney(dmgTotal * 0.46, rng2)
     const v2 = oddMoney(dmgTotal * 0.31, rng2)
     const values = [v1, v2, round2(dmgTotal - v1 - v2)]

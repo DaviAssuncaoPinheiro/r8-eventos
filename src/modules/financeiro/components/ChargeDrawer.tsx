@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { Banknote, Check, CheckCircle2, Copy, FilePlus2, Mail, MessageCircle, QrCode, Receipt, Send, Truck } from 'lucide-react'
-import { Badge, Button, Drawer, Money, Segmented, Skeleton, Timeline, WhatsAppPreview, notify, type TimelineEvent } from '@/ui'
+import { AnimatePresence, motion } from 'motion/react'
+import { Banknote, Bell, Check, CheckCircle2, Copy, FilePlus2, Link2, Mail, QrCode, Receipt, Send, Truck } from 'lucide-react'
+import { Badge, Button, Drawer, EmailPreview, Money, Segmented, Skeleton, Timeline, notify, type TimelineEvent } from '@/ui'
+import { celebrate, reduced } from '@/ui/Motion'
 import { CHARGE_KIND, CHARGE_STATUS } from '@/app/status'
-import { formatDate, formatDateTime } from '@/lib/format'
-import { buildWhatsAppMessage, getCharge, markPaid, sendCharge, sendReminder, useMutation, useQuery, useSettings } from '@/services'
+import { formatDate, formatDateTime, formatMoney } from '@/lib/format'
+import { buildChargeMessage, getCharge, markPaid, sendCharge, sendReminder, useMutation, useQuery, useSettings } from '@/services'
 import type { PayMethod } from '@/services'
 import { copyText, dueLabel, errMessage } from '../lib'
 
@@ -34,6 +36,26 @@ function CopyLine({ label, value }: { label: string; value: string }) {
   )
 }
 
+/** Etiqueta da situação: ao trocar (rascunho, enviada, paga) a anterior sai e a nova entra com escala. */
+function AnimatedStatus({ status }: { status: keyof typeof CHARGE_STATUS }) {
+  const st = CHARGE_STATUS[status]
+  if (reduced()) return <Badge tone={st.tone}>{st.label}</Badge>
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span
+        key={status}
+        className="inline-flex"
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.7, opacity: 0, transition: { duration: 0.1 } }}
+        transition={{ type: 'spring', stiffness: 500, damping: 24 }}
+      >
+        <Badge tone={st.tone}>{st.label}</Badge>
+      </motion.span>
+    </AnimatePresence>
+  )
+}
+
 /**
  * Gaveta da cobrança, usada no Financeiro e em Avarias.
  * Passe o id para abrir e `null` para fechar; `onClose` é chamado ao fechar.
@@ -45,7 +67,7 @@ export function ChargeDrawer({ chargeId, onClose }: { chargeId: string | null; o
   const company = useSettings().company.name
 
   const q = useQuery(() => (id ? getCharge(id) : Promise.resolve(undefined)), [id])
-  const msg = useQuery(() => (id ? buildWhatsAppMessage(id) : Promise.resolve('')), [id])
+  const msg = useQuery(() => (id ? buildChargeMessage(id) : Promise.resolve(undefined)), [id])
   const detail = q.data && q.data.charge.id === id ? q.data : undefined
 
   const [method, setMethod] = React.useState<PayMethod>('pix')
@@ -62,29 +84,26 @@ export function ChargeDrawer({ chargeId, onClose }: { chargeId: string | null; o
   const c = detail?.charge
   const pix = detail?.pix
 
-  /* a mensagem muda de forma de pagamento sem esperar o envio */
-  const message = React.useMemo(() => {
-    const base = msg.data ?? ''
-    if (!pix) return base
-    const i = base.lastIndexOf('\n\n')
-    if (i < 0) return base
-    const tail = method === 'pix' ? `Pix copia e cola:\n${pix.copiaECola}` : `Linha digitável do boleto:\n${pix.boletoLine}`
-    return `${base.slice(0, i)}\n\n${tail}`
-  }, [msg.data, pix, method])
+  /* o e-mail muda de forma de pagamento sem esperar o envio */
+  const email = React.useMemo(() => {
+    const m = msg.data
+    if (!m) return undefined
+    return { ...m, body: m.body.replace(/Pague por (Pix|boleto)/, method === 'pix' ? 'Pague por Pix' : 'Pague por boleto') }
+  }, [msg.data, method])
 
   const events: TimelineEvent[] = []
   if (c) {
     events.push({ id: 'criada', icon: FilePlus2, title: 'Cobrança criada', meta: formatDate(c.issuedAt) })
-    if (c.sentAt) events.push({ id: 'envio', icon: c.sentVia === 'email' ? Mail : MessageCircle, tone: 'info', title: c.sentVia === 'email' ? 'Enviada por e-mail' : 'Enviada por WhatsApp', meta: formatDateTime(c.sentAt) })
-    c.reminders.forEach((r, i) => events.push({ id: `lem${i}`, icon: r.channel === 'email' ? Mail : MessageCircle, tone: 'warn', title: r.channel === 'email' ? 'Lembrete por e-mail' : 'Lembrete por WhatsApp', meta: formatDateTime(r.at) }))
+    if (c.sentAt) events.push({ id: 'envio', icon: c.sentVia === 'portal' ? Bell : Mail, tone: 'info', title: c.sentVia === 'portal' ? 'Aviso no portal do cliente' : 'Enviada por e-mail', meta: formatDateTime(c.sentAt) })
+    c.reminders.forEach((r, i) => events.push({ id: `lem${i}`, icon: r.channel === 'portal' ? Bell : Mail, tone: 'warn', title: r.channel === 'portal' ? 'Lembrete no portal' : 'Lembrete por e-mail', meta: formatDateTime(r.at) }))
     if (c.paidAt) events.push({ id: 'paga', icon: CheckCircle2, tone: 'ok', title: 'Pagamento recebido', meta: formatDate(c.paidAt) })
   }
 
   const doSend = async () => {
     if (!c) return
     try {
-      await send.run(c.id, { via: 'whatsapp', method })
-      notify.success('Cobrança enviada por WhatsApp')
+      await send.run(c.id, { via: 'email', method })
+      notify.success('Cobrança enviada por e-mail')
     } catch (e) {
       notify.error(errMessage(e, 'Não foi possível enviar. Tente de novo.'))
     }
@@ -92,16 +111,25 @@ export function ChargeDrawer({ chargeId, onClose }: { chargeId: string | null; o
   const doRemind = async () => {
     if (!c) return
     try {
-      await remind.run(c.id, 'whatsapp')
+      await remind.run(c.id, 'email')
       notify.success('Lembrete enviado')
     } catch (e) {
       notify.error(errMessage(e, 'Não foi possível enviar o lembrete. Tente de novo.'))
     }
   }
-  const doPay = async () => {
+  const doCopyLink = async () => {
+    const link = msg.data?.payLink
+    if (!link) return
+    const ok = await copyText(link)
+    if (ok) notify.success('Link de pagamento copiado')
+    else notify.error('Não foi possível copiar. Tente de novo.')
+  }
+  const doPay = async (origin: HTMLElement) => {
     if (!c) return
+    const r = origin.getBoundingClientRect()
     try {
       await pay.run(c.id)
+      celebrate({ x: r.left + r.width / 2, y: r.top + r.height / 2 })
       notify.success('Cobrança marcada como paga')
     } catch (e) {
       notify.error(errMessage(e, 'Não foi possível dar baixa. Tente de novo.'))
@@ -109,15 +137,20 @@ export function ChargeDrawer({ chargeId, onClose }: { chargeId: string | null; o
   }
 
   const footer = !c ? null : c.status === 'rascunho' ? (
-    <Button variant="primary" size="lg" icon={Send} loading={send.loading} onClick={doSend} className="max-sm:w-full">
-      Enviar por WhatsApp
-    </Button>
+    <>
+      <Button variant="secondary" size="lg" icon={Link2} onClick={doCopyLink} disabled={!msg.data}>
+        Copiar link de pagamento
+      </Button>
+      <Button variant="primary" size="lg" icon={Send} loading={send.loading} onClick={doSend}>
+        Enviar cobrança
+      </Button>
+    </>
   ) : c.status === 'aberta' || c.status === 'atrasada' ? (
     <>
       <Button variant="secondary" size="lg" icon={Send} loading={remind.loading} onClick={doRemind}>
         Enviar lembrete
       </Button>
-      <Button variant="primary" size="lg" icon={Check} loading={pay.loading} onClick={doPay}>
+      <Button variant="primary" size="lg" icon={Check} loading={pay.loading} onClick={(e) => void doPay(e.currentTarget)}>
         Marcar como paga
       </Button>
     </>
@@ -150,7 +183,7 @@ export function ChargeDrawer({ chargeId, onClose }: { chargeId: string | null; o
               <p className="text-kpi">
                 <Money value={c.value} variant="kpi" />
               </p>
-              <Badge tone={CHARGE_STATUS[c.status].tone}>{CHARGE_STATUS[c.status].label}</Badge>
+              <AnimatedStatus status={c.status} />
             </div>
             <p className="mt-2 text-body-lg font-semibold">
               <Link to={`/clientes/${c.clientId}`} className="rounded-tip hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
@@ -192,21 +225,50 @@ export function ChargeDrawer({ chargeId, onClose }: { chargeId: string | null; o
           ) : null}
 
           {c.status === 'paga' ? (
-            <section aria-label="Comprovante" className="flex items-center gap-3 rounded-card bg-ok-soft p-4 text-ok-ink">
+            <motion.section
+              aria-label="Comprovante"
+              className="relative flex items-center gap-3 overflow-hidden rounded-card bg-ok-soft p-4 text-ok-ink"
+              initial={reduced() ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
               <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-pill bg-raised">
                 <Receipt size={20} strokeWidth={2} />
               </span>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-body-lg font-semibold">Pagamento recebido</p>
                 <p className="text-body">{c.paidAt ? `${formatDate(c.paidAt)} por ${c.method === 'pix' ? 'Pix' : 'boleto'}` : ''}</p>
               </div>
-            </section>
+              <motion.span
+                aria-hidden
+                className="shrink-0 -rotate-12 rounded-control border-2 border-current px-3 py-1 text-title-card font-extrabold uppercase tracking-wider"
+                initial={reduced() ? false : { scale: 2.4, opacity: 0, rotate: -28 }}
+                animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 18, delay: 0.15 }}
+              >
+                Paga
+              </motion.span>
+            </motion.section>
           ) : c.status === 'cancelada' ? null : (
             <>
-              {/* mensagem que o cliente recebe */}
-              <section aria-label="Mensagem de WhatsApp" className="flex flex-col gap-3">
-                <h3 className="text-title-card">Mensagem</h3>
-                <WhatsAppPreview from={company} message={message} />
+              {/* e-mail que o cliente recebe */}
+              <section aria-label="E-mail da cobrança" className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-title-card">E-mail</h3>
+                    <Badge tone="info">No portal do cliente</Badge>
+                  </div>
+                  {c.status !== 'rascunho' ? (
+                    <Button variant="ghost" size="sm" icon={Link2} onClick={doCopyLink} disabled={!msg.data}>
+                      Copiar link de pagamento
+                    </Button>
+                  ) : null}
+                </div>
+                {email ? (
+                  <EmailPreview from={company} to={detail?.client.contacts[0]?.email ?? detail?.client.name ?? ''} subject={email.subject} body={email.body} cta={`Pagar ${formatMoney(c.value)} com ${method === 'pix' ? 'Pix' : 'boleto'}`} />
+                ) : (
+                  <Skeleton shape="block" className="h-56" />
+                )}
               </section>
 
               {/* forma de pagamento */}

@@ -1,6 +1,7 @@
 import { AlertTriangle, Minus, Plus } from 'lucide-react'
 import { Button, Money, cn } from '@/ui'
 import type { AvailabilityResult, EquipmentType } from '@/services'
+import { TypeArtTile } from '@/modules/equipamentos/components/TypeArt'
 
 /** Cartão de tipo de equipamento do passo "Itens": foto, preço, quantidade e aviso de disponibilidade. */
 export function CartaoTipo({ type, rate, per, qty, avail, checking, onQty }: { type: EquipmentType; rate: number; per: string; qty: number; avail?: AvailabilityResult; checking: boolean; onQty: (n: number) => void }) {
@@ -9,9 +10,7 @@ export function CartaoTipo({ type, rate, per, qty, avail, checking, onQty }: { t
   return (
     <li className={cn('flex flex-col gap-3 rounded-card p-4 transition-[background-color,box-shadow] duration-150 ease-[var(--ease-ui)]', short ? 'bg-danger-soft ring-2 ring-danger ring-inset' : qty > 0 ? 'bg-accent-soft' : 'bg-sunken')}>
       <div className="flex items-center gap-3">
-        <span className="size-16 shrink-0 overflow-hidden rounded-control bg-raised">
-          <img src={type.photo} alt="" loading="lazy" draggable={false} className="size-full object-cover" />
-        </span>
+        <TypeArtTile typeId={type.id} prefix={type.prefix} className="size-16 rounded-control" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-body font-semibold">{type.name}</p>
           <p className="text-body text-fg-2">

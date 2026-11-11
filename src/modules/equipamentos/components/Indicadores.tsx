@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { ArrowUpRight } from 'lucide-react'
-import { ArcGauge, MoneyCard, RollingNumber, Skeleton, Stagger } from '@/ui'
+import { ArcGauge, MoneyCard, RollingNumber, Skeleton } from '@/ui'
+import { Cascata } from './Cascata'
 import type { StockRow } from '@/services'
 
 /** Três indicadores que abrem o estoque: o que rende agora, o que está parado e a ocupação. Cada um leva ao filtro. */
@@ -32,7 +33,7 @@ export function Indicadores({ rows, loading, onRendendo, onParado, onOcupacao }:
     )
   }
   return (
-    <Stagger className="mb-4 grid gap-4 md:grid-cols-3">
+    <Cascata className="mb-4 grid gap-4 md:grid-cols-3">
       <MoneyCard hero title="Rendendo agora" value={t.earning} onOpen={onRendendo} openLabel="Ver equipamentos em campo" formula="Valor mensal de tabela dos equipamentos que estão em campo hoje." className="min-h-[188px]" />
       <MoneyCard
         title="Parado"
@@ -73,6 +74,6 @@ export function Indicadores({ rows, loading, onRendendo, onParado, onOcupacao }:
           </span>
         </div>
       </section>
-    </Stagger>
+    </Cascata>
   )
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Flag, Mail, MessageCircle, Plus, Save, Trash2 } from 'lucide-react'
-import { Banner, Button, Field, Input, Segmented, Select, Skeleton, Switch, Textarea, WhatsAppPreview, cn, notify } from '@/ui'
+import { Bell, Flag, Mail, Plus, Save, Trash2 } from 'lucide-react'
+import { Banner, Button, EmailPreview, Field, Input, Segmented, Select, Skeleton, Switch, Textarea, cn, notify } from '@/ui'
 import { formatDate, formatMoney } from '@/lib/format'
 import { getDunning, saveDunning, useMutation, useQuery, useSettings } from '@/services'
 import type { ChargeView, DunningStep } from '@/services'
@@ -23,7 +23,7 @@ function fill(template: string, sample?: ChargeView) {
     codigo: sample?.code ?? 'COB-5021',
     valor: formatMoney(sample?.value ?? 1260),
     vencimento: sample ? formatDate(sample.dueAt) : '15/11/2026',
-    link: 'pagar.r8.app/5021',
+    link: `${typeof window === 'undefined' ? '' : window.location.origin}/portal/cliente?fatura=${sample?.id ?? 'COB-5021'}`,
   }
   return template.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m)
 }
@@ -53,7 +53,7 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
   const add = () => {
     const id = `novo-${++seq.current}`
     const next = draft.length ? Math.max(...draft.map((s) => s.dayOffset)) + 5 : 1
-    setDraft((d) => [...d, { id, dayOffset: next, channel: 'whatsapp', enabled: true, template: 'Olá, {cliente}. Não encontramos o pagamento da cobrança {codigo} ({valor}). Pix: {link}' }])
+    setDraft((d) => [...d, { id, dayOffset: next, channel: 'email', enabled: true, template: 'Olá, {cliente}. Não encontramos o pagamento da cobrança {codigo} ({valor}). Pague pelo link: {link}' }])
     setSelected(id)
     setDirty(true)
   }
@@ -148,7 +148,7 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
                         type="button"
                         onClick={() => setSelected(m.step.id === selected ? null : m.step.id)}
                         aria-pressed={m.step.id === selected}
-                        aria-label={`Editar passo: ${offsetLabel(m.step.dayOffset)}, ${m.step.channel === 'email' ? 'e-mail' : 'WhatsApp'}`}
+                        aria-label={`Editar passo: ${offsetLabel(m.step.dayOffset)}, ${m.step.channel === 'portal' ? 'aviso no portal' : 'e-mail'}`}
                         className={cn(
                           'ds-touch ds-touch-sq relative grid size-12 place-items-center rounded-pill transition-[background-color,color,box-shadow] duration-150 ease-[var(--ease-ui)]',
                           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
@@ -156,7 +156,7 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
                           m.step.id === selected && 'shadow-[0_0_0_2px_var(--raised),0_0_0_4px_var(--accent)]',
                         )}
                       >
-                        {m.step.channel === 'email' ? <Mail size={20} strokeWidth={2} aria-hidden /> : <MessageCircle size={20} strokeWidth={2} aria-hidden />}
+                        {m.step.channel === 'portal' ? <Bell size={20} strokeWidth={2} aria-hidden /> : <Mail size={20} strokeWidth={2} aria-hidden />}
                       </button>
                       <Switch
                         checked={m.step.enabled}
@@ -181,8 +181,8 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
                     value={sel.channel}
                     onChange={(v) => patch(sel.id, { channel: v })}
                     options={[
-                      { value: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
                       { value: 'email', label: 'E-mail', icon: Mail },
+                      { value: 'portal', label: 'Aviso no portal', icon: Bell },
                     ]}
                   />
                 </div>
@@ -226,16 +226,22 @@ export function Dunning({ sample }: { sample?: ChargeView }) {
                 </div>
               </div>
               <div className="min-w-0">
-                {sel.channel === 'whatsapp' ? (
-                  <WhatsAppPreview from={company} message={fill(sel.template, sample)} />
-                ) : (
+                {sel.channel === 'portal' ? (
                   <div className="rounded-card bg-sunken p-5">
                     <p className="flex items-center gap-2 text-caption font-semibold text-fg-3">
-                      <Mail size={14} strokeWidth={2} aria-hidden />
-                      E-mail de {company}
+                      <Bell size={14} strokeWidth={2} aria-hidden />
+                      Aviso no portal do cliente
                     </p>
-                    <p className="mt-3 text-body break-words whitespace-pre-wrap">{fill(sel.template, sample)}</p>
+                    <p className="mt-3 rounded-control bg-raised p-4 text-body break-words whitespace-pre-wrap">{fill(sel.template, sample)}</p>
                   </div>
+                ) : (
+                  <EmailPreview
+                    from={company}
+                    to={sample?.clientName ?? 'cliente@exemplo.com.br'}
+                    subject={`Cobrança ${sample?.code ?? 'COB-5021'}: ${formatMoney(sample?.value ?? 1260)}`}
+                    body={fill(sel.template, sample)}
+                    cta={`Pagar ${formatMoney(sample?.value ?? 1260)} com Pix`}
+                  />
                 )}
               </div>
             </div>

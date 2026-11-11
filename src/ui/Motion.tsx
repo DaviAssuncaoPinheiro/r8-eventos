@@ -14,7 +14,7 @@ const EASE = [0.16, 1, 0.3, 1] as const
 
 /* ───────── Cascata: os filhos diretos entram um depois do outro ───────── */
 
-export interface StaggerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StaggerProps extends React.HTMLAttributes<HTMLElement> {
   /** Intervalo entre os filhos, em segundos. */
   gap?: number
   /** Atraso antes do primeiro, em segundos. */
@@ -23,56 +23,21 @@ export interface StaggerProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Envolve uma grade ou lista: cada filho direto sobe 14 px e aparece, em sequência.
- * Use uma vez por bloco principal da tela (linha de indicadores, grade de cartões), não em tudo.
+ * Envolve uma grade ou lista: cada filho direto sobe 14 px e aparece, em sequência, uma vez.
+ * É CSS puro sobre os próprios filhos (classe `ds-stagger` em tokens.css): não cria elemento extra,
+ * então não mexe na grade. Use uma vez por bloco principal da tela, não em tudo.
  */
-export function Stagger({ gap = 0.055, delay = 0, as = 'div', className, children, ...rest }: StaggerProps) {
-  const Tag = motion[as] as typeof motion.div
-  if (reduced()) {
-    const Plain = as as 'div'
-    return (
-      <Plain className={className} {...(rest as React.HTMLAttributes<HTMLDivElement>)}>
-        {children}
-      </Plain>
-    )
-  }
-  return (
-    <Tag
-      className={className}
-      initial="hidden"
-      animate="show"
-      variants={{ hidden: {}, show: { transition: { staggerChildren: gap, delayChildren: delay } } }}
-      {...(rest as object)}
-    >
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child) ? (
-          <motion.div
-            className="contents-none min-w-0"
-            style={{ display: 'contents' }}
-            variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.42, ease: EASE } } }}
-          >
-            {child}
-          </motion.div>
-        ) : (
-          child
-        ),
-      )}
-    </Tag>
-  )
+export function Stagger({ gap = 0.055, delay = 0, as: Tag = 'div', className, style, children, ...rest }: StaggerProps) {
+  const vars = { '--stagger-gap': `${Math.round(gap * 1000)}ms`, '--stagger-delay': `${Math.round(delay * 1000)}ms`, ...style } as React.CSSProperties
+  return React.createElement(Tag, { className: cn('ds-stagger', className), style: vars, ...rest }, children)
 }
 
 /** Um bloco só: sobe e aparece ao montar. `delay` em segundos. */
-export function Reveal({ delay = 0, className, children, ...rest }: { delay?: number } & React.HTMLAttributes<HTMLDivElement>) {
-  if (reduced())
-    return (
-      <div className={className} {...rest}>
-        {children}
-      </div>
-    )
+export function Reveal({ delay = 0, className, style, children, ...rest }: { delay?: number } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <motion.div className={className} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: EASE, delay }} {...(rest as object)}>
+    <div className={cn('ds-reveal', className)} style={{ animationDelay: `${Math.round(delay * 1000)}ms`, ...style }} {...rest}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 

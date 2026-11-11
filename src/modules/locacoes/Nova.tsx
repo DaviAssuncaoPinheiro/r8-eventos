@@ -9,6 +9,7 @@ import { checkAvailability, createRental, listClients, listTypes, quoteRental, u
 import { formatDate, formatPhone } from '@/lib/format'
 import { ClientePicker } from './components/ClientePicker'
 import { CartaoTipo } from './components/CartaoTipo'
+import { TypeArtTile } from '@/modules/equipamentos/components/TypeArt'
 import { capital, cleanTitle, periodTag } from './util'
 
 interface Form {
@@ -30,6 +31,8 @@ const STEPS = [
   { id: 'resumo', label: 'Resumo' },
 ]
 
+const isDay = (v: string | null): v is string => !!v && /^\d{4}-\d{2}-\d{2}$/.test(v)
+
 const BAIRROS_ORD = [...BAIRROS].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
 
 export default function Nova() {
@@ -38,8 +41,16 @@ export default function Nova() {
   const labels = useLabels()
   const t0 = today()
   const [step, setStep] = React.useState(0)
-  const [form, setForm] = React.useState<Form>({ clientId: params.get('cliente') ?? '', kind: 'obra', title: '', address: '', bairroId: '', start: t0, end: addDays(t0, 6), contactName: '', contactRole: '', contactPhone: '' })
-  const [qtys, setQtys] = React.useState<Record<string, number>>({})
+  // vindo da linha do tempo: ?tipo=<typeId>&inicio=AAAA-MM-DD&fim=AAAA-MM-DD já preenche período e item
+  const pTipo = params.get('tipo')
+  const pStart = isDay(params.get('inicio')) ? (params.get('inicio') as string) : null
+  const pEnd = isDay(params.get('fim')) ? (params.get('fim') as string) : null
+  const [form, setForm] = React.useState<Form>(() => {
+    const start = pStart && pStart > t0 ? pStart : t0
+    const end = pEnd && pEnd >= start ? pEnd : pStart && pEnd ? start : addDays(start, 6)
+    return { clientId: params.get('cliente') ?? '', kind: 'obra', title: '', address: '', bairroId: '', start, end, contactName: '', contactRole: '', contactPhone: '' }
+  })
+  const [qtys, setQtys] = React.useState<Record<string, number>>(() => (pTipo ? { [pTipo]: 1 } : {}))
   const [cleanings, setCleanings] = React.useState<string>('1')
   const [errors, setErrors] = React.useState<Record<string, string>>({})
   const set = <K extends keyof Form>(k: K, v: Form[K]) => {
@@ -50,6 +61,10 @@ export default function Nova() {
   const clients = useQuery(() => listClients(), [])
   const types = useQuery(() => listTypes(), [])
   const client = clients.data?.find((c) => c.id === form.clientId)
+  // tipo desconhecido na URL (outro pacote de segmento): descarta
+  React.useEffect(() => {
+    if (types.data && pTipo && !types.data.some((t) => t.id === pTipo)) setQtys((q) => (q[pTipo] ? {} : q))
+  }, [types.data, pTipo])
 
   // cliente escolhido preenche o contato, se ainda estiver vazio
   const prefilled = React.useRef('')
@@ -264,7 +279,7 @@ export default function Nova() {
                   const rate = quote.data?.items.find((i) => i.typeId === id)?.rate
                   return (
                     <li key={id} className="flex items-center gap-3 rounded-control bg-sunken p-2 pr-4">
-                      <span className="size-12 shrink-0 overflow-hidden rounded-control bg-raised">{t ? <img src={t.photo} alt="" className="size-full object-cover" /> : null}</span>
+                      <TypeArtTile typeId={t?.id} prefix={t?.prefix} className="size-12 rounded-control" />
                       <span className="min-w-0 flex-1 truncate text-body font-semibold">
                         <span className="tnum">{n}</span> × {t?.name}
                       </span>

@@ -61,7 +61,7 @@ export interface SideNavItemProps {
 }
 
 const itemBase =
-  'ds-touch relative flex h-11 w-full shrink-0 cursor-pointer items-center rounded-control text-left text-[15px] leading-5 font-medium text-fg-2 no-underline select-none ' +
+  'ds-touch relative flex h-10 w-full shrink-0 cursor-pointer items-center rounded-control text-left text-[15px] leading-5 font-medium text-fg-2 no-underline select-none ' +
   'transition-[background-color,color,padding] duration-150 ease-[var(--ease-ui)] ' +
   'hover:bg-hover hover:text-fg data-[force=hover]:bg-hover data-[force=hover]:text-fg ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ' +
@@ -167,7 +167,7 @@ export function SideNavGroup({ label, children, className }: { label?: string; c
         collapsed ? (
           <div aria-hidden className="mx-3 mt-3 mb-2 h-px bg-hairline" />
         ) : (
-          <div id={id} className="px-3 pt-4 pb-1.5 text-caption font-medium tracking-[0.08em] text-fg-3 uppercase">
+          <div id={id} className="px-3 pt-3 pb-1 text-caption font-medium tracking-[0.08em] text-fg-3 uppercase">
             {label}
           </div>
         )

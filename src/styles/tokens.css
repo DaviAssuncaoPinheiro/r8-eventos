@@ -531,6 +531,30 @@
   .ds-mapreal .maplibregl-ctrl-attrib-button {
     border-radius: 999px;
   }
+  /* cascata de entrada: os filhos diretos sobem e aparecem em sequência, uma vez.
+     fill-mode "backwards": segura o estado inicial só durante o atraso e solta o elemento no fim,
+     para não brigar com transform de hover ou de inclinação */
+  .ds-stagger > *,
+  .ds-reveal {
+    animation: ds-rise 460ms var(--ease-ui) backwards;
+  }
+  .ds-stagger > * {
+    animation-delay: calc(var(--stagger-delay, 0ms) + var(--stagger-gap, 55ms) * var(--n, 0));
+  }
+  .ds-stagger > :nth-child(2) { --n: 1; }
+  .ds-stagger > :nth-child(3) { --n: 2; }
+  .ds-stagger > :nth-child(4) { --n: 3; }
+  .ds-stagger > :nth-child(5) { --n: 4; }
+  .ds-stagger > :nth-child(6) { --n: 5; }
+  .ds-stagger > :nth-child(7) { --n: 6; }
+  .ds-stagger > :nth-child(8) { --n: 7; }
+  .ds-stagger > :nth-child(9) { --n: 8; }
+  .ds-stagger > :nth-child(10) { --n: 9; }
+  .ds-stagger > :nth-child(11) { --n: 10; }
+  .ds-stagger > :nth-child(n + 12) { --n: 11; }
+  @keyframes ds-rise {
+    from { opacity: 0; transform: translateY(14px); }
+  }
   /* números que rolam (NumberFlow): "R$" e centavos menores na variante de indicador */
   .ds-roll {
     --number-flow-char-height: 1em;

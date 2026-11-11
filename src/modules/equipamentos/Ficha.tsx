@@ -6,14 +6,18 @@ import { PageHeader } from '@/app/PageHeader'
 import { DAMAGE_STATUS, useUnitStatus } from '@/app/status'
 import { addDays, diffDays, today } from '@/domain/dates'
 import { formatDate, formatDateTime, formatNumber } from '@/lib/format'
-import { getUnit, listRentals, listServices, setUnitStatus, useMutation, useQuery, useSegment, type UnitStatus } from '@/services'
+import { getUnit, getUnitPayback, listRentals, listServices, setUnitStatus, useMutation, useQuery, useSegment, type UnitStatus } from '@/services'
+import { PaybackChart } from './components/PaybackChart'
 import { DayStrip } from './components/DayStrip'
 import { HISTORY_ICON, History, type HistoryItem } from './components/History'
 import { TypeThumb } from './components/TypeThumb'
+import { TypeArtTile } from './components/TypeArt'
 import { addChange, readChanges } from './components/statusLog'
 import { IDLE_LIMIT } from './components/UnitCard'
 import { unitUrl, useLabelPrinter } from './components/useLabelPrinter'
 
+/* Tipos com foto própria e boa; cabine PcD e pia dividiam a foto do banheiro e ficam com a ilustração */
+const HAS_PHOTO = new Set(['bq', 'trailer', 'tnd5', 'tnd10', 'ala', 'fec', 'bal'])
 const SETTABLE: UnitStatus[] = ['disponivel', 'limpeza', 'manutencao']
 const BASE_MENU_LABEL: Record<UnitStatus, string> = { disponivel: 'Disponível', em_campo: 'Em campo', limpeza: 'Em limpeza', manutencao: 'Manutenção' }
 
@@ -26,6 +30,7 @@ export default function Ficha() {
   const q = useQuery(() => getUnit(code), [code])
   const rentals = useQuery(() => listRentals({}), [])
   const services = useQuery(() => listServices({}), [])
+  const payback = useQuery(() => getUnitPayback(code), [code])
   const mut = useMutation((id: string, status: UnitStatus) => setUnitStatus(id, status))
   const printer = useLabelPrinter()
   const [logTick, setLogTick] = React.useState(0)
@@ -135,7 +140,11 @@ export default function Ficha() {
       <div className="grid grid-cols-1 gap-4 @min-[1180px]/frame:grid-cols-12">
         {/* foto e QR */}
         <Card padding="none" className="p-2 @min-[1180px]/frame:col-span-5">
-          <TypeThumb src={unit.type.photo} alt={unit.type.name} typeId={unit.type.id} tag={unit.type.short} className="aspect-[16/10] w-full rounded-[16px]" />
+          {HAS_PHOTO.has(unit.type.id) ? (
+            <TypeThumb src={unit.type.photo} alt={unit.type.name} typeId={unit.type.id} tag={unit.type.short} className="aspect-[16/10] w-full rounded-[16px]" />
+          ) : (
+            <TypeArtTile typeId={unit.type.id} prefix={unit.type.prefix} label={unit.type.name} tag={unit.type.short} className="aspect-[16/10] w-full rounded-[16px]" />
+          )}
           <div className="p-4 sm:p-5">
             <h2 className="mb-4 text-title-sub">{unit.type.name}</h2>
             <QrTile
@@ -170,24 +179,30 @@ export default function Ficha() {
           </dl>
 
           <div className="mt-6">
-            <div
-              role="img"
-              aria-label={`${daysRented} dias alugada e ${daysIdle} dias parada`}
-              className="flex h-4 gap-1"
-            >
-              <span className="rounded-pill bg-accent" style={{ flexGrow: daysRented, minWidth: daysRented ? 6 : 0 }} />
-              <span className="ds-hatch rounded-pill bg-sunken ring-1 ring-idle ring-inset" style={{ flexGrow: daysIdle, minWidth: daysIdle ? 6 : 0 }} />
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-3 text-body">
-              <span className="flex items-center gap-2">
-                <span aria-hidden className="size-2.5 rounded-pill bg-accent" />
-                <span className="tnum font-semibold">{daysRented}</span> alugada
-              </span>
-              <span className="flex items-center gap-2">
-                <span aria-hidden className="ds-hatch size-2.5 rounded-pill bg-sunken ring-1 ring-idle ring-inset" />
-                <span className="tnum font-semibold">{daysIdle}</span> parada
-              </span>
-            </div>
+            {payback.data ? (
+              <PaybackChart data={payback.data} />
+            ) : (
+              <>
+              <div
+                role="img"
+                aria-label={`${daysRented} dias alugada e ${daysIdle} dias parada`}
+                className="flex h-4 gap-1"
+              >
+                <span className="rounded-pill bg-accent" style={{ flexGrow: daysRented, minWidth: daysRented ? 6 : 0 }} />
+                <span className="ds-hatch rounded-pill bg-sunken ring-1 ring-idle ring-inset" style={{ flexGrow: daysIdle, minWidth: daysIdle ? 6 : 0 }} />
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3 text-body">
+                <span className="flex items-center gap-2">
+                  <span aria-hidden className="size-2.5 rounded-pill bg-accent" />
+                  <span className="tnum font-semibold">{daysRented}</span> alugada
+                </span>
+                <span className="flex items-center gap-2">
+                  <span aria-hidden className="ds-hatch size-2.5 rounded-pill bg-sunken ring-1 ring-idle ring-inset" />
+                  <span className="tnum font-semibold">{daysIdle}</span> parada
+                </span>
+              </div>
+              </>
+            )}
           </div>
 
           <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">

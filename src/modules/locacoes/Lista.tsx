@@ -2,11 +2,13 @@ import * as React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ClipboardList, KanbanSquare, List, Plus, Search } from 'lucide-react'
 import { PageHeader } from '@/app/PageHeader'
+import { cn } from '@/ui'
 import { RENTAL_FLOW, RENTAL_STATUS } from '@/app/status'
-import { Banner, Button, Card, EmptyState, Input, Money, Segmented, Select, Skeleton, StatusDot, Table, type TableColumn } from '@/ui'
-import { listRentals, listTypes, useQuery, type RentalListItem, type RentalStatus } from '@/services'
+import { Banner, Button, Card, EmptyState, Input, Money, Segmented, Select, Skeleton, StatusDot, Table, celebrate, notify, type MenuEntry, type TableColumn } from '@/ui'
+import { advanceRental, confirmRental, listRentals, listTypes, useMutation, useQuery, type RentalListItem, type RentalStatus } from '@/services'
 import { formatDate } from '@/lib/format'
-import { cleanTitle } from './util'
+import { NEXT_STAGE, cleanTitle } from './util'
+import { Cascata } from '@/modules/equipamentos/components/Cascata'
 import { FunilTrilha } from './components/FunilTrilha'
 import { CartaoLocacao } from './components/CartaoLocacao'
 
@@ -175,13 +177,65 @@ function Quadro({ rentals, all, status, types, loading, empty, onOpen, onNew }: 
     )
   }
   const stages = status && status !== 'cancelada' ? [status] : RENTAL_FLOW
+  return <QuadroColunas stages={stages} rentals={rentals} types={types} onOpen={onOpen} />
+}
+
+function QuadroColunas({ stages, rentals, types, onOpen }: { stages: RentalStatus[]; rentals: RentalListItem[]; types: Map<string, import('@/services').EquipmentType>; onOpen: (r: RentalListItem) => void }) {
+  const [drag, setDrag] = React.useState<RentalListItem | null>(null)
+  const [over, setOver] = React.useState<RentalStatus | null>(null)
+  const advance = useMutation((r: RentalListItem) => (r.status === 'orcamento' ? confirmRental(r.id) : advanceRental(r.id)))
+
+  /** Avança a locação uma etapa (arrastar ou menu). Faturada comemora. */
+  const move = async (r: RentalListItem, to: RentalStatus, origin?: { x: number; y: number } | Element | null) => {
+    if (NEXT_STAGE[r.status] !== to) {
+      notify.info('Só dá para avançar uma etapa por vez.')
+      return
+    }
+    try {
+      await advance.run(r)
+      notify.success(`${r.code} avançou: ${RENTAL_STATUS[to].label}`)
+      if (to === 'faturada') celebrate(origin)
+    } catch (e) {
+      notify.error(e instanceof Error && e.message ? e.message : 'Não foi possível mudar a etapa. Tente de novo.')
+    }
+  }
+  const menuOf = (r: RentalListItem): MenuEntry[] => {
+    const next = NEXT_STAGE[r.status]
+    return [
+      { label: 'Abrir locação', onSelect: () => onOpen(r) },
+      ...(next ? [{ label: `Avançar para ${RENTAL_STATUS[next].label.toLowerCase()}`, onSelect: () => void move(r, next, null) } as MenuEntry] : []),
+    ]
+  }
+  const root = React.useRef<HTMLDivElement>(null)
+  /** coluna sob o ponteiro, pela geometria (o cartão arrastado cobre o ponto) */
+  const stageAt = (x: number, y: number): RentalStatus | null => {
+    for (const el of root.current?.querySelectorAll<HTMLElement>('[data-stage]') ?? []) {
+      const b = el.getBoundingClientRect()
+      if (x >= b.left && x <= b.right && y >= b.top && y <= b.bottom) return el.dataset.stage as RentalStatus
+    }
+    return null
+  }
+  /** perto da borda, o quadro rola para alcançar a etapa seguinte */
+  const edgeScroll = (x: number) => {
+    const el = root.current
+    if (!el) return
+    const b = el.getBoundingClientRect()
+    if (x > b.right - 80) el.scrollLeft += 24
+    else if (x < b.left + 80) el.scrollLeft -= 24
+  }
+  const target = drag ? NEXT_STAGE[drag.status] : undefined
   return (
-    <div className="snap-x overflow-x-auto pb-2" tabIndex={-1}>
-      <div className={stages.length === 1 ? 'grid grid-cols-1' : 'grid min-w-max grid-flow-col auto-cols-[min(300px,86vw)] gap-3 sm:auto-cols-[minmax(272px,1fr)] @min-[1180px]/frame:min-w-0'}>
-        {stages.map((s) => {
+    <div ref={root} data-board className={cn('snap-x pb-2', drag ? 'overflow-x-hidden' : 'overflow-x-auto')} tabIndex={-1}>
+      <div className={stages.length === 1 ? 'grid grid-cols-1' : 'grid min-w-max grid-flow-col auto-cols-[min(300px,86vw)] gap-3 sm:auto-cols-[minmax(272px,1fr)] @min-[1000px]/frame:min-w-0 @min-[1000px]/frame:grid-flow-row @min-[1000px]/frame:auto-cols-auto @min-[1000px]/frame:grid-cols-5'}>
+        {stages.map((s, si) => {
           const list = rentals.filter((r) => r.status === s)
           return (
-            <section key={s} aria-label={RENTAL_STATUS[s].label} className="min-w-0 snap-start rounded-card bg-sunken p-2">
+            <section
+              key={s}
+              aria-label={RENTAL_STATUS[s].label}
+              data-stage={s}
+              className={cn('@container/col min-w-0 snap-start rounded-card bg-sunken p-2 transition-[box-shadow,opacity] duration-200 ease-[var(--ease-ui)]', drag && s === target && 'ring-2 ring-accent ring-inset', drag && s === target && over === s && 'bg-accent-soft', drag && s !== target && s !== drag.status && 'opacity-60')}
+            >
               <header className="flex items-center justify-between px-2 pt-1 pb-3">
                 <StatusDot tone={RENTAL_STATUS[s].tone} className="font-semibold">
                   {RENTAL_STATUS[s].label}
@@ -189,11 +243,31 @@ function Quadro({ rentals, all, status, types, loading, empty, onOpen, onNew }: 
                 <span className="tnum text-caption font-semibold text-fg-2">{list.length}</span>
               </header>
               {list.length ? (
-                <ul className={stages.length === 1 ? 'grid gap-2 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3' : 'flex flex-col gap-2'}>
+                <Cascata as="ul" delay={si * 90} className={stages.length === 1 ? 'grid gap-2 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-3' : 'flex flex-col gap-2'}>
                   {list.map((r) => (
-                    <CartaoLocacao key={r.id} rental={r} types={types} onOpen={() => onOpen(r)} />
+                    <CartaoLocacao
+                      key={r.id}
+                      rental={r}
+                      types={types}
+                      onOpen={() => onOpen(r)}
+                      menu={menuOf(r)}
+                      drag={
+                        NEXT_STAGE[r.status]
+                          ? {
+                              onStart: () => setDrag(r),
+                              onMove: (x, y) => (setOver(stageAt(x, y)), edgeScroll(x)),
+                              onEnd: (x, y, moved) => {
+                                const to = stageAt(x, y)
+                                setDrag(null)
+                                setOver(null)
+                                if (moved && to && to !== r.status) void move(r, to, { x, y })
+                              },
+                            }
+                          : undefined
+                      }
+                    />
                   ))}
-                </ul>
+                </Cascata>
               ) : (
                 <p className="rounded-card px-3 py-6 text-center text-body text-fg-3">Nenhuma locação</p>
               )}

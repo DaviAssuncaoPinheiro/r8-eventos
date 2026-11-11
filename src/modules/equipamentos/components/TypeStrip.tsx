@@ -1,4 +1,5 @@
-import { Money, Skeleton, Stagger, cn } from '@/ui'
+import { Money, Skeleton, cn } from '@/ui'
+import { Cascata } from './Cascata'
 import type { StockRow } from '@/services'
 import { TypeArtTile } from './TypeArt'
 
@@ -25,7 +26,7 @@ export function OccupancyBar({ row, className }: { row: StockRow; className?: st
 
 export function TypeStrip({ rows, loading, selected, onSelect }: { rows?: StockRow[]; loading: boolean; selected?: string; onSelect: (typeId: string | undefined) => void }) {
   return (
-    <Stagger delay={0.1} gap={0.045} aria-busy={loading || undefined} className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
+    <Cascata delay={100} gap={45} aria-busy={loading || undefined} className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
       {loading || !rows
         ? Array.from({ length: 6 }, (_, i) => (
             <div key={i} aria-hidden className="w-[236px] shrink-0 rounded-card bg-raised p-2">
@@ -66,6 +67,6 @@ export function TypeStrip({ rows, loading, selected, onSelect }: { rows?: StockR
               </button>
             )
           })}
-    </Stagger>
+    </Cascata>
   )
 }

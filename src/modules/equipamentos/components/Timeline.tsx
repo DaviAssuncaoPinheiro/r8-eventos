@@ -59,7 +59,7 @@ export function Timeline({ initialType }: { initialType?: string }) {
     return () => ro.disconnect()
   }, [])
   const narrow = viewW < 640
-  const leftW = narrow ? 76 : 252
+  const leftW = narrow ? 76 : 276
   const dayW = Math.max(narrow ? 36 : 34, Math.floor((viewW - leftW) / days))
   const gridW = dayW * days
   const dates = React.useMemo(() => eachDay(from, addDays(from, days - 1)), [from, days])
@@ -312,7 +312,7 @@ function TypeBlock(p: BlockProps) {
   const minLabelW = 64
 
   return (
-    <div className="relative z-[1] border-b border-hairline last:border-b-0">
+    <div className={cn('relative border-b border-hairline last:border-b-0', p.sel ? 'z-[8]' : 'z-[1]')}>
       {/* linha do tipo */}
       <div className="flex" style={{ height: rowH }}>
         <div className={cn('sticky left-0 z-10 flex shrink-0 items-center bg-raised', narrow ? 'justify-center' : 'gap-1 pr-2 pl-2')} style={{ width: leftW }}>

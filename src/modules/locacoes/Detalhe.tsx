@@ -6,6 +6,8 @@ import { RENTAL_STATUS, SERVICE_ICON } from '@/app/status'
 import { Badge, Banner, Button, Dialog, EmptyState, Field, Input, Menu, MoneyCard, ServiceRow, SignaturePad, Skeleton, notify, type MenuEntry } from '@/ui'
 import { ServiceError, advanceRental, cancelRental, confirmRental, generateContract, generateContractText, getRental, getSettings, signContract, useLabels, useMutation, useQuery, type RentalDetail, type Service } from '@/services'
 import { formatDate, formatTime } from '@/lib/format'
+import { TypeArtTile } from '@/modules/equipamentos/components/TypeArt'
+import { Cascata } from '@/modules/equipamentos/components/Cascata'
 import { TrilhaEtapas } from './components/TrilhaEtapas'
 import { Dossie } from './components/Dossie'
 import { ContratoPapel } from './components/ContratoPapel'
@@ -148,17 +150,17 @@ function Conteudo({ detail }: { detail: RentalDetail }) {
         ) : null}
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-4">
+      <Cascata className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 @min-[1180px]/frame:grid-cols-4">
         <MoneyCard hero title="Valor total" value={financial.total} />
         <MoneyCard title="A receber" value={financial.open} onOpen={() => navigate(`/financeiro?q=${encodeURIComponent(rental.code)}`)} formula="Cobranças abertas e atrasadas desta locação." />
         <MoneyCard title="Pago" value={financial.paid} formula="Cobranças desta locação já pagas." />
         <MoneyCard title={`${labels.damagePlural.charAt(0).toUpperCase()}${labels.damagePlural.slice(1)}`} value={damagesTotal} onOpen={detail.damages.length ? () => navigate('/avarias') : undefined} formula={`Soma das ${labels.damagePlural} registradas nesta locação.`} />
-      </div>
+      </Cascata>
 
-      <div className="mt-4 grid grid-cols-1 items-start gap-4 @min-[1180px]/frame:grid-cols-12">
+      <Cascata delay={200} className="mt-4 grid grid-cols-1 items-start gap-4 @min-[1180px]/frame:grid-cols-12">
         <ItensUnidades detail={detail} className="@min-[1180px]/frame:col-span-7" />
         <Servicos detail={detail} className="@min-[1180px]/frame:col-span-5" />
-      </div>
+      </Cascata>
 
       <div className="mt-4">
         <Dossie detail={detail} downloading={printing === 'dossie'} onDownload={() => void download('dossie')} />
@@ -236,9 +238,7 @@ function ItensUnidades({ detail, className }: { detail: RentalDetail; className?
           return (
             <li key={it.typeId} className="rounded-control bg-sunken p-3">
               <div className="flex items-center gap-3">
-                <span className="size-14 shrink-0 overflow-hidden rounded-control bg-raised">
-                  <img src={it.type.photo} alt="" loading="lazy" draggable={false} className="size-full object-cover" />
-                </span>
+                <TypeArtTile typeId={it.type.id} prefix={it.type.prefix} className="size-14 rounded-control" />
                 <p className="min-w-0 flex-1 truncate text-body font-semibold">{it.type.name}</p>
                 <span className="tnum text-kpi leading-none">{it.qty}</span>
               </div>
