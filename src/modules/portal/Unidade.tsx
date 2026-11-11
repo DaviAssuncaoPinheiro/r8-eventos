@@ -101,7 +101,7 @@ export default function Unidade() {
                           className="relative block aspect-[4/3] w-full overflow-hidden rounded-control bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         >
                           <img src={p.src} alt="" loading="lazy" draggable={false} style={{ objectPosition: CROPS[i % CROPS.length] }} className="size-full object-cover" />
-                          <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-pill bg-inverse/80 px-2.5 py-1 text-caption font-semibold text-on-inverse">{data.lastCleaning?.photos[i]?.label}</span>
+                          <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-pill bg-inverse/80 px-2.5 py-1 text-caption font-semibold text-on-inverse">{data.lastCleaning?.photos[i]?.label.split(' · ')[0]}</span>
                         </button>
                       </li>
                     ))}

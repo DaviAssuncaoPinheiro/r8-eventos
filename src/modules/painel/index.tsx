@@ -107,7 +107,7 @@ function buildMap(panel: MoneyPanel, services: ServiceView[]) {
 function fitBox(pins: MapPin[], ratio: number): [number, number, number, number] {
   const xs = [BASE.x, ...pins.map((p) => p.x)]
   const ys = [BASE.y, ...pins.map((p) => p.y)]
-  const pad = 140
+  const pad = 175
   const minX = Math.min(...xs) - pad
   const maxX = Math.max(...xs) + pad
   const minY = Math.min(...ys) - pad

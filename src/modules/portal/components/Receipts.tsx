@@ -63,7 +63,7 @@ function Receipt({ r, onPhoto }: { r: ServiceReceipt; onPhoto: (photos: PhotoIte
                     style={{ objectPosition: CROPS[i % CROPS.length] }}
                     className="size-full object-cover transition-transform duration-200 ease-[var(--ease-ui)] group-hover:scale-[1.03]"
                   />
-                  <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-pill bg-inverse/80 px-2.5 py-1 text-caption font-semibold text-on-inverse">{r.photos[i].label}</span>
+                  <span className="absolute bottom-1.5 left-1.5 max-w-[calc(100%-12px)] truncate rounded-pill bg-inverse/80 px-2.5 py-1 text-caption font-semibold text-on-inverse">{r.photos[i].label.split(' · ')[0]}</span>
                 </button>
               </li>
             ))}
@@ -164,7 +164,7 @@ export function ReceiptsSection({
 
       {months.length > 1 ? (
         <div className="-mx-4 mt-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-          <Segmented<string> className="h-11" label="Mês" value={month} onChange={onMonth} options={months.map((m) => ({ value: m, label: monthLabel(m) }))} />
+          <Segmented<string> label="Mês" value={month} onChange={onMonth} options={months.map((m) => ({ value: m, label: monthLabel(m) }))} />
         </div>
       ) : null}
 
