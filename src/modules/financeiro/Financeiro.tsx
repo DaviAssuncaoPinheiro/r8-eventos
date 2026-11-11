@@ -90,10 +90,10 @@ export default function Financeiro() {
   const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
   const visible = React.useMemo(() => {
     const t = norm(qText.trim())
-    return charges.filter((c) => (status === 'todas' || c.status === status) && (!band || inBand(c, band)) && (!t || norm(`${c.clientName} ${c.code}`).includes(t)))
+    return charges.filter((c) => (status === 'todas' || c.status === status) && (!band || inBand(c, band)) && (!t || norm(`${c.clientName} ${c.code} ${c.rentalCode ?? ''}`).includes(t)))
   }, [charges, status, band, qText])
 
-  const countBase = React.useMemo(() => charges.filter((c) => (!band || inBand(c, band)) && (!norm(qText.trim()) || norm(`${c.clientName} ${c.code}`).includes(norm(qText.trim())))), [charges, band, qText])
+  const countBase = React.useMemo(() => charges.filter((c) => (!band || inBand(c, band)) && (!norm(qText.trim()) || norm(`${c.clientName} ${c.code} ${c.rentalCode ?? ''}`).includes(norm(qText.trim())))), [charges, band, qText])
   const counts = (s: StatusParam) => (s === 'todas' ? countBase.length : countBase.filter((c) => c.status === s).length)
 
   const openCharge = (id: string) => navigate(`/financeiro/cobranca/${id}${search}`)
@@ -311,7 +311,7 @@ export default function Financeiro() {
           <div className="w-full sm:w-[300px]">
             <Input
               type="search"
-              aria-label="Buscar cliente ou código"
+              aria-label="Buscar cliente, cobrança ou locação"
               placeholder="Buscar cliente"
               prefix={<Search size={16} strokeWidth={2} aria-hidden />}
               value={qText}

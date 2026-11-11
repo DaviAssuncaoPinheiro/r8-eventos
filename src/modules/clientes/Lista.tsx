@@ -154,7 +154,7 @@ export default function Lista() {
             <Card as="section" className="min-w-0 sm:p-6 @min-[1000px]/frame:col-span-8">
               <h2 className="mb-3 text-title-sub">Maiores clientes por receita</h2>
               {top5.length ? (
-                <HBars label="Cinco maiores clientes por receita" rows={top5.map((c) => ({ key: c.id, label: c.name, value: c.totalPaid, valueLabel: formatMoney(c.totalPaid), href: `/clientes/${c.id}` }))} />
+                <HBars labelWidth={230} label="Cinco maiores clientes por receita" rows={top5.map((c) => ({ key: c.id, label: c.name, value: c.totalPaid, valueLabel: formatMoney(c.totalPaid), href: `/clientes/${c.id}` }))} />
               ) : (
                 <EmptyState icon={Users} title="Os maiores clientes aparecem aqui">
                   Cadastre um cliente e emita a primeira cobrança.
